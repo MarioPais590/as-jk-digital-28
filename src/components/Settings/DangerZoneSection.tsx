@@ -4,13 +4,14 @@ import { Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { storageUtils } from '@/utils/localStorage';
 
 export const DangerZoneSection: React.FC = () => {
   const { toast } = useToast();
 
   const handleClearData = () => {
     if (confirm('Tem certeza que deseja apagar todos os dados? Esta ação não pode ser desfeita.')) {
-      localStorage.removeItem('financas-jk-data');
+      storageUtils.clearAllData();
       toast({
         title: "Dados apagados",
         description: "Todos os dados foram removidos. Recarregue a página para ver as mudanças.",

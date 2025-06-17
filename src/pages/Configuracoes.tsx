@@ -8,12 +8,14 @@ import { SystemPreferencesSection } from '@/components/Settings/SystemPreference
 import { DataManagementSection } from '@/components/Settings/DataManagementSection';
 import { DangerZoneSection } from '@/components/Settings/DangerZoneSection';
 import { AppInfoSection } from '@/components/Settings/AppInfoSection';
+import { UserConfig } from '@/types/user';
+import { validateUserProfile } from '@/utils/validators';
 
 export const Configuracoes: React.FC = () => {
   const { updateProfile } = useAuth();
   const { toast } = useToast();
   
-  const [userConfig, setUserConfig] = useState({
+  const [userConfig, setUserConfig] = useState<UserConfig>({
     nome: '',
     email: '',
     moeda: 'BRL',
@@ -22,26 +24,19 @@ export const Configuracoes: React.FC = () => {
   });
 
   const handleSaveConfig = () => {
-    // Validações básicas antes de tentar salvar
-    if (!userConfig.nome.trim()) {
+    // Validar dados antes de tentar salvar
+    const validation = validateUserProfile(userConfig.nome, userConfig.email);
+    
+    if (!validation.isValid) {
       toast({
         title: "Campo obrigatório",
-        description: "O nome não pode estar vazio.",
+        description: validation.message,
         variant: "destructive",
       });
       return;
     }
 
-    if (!userConfig.email.trim()) {
-      toast({
-        title: "Campo obrigatório", 
-        description: "O e-mail não pode estar vazio.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Atualizar perfil do usuário usando o contexto de autenticação
+    // Atualizar perfil do usuário
     const result = updateProfile(userConfig.nome, userConfig.email);
     
     if (result.success) {
@@ -50,7 +45,7 @@ export const Configuracoes: React.FC = () => {
         description: result.message,
       });
       
-      // Sincronizar estado local com o usuário atualizado após um pequeno delay
+      // Sincronizar estado local após pequeno delay
       setTimeout(() => {
         const currentUser = JSON.parse(localStorage.getItem('financas-jk-user') || '{}');
         if (currentUser.id) {

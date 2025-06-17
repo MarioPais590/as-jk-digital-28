@@ -1,14 +1,13 @@
 
 import { useState, useEffect } from 'react';
+import { storageUtils } from '@/utils/localStorage';
 
 export const useTheme = () => {
-  const [isDark, setIsDark] = useState(() => {
-    const saved = localStorage.getItem('financas-jk-theme');
-    return saved ? JSON.parse(saved) : false;
-  });
+  const [isDark, setIsDark] = useState(() => storageUtils.getTheme());
 
   useEffect(() => {
-    localStorage.setItem('financas-jk-theme', JSON.stringify(isDark));
+    storageUtils.setTheme(isDark);
+    
     if (isDark) {
       document.documentElement.classList.add('dark');
     } else {

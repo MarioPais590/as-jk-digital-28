@@ -5,15 +5,11 @@ import { useTheme } from '@/hooks/useTheme';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
-
-interface UserConfig {
-  notificacoes: boolean;
-  backupAutomatico: boolean;
-}
+import { UserConfig } from '@/types/user';
 
 interface SystemPreferencesSectionProps {
   userConfig: UserConfig;
-  setUserConfig: React.Dispatch<React.SetStateAction<any>>;
+  setUserConfig: React.Dispatch<React.SetStateAction<UserConfig>>;
 }
 
 export const SystemPreferencesSection: React.FC<SystemPreferencesSectionProps> = ({
@@ -53,7 +49,7 @@ export const SystemPreferencesSection: React.FC<SystemPreferencesSectionProps> =
           </div>
           <Switch 
             checked={userConfig.notificacoes}
-            onCheckedChange={(checked) => setUserConfig((prev: any) => ({...prev, notificacoes: checked}))}
+            onCheckedChange={(checked) => setUserConfig((prev) => ({...prev, notificacoes: checked}))}
           />
         </div>
         
@@ -68,7 +64,7 @@ export const SystemPreferencesSection: React.FC<SystemPreferencesSectionProps> =
           </div>
           <Switch 
             checked={userConfig.backupAutomatico}
-            onCheckedChange={(checked) => setUserConfig((prev: any) => ({...prev, backupAutomatico: checked}))}
+            onCheckedChange={(checked) => setUserConfig((prev) => ({...prev, backupAutomatico: checked}))}
           />
         </div>
       </div>

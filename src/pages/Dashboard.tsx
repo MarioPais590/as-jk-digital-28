@@ -4,6 +4,7 @@ import { FinancialCard } from '@/components/FinancialCard';
 import { MonthlyChart } from '@/components/Charts/MonthlyChart';
 import { YearlyChart } from '@/components/Charts/YearlyChart';
 import { useFinancialData } from '@/hooks/useFinancialData';
+import { CURRENCY_CONFIG, DATE_CONFIG } from '@/constants/app';
 
 export const Dashboard: React.FC = () => {
   const { getMonthlyData, getDailyBalances, getYearlyData } = useFinancialData();
@@ -16,6 +17,17 @@ export const Dashboard: React.FC = () => {
   const dailyBalances = getDailyBalances(currentYear, currentMonth);
   const yearlyData = getYearlyData(currentYear);
 
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat(CURRENCY_CONFIG.LOCALE, { 
+      style: 'currency', 
+      currency: CURRENCY_CONFIG.DEFAULT 
+    }).format(value);
+  };
+
+  const getCurrentMonthYear = () => {
+    return currentDate.toLocaleDateString(DATE_CONFIG.LOCALE, DATE_CONFIG.FORMATS.LONG_MONTH_YEAR);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -24,7 +36,7 @@ export const Dashboard: React.FC = () => {
           Dashboard
         </h1>
         <p className="text-gray-600 dark:text-gray-400 mt-1">
-          Visão geral das suas finanças em {new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
+          Visão geral das suas finanças em {getCurrentMonthYear()}
         </p>
       </div>
 
@@ -67,19 +79,19 @@ export const Dashboard: React.FC = () => {
           </div>
           <div className="text-center">
             <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-              {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(monthlyData.totalEntradas)}
+              {formatCurrency(monthlyData.totalEntradas)}
             </p>
             <p className="text-sm text-gray-600 dark:text-gray-400">Entradas</p>
           </div>
           <div className="text-center">
             <p className="text-2xl font-bold text-red-600 dark:text-red-400">
-              {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(monthlyData.totalSaidas)}
+              {formatCurrency(monthlyData.totalSaidas)}
             </p>
             <p className="text-sm text-gray-600 dark:text-gray-400">Saídas</p>
           </div>
           <div className="text-center">
             <p className={`text-2xl font-bold ${monthlyData.saldoAtual >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-              {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(monthlyData.saldoAtual)}
+              {formatCurrency(monthlyData.saldoAtual)}
             </p>
             <p className="text-sm text-gray-600 dark:text-gray-400">Saldo</p>
           </div>

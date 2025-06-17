@@ -16,6 +16,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
+import { APP_CONFIG } from '@/constants/app';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -65,15 +66,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
           <div className={cn("flex items-center gap-3", !isOpen && "lg:justify-center")}>
             <div className="w-8 h-8 flex items-center justify-center">
               <img 
-                src="/lovable-uploads/e6254b16-9322-4b60-866d-3e65af6c400b.png" 
-                alt="Finanças JK Logo" 
+                src={APP_CONFIG.LOGO_PATH}
+                alt={`${APP_CONFIG.NAME} Logo`}
                 className="w-8 h-8 object-contain"
               />
             </div>
             {isOpen && (
               <div>
-                <h1 className="font-bold text-lg text-gray-900 dark:text-white">Finanças JK</h1>
-                <p className="text-xs text-gray-500 dark:text-gray-400">por Mário Augusto</p>
+                <h1 className="font-bold text-lg text-gray-900 dark:text-white">{APP_CONFIG.NAME}</h1>
+                <p className="text-xs text-gray-500 dark:text-gray-400">por {APP_CONFIG.DEVELOPER_FULL}</p>
               </div>
             )}
           </div>

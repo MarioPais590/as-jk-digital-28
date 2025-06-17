@@ -1,8 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Transaction, FinancialSummary, MonthlyBalance, DailyBalance } from '@/types/financial';
-
-const STORAGE_KEY = 'financas-jk-data';
+import { storageUtils } from '@/utils/localStorage';
 
 export const useFinancialData = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -10,22 +9,15 @@ export const useFinancialData = () => {
 
   // Carregar dados do localStorage
   useEffect(() => {
-    const savedData = localStorage.getItem(STORAGE_KEY);
-    if (savedData) {
-      try {
-        const data = JSON.parse(savedData);
-        setTransactions(data);
-      } catch (error) {
-        console.error('Erro ao carregar dados:', error);
-      }
-    }
+    const savedTransactions = storageUtils.getTransactions();
+    setTransactions(savedTransactions);
     setLoading(false);
   }, []);
 
   // Salvar dados no localStorage
   useEffect(() => {
     if (!loading) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
+      storageUtils.setTransactions(transactions);
     }
   }, [transactions, loading]);
 

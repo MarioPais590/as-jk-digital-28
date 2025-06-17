@@ -1,16 +1,9 @@
+
 import { useState, useEffect } from 'react';
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-}
-
-interface AuthState {
-  user: User | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-}
+import { User, AuthState, AuthResponse } from '@/types/user';
+import { storageUtils } from '@/utils/localStorage';
+import { validateUserProfile } from '@/utils/validators';
+import { dispatchUserProfileUpdate } from '@/utils/events';
 
 export const useAuth = () => {
   const [authState, setAuthState] = useState<AuthState>({
@@ -20,12 +13,10 @@ export const useAuth = () => {
   });
 
   useEffect(() => {
-    // Verificar se há usuário logado no localStorage
-    const savedUser = localStorage.getItem('financas-jk-user');
+    const savedUser = storageUtils.getUser();
     if (savedUser) {
-      const user = JSON.parse(savedUser);
       setAuthState({
-        user,
+        user: savedUser,
         isAuthenticated: true,
         isLoading: false,
       });
@@ -34,64 +25,42 @@ export const useAuth = () => {
     }
   }, []);
 
-  const updateProfile = (name: string, email: string): { success: boolean; message: string } => {
+  const updateProfile = (name: string, email: string): AuthResponse => {
     try {
       // Tentar recuperar o usuário do localStorage se não estiver no estado
-      let currentUser = authState.user;
-      
-      if (!currentUser) {
-        const savedUser = localStorage.getItem('financas-jk-user');
-        if (savedUser) {
-          currentUser = JSON.parse(savedUser);
-        }
-      }
+      let currentUser = authState.user || storageUtils.getUser();
 
-      if (!currentUser || !currentUser.id) {
+      if (!currentUser?.id) {
         return { success: false, message: 'Usuário não encontrado. Faça login novamente.' };
       }
 
-      // Validar se nome e email não estão vazios
-      if (!name.trim() || !email.trim()) {
-        return { success: false, message: 'Nome e e-mail são obrigatórios.' };
+      // Validar dados de entrada
+      const validation = validateUserProfile(name, email);
+      if (!validation.isValid) {
+        return { success: false, message: validation.message };
       }
 
-      // Validar formato do email
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        return { success: false, message: 'Por favor, insira um e-mail válido.' };
-      }
+      // Atualizar dados do usuário
+      const updatedUser: User = { ...currentUser, name, email };
+      storageUtils.setUser(updatedUser);
 
-      // Atualizar dados do usuário no localStorage
-      const updatedUser = { ...currentUser, name, email };
-      localStorage.setItem('financas-jk-user', JSON.stringify(updatedUser));
-
-      // Atualizar lista de usuários também
-      const savedUsers = JSON.parse(localStorage.getItem('financas-jk-users') || '[]');
-      const userIndex = savedUsers.findIndex((u: any) => u.id === currentUser.id);
+      // Atualizar lista de usuários
+      const savedUsers = storageUtils.getUsers();
+      const userIndex = savedUsers.findIndex(u => u.id === currentUser.id);
       if (userIndex !== -1) {
         savedUsers[userIndex] = { ...savedUsers[userIndex], name, email };
-        localStorage.setItem('financas-jk-users', JSON.stringify(savedUsers));
+        storageUtils.setUsers(savedUsers);
       }
 
-      // Atualizar estado local IMEDIATAMENTE
+      // Atualizar estado local imediatamente
       setAuthState(prev => ({
         ...prev,
         user: updatedUser,
         isAuthenticated: true
       }));
 
-      // Disparar evento customizado para notificar outros componentes sobre a mudança
-      console.log('Disparando evento userProfileUpdated com:', updatedUser);
-      window.dispatchEvent(new CustomEvent('userProfileUpdated', { 
-        detail: updatedUser 
-      }));
-
-      // Também disparar um evento de mudança no storage como fallback
-      window.dispatchEvent(new StorageEvent('storage', {
-        key: 'financas-jk-user',
-        newValue: JSON.stringify(updatedUser),
-        storageArea: localStorage
-      }));
+      // Disparar eventos de atualização
+      dispatchUserProfileUpdate(updatedUser);
 
       return { success: true, message: 'Perfil atualizado com sucesso!' };
     } catch (error) {
@@ -100,15 +69,14 @@ export const useAuth = () => {
     }
   };
 
-  const login = async (email: string, password: string): Promise<{ success: boolean; message: string }> => {
+  const login = async (email: string, password: string): Promise<AuthResponse> => {
     try {
-      // Simular validação (em produção, isso seria uma chamada para API)
-      const savedUsers = JSON.parse(localStorage.getItem('financas-jk-users') || '[]');
+      const savedUsers = storageUtils.getUsers();
       const user = savedUsers.find((u: any) => u.email === email && u.password === password);
       
       if (user) {
-        const userData = { id: user.id, name: user.name, email: user.email };
-        localStorage.setItem('financas-jk-user', JSON.stringify(userData));
+        const userData: User = { id: user.id, name: user.name, email: user.email };
+        storageUtils.setUser(userData);
         setAuthState({
           user: userData,
           isAuthenticated: true,
@@ -123,9 +91,9 @@ export const useAuth = () => {
     }
   };
 
-  const register = async (name: string, email: string, password: string): Promise<{ success: boolean; message: string }> => {
+  const register = async (name: string, email: string, password: string): Promise<AuthResponse> => {
     try {
-      const savedUsers = JSON.parse(localStorage.getItem('financas-jk-users') || '[]');
+      const savedUsers = storageUtils.getUsers();
       
       // Verificar se e-mail já existe
       if (savedUsers.some((u: any) => u.email === email)) {
@@ -141,11 +109,11 @@ export const useAuth = () => {
       };
 
       savedUsers.push(newUser);
-      localStorage.setItem('financas-jk-users', JSON.stringify(savedUsers));
+      storageUtils.setUsers(savedUsers);
 
       // Fazer login automático
-      const userData = { id: newUser.id, name: newUser.name, email: newUser.email };
-      localStorage.setItem('financas-jk-user', JSON.stringify(userData));
+      const userData: User = { id: newUser.id, name: newUser.name, email: newUser.email };
+      storageUtils.setUser(userData);
       setAuthState({
         user: userData,
         isAuthenticated: true,
@@ -159,7 +127,7 @@ export const useAuth = () => {
   };
 
   const logout = () => {
-    localStorage.removeItem('financas-jk-user');
+    storageUtils.removeUser();
     setAuthState({
       user: null,
       isAuthenticated: false,

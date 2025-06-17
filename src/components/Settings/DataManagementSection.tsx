@@ -5,14 +5,15 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { storageUtils } from '@/utils/localStorage';
 
 export const DataManagementSection: React.FC = () => {
   const { toast } = useToast();
 
   const handleExportData = () => {
-    const data = localStorage.getItem('financas-jk-data');
-    if (data) {
-      const blob = new Blob([data], { type: 'application/json' });
+    const transactions = storageUtils.getTransactions();
+    if (transactions.length > 0) {
+      const blob = new Blob([JSON.stringify(transactions, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -24,6 +25,12 @@ export const DataManagementSection: React.FC = () => {
         title: "Dados exportados",
         description: "Seus dados foram exportados com sucesso.",
       });
+    } else {
+      toast({
+        title: "Nenhum dado encontrado",
+        description: "Não há transações para exportar.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -34,12 +41,18 @@ export const DataManagementSection: React.FC = () => {
       reader.onload = (event) => {
         try {
           const data = event.target?.result as string;
-          JSON.parse(data); // Validar se é um JSON válido
-          localStorage.setItem('financas-jk-data', data);
-          toast({
-            title: "Dados importados",
-            description: "Seus dados foram importados com sucesso. Recarregue a página para ver as mudanças.",
-          });
+          const parsedData = JSON.parse(data);
+          
+          // Validar se é um array de transações
+          if (Array.isArray(parsedData)) {
+            storageUtils.setTransactions(parsedData);
+            toast({
+              title: "Dados importados",
+              description: "Seus dados foram importados com sucesso. Recarregue a página para ver as mudanças.",
+            });
+          } else {
+            throw new Error('Formato inválido');
+          }
         } catch {
           toast({
             title: "Erro na importação",

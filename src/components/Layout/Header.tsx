@@ -4,6 +4,8 @@ import { Menu, Sun, Moon } from 'lucide-react';
 import { useTheme } from '@/hooks/useTheme';
 import { useAuth } from '@/hooks/useAuth';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { storageUtils } from '@/utils/localStorage';
+import { USER_EVENTS } from '@/utils/events';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -25,25 +27,14 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, sidebarOpen }) => {
 
   // Recuperar avatar do localStorage e escutar mudanças
   useEffect(() => {
-    const updateAvatar = () => {
-      setSavedAvatar(localStorage.getItem('financas-jk-user-avatar'));
-    };
-
     const updateUserData = () => {
       // Atualizar avatar
-      updateAvatar();
+      setSavedAvatar(storageUtils.getUserAvatar());
       
-      // Atualizar nome do usuário diretamente do localStorage
-      const savedUser = localStorage.getItem('financas-jk-user');
-      if (savedUser) {
-        try {
-          const userData = JSON.parse(savedUser);
-          if (userData.name) {
-            setCurrentUserName(userData.name);
-          }
-        } catch (error) {
-          console.error('Erro ao parsear dados do usuário:', error);
-        }
+      // Atualizar nome do usuário
+      const savedUser = storageUtils.getUser();
+      if (savedUser?.name) {
+        setCurrentUserName(savedUser.name);
       }
     };
 
@@ -56,18 +47,16 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, sidebarOpen }) => {
       updateUserData();
     };
 
-    window.addEventListener('userProfileUpdated', handleProfileUpdate);
-    
-    // Também escutar mudanças no localStorage (fallback)
+    window.addEventListener(USER_EVENTS.PROFILE_UPDATED, handleProfileUpdate);
     window.addEventListener('storage', updateUserData);
     
     return () => {
-      window.removeEventListener('userProfileUpdated', handleProfileUpdate);
+      window.removeEventListener(USER_EVENTS.PROFILE_UPDATED, handleProfileUpdate);
       window.removeEventListener('storage', updateUserData);
     };
   }, []);
 
-  // Garantir que o nome seja exibido corretamente, priorizando o estado local atualizado
+  // Garantir que o nome seja exibido corretamente
   const displayName = currentUserName || user?.name || 'Usuário';
 
   return (
