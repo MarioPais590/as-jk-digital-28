@@ -1,0 +1,66 @@
+
+{
+  "name": "Finanças JK",
+  "short_name": "FinançasJK",
+  "lang": "pt-BR",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#16A34A",
+  "background_color": "#E8C006",
+  "description": "Aplicativo de gestão financeira pessoal desenvolvido por Mário Augusto",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/lovable-uploads/e6254b16-9322-4b60-866d-3e65af6c400b.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/lovable-uploads/e6254b16-9322-4b60-866d-3e65af6c400b.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["finance", "productivity", "business"],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "Acessar painel principal",
+      "url": "/",
+      "icons": [
+        {
+          "src": "/lovable-uploads/e6254b16-9322-4b60-866d-3e65af6c400b.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Entradas",
+      "short_name": "Entradas",
+      "description": "Registrar entrada financeira",
+      "url": "/entradas",
+      "icons": [
+        {
+          "src": "/lovable-uploads/e6254b16-9322-4b60-866d-3e65af6c400b.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Saídas",
+      "short_name": "Saídas",
+      "description": "Registrar saída financeira",
+      "url": "/saidas",
+      "icons": [
+        {
+          "src": "/lovable-uploads/e6254b16-9322-4b60-866d-3e65af6c400b.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}

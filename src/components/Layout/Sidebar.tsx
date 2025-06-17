@@ -61,8 +61,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800">
           <div className={cn("flex items-center gap-3", !isOpen && "lg:justify-center")}>
-            <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">JK</span>
+            <div className="w-8 h-8 flex items-center justify-center">
+              <img 
+                src="/lovable-uploads/e6254b16-9322-4b60-866d-3e65af6c400b.png" 
+                alt="Finanças JK Logo" 
+                className="w-8 h-8 object-contain"
+              />
             </div>
             {isOpen && (
               <div>

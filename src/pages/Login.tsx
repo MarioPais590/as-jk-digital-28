@@ -85,8 +85,12 @@ export const Login: React.FC = () => {
         <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-800 p-8">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-green-600 rounded-lg flex items-center justify-center mx-auto mb-4">
-              <span className="text-white font-bold text-xl">JK</span>
+            <div className="w-16 h-16 flex items-center justify-center mx-auto mb-4">
+              <img 
+                src="/lovable-uploads/e6254b16-9322-4b60-866d-3e65af6c400b.png" 
+                alt="Finanças JK Logo" 
+                className="w-16 h-16 object-contain"
+              />
             </div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
               Finanças JK

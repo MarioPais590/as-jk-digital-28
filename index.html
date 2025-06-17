@@ -8,18 +8,136 @@
     <meta name="description" content="Aplicativo de gestão financeira pessoal desenvolvido por Mário Augusto" />
     <meta name="author" content="Mário Augusto" />
 
+    <!-- PWA Configuration -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#16A34A" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Finanças JK" />
+    <link rel="apple-touch-icon" href="/lovable-uploads/e6254b16-9322-4b60-866d-3e65af6c400b.png" />
+    
+    <!-- Favicon -->
+    <link rel="icon" href="/lovable-uploads/e6254b16-9322-4b60-866d-3e65af6c400b.png" type="image/png" />
+
+    <!-- Meta tags para PWA -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="Finanças JK" />
+    <meta name="msapplication-TileColor" content="#E8C006" />
+    <meta name="msapplication-TileImage" content="/lovable-uploads/e6254b16-9322-4b60-866d-3e65af6c400b.png" />
+
+    <!-- Open Graph -->
     <meta property="og:title" content="Finanças JK - Gestão Financeira Pessoal" />
     <meta property="og:description" content="Controle suas finanças de forma simples e eficiente" />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <meta property="og:image" content="/lovable-uploads/e6254b16-9322-4b60-866d-3e65af6c400b.png" />
 
+    <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@lovable_dev" />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <meta name="twitter:image" content="/lovable-uploads/e6254b16-9322-4b60-866d-3e65af6c400b.png" />
   </head>
 
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- PWA Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('SW registrado com sucesso: ', registration);
+            })
+            .catch((registrationError) => {
+              console.log('SW falha no registro: ', registrationError);
+            });
+        });
+      }
+
+      // PWA Install Prompt
+      let deferredPrompt;
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        
+        // Mostrar banner personalizado de instalação após alguns segundos
+        setTimeout(() => {
+          if (deferredPrompt && !window.matchMedia('(display-mode: standalone)').matches) {
+            const installBanner = document.createElement('div');
+            installBanner.style.cssText = `
+              position: fixed;
+              top: 20px;
+              left: 50%;
+              transform: translateX(-50%);
+              background: #16A34A;
+              color: white;
+              padding: 12px 20px;
+              border-radius: 8px;
+              z-index: 1000;
+              box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+              font-size: 14px;
+              text-align: center;
+              max-width: 90%;
+              animation: slideDown 0.3s ease;
+            `;
+            
+            installBanner.innerHTML = `
+              <div style="margin-bottom: 8px;">📱 Instale o Finanças JK</div>
+              <div style="display: flex; gap: 10px; justify-content: center;">
+                <button onclick="installApp()" style="background: white; color: #16A34A; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: 500;">Instalar</button>
+                <button onclick="dismissInstall()" style="background: transparent; color: white; border: 1px solid white; padding: 6px 12px; border-radius: 4px; cursor: pointer;">Depois</button>
+              </div>
+            `;
+            
+            document.body.appendChild(installBanner);
+            
+            // Auto-dismiss after 10 seconds
+            setTimeout(() => {
+              if (document.body.contains(installBanner)) {
+                installBanner.remove();
+              }
+            }, 10000);
+          }
+        }, 3000);
+      });
+
+      window.installApp = () => {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+              console.log('Usuário aceitou a instalação');
+            }
+            deferredPrompt = null;
+          });
+        }
+        dismissInstall();
+      };
+
+      window.dismissInstall = () => {
+        const banner = document.querySelector('div[style*="position: fixed"]');
+        if (banner) {
+          banner.remove();
+        }
+      };
+
+      // Add CSS animation
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes slideDown {
+          from {
+            transform: translateX(-50%) translateY(-100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+          }
+        }
+      `;
+      document.head.appendChild(style);
+    </script>
   </body>
 </html>
