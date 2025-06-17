@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { User, Upload } from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/components/Auth/AuthProvider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -32,17 +32,6 @@ export const UserProfileSection: React.FC<UserProfileSectionProps> = ({
   const [avatarPreview, setAvatarPreview] = useState<string | null>(
     localStorage.getItem('financas-jk-user-avatar')
   );
-
-  // Sincronizar dados do usuário com o estado local quando o usuário for carregado
-  useEffect(() => {
-    if (user) {
-      setUserConfig(prev => ({
-        ...prev,
-        nome: user.name,
-        email: user.email
-      }));
-    }
-  }, [user, setUserConfig]);
 
   const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -113,7 +102,7 @@ export const UserProfileSection: React.FC<UserProfileSectionProps> = ({
               <AvatarImage src={avatarPreview} alt="Preview do avatar" />
             )}
             <AvatarFallback className="text-2xl bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400">
-              {userConfig.nome.charAt(0).toUpperCase()}
+              {userConfig.nome.charAt(0).toUpperCase() || 'U'}
             </AvatarFallback>
           </Avatar>
           

@@ -94,10 +94,15 @@ export const useSupabaseAuth = () => {
       // Update profile in profiles table
       const { error: profileError } = await supabase
         .from('profiles')
-        .update({ nome, email })
+        .upsert({ 
+          id: user.id, 
+          nome, 
+          email 
+        })
         .eq('id', user.id);
 
       if (profileError) {
+        console.error('Erro ao atualizar perfil:', profileError);
         return { success: false, message: profileError.message };
       }
 

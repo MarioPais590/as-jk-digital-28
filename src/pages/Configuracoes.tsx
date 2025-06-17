@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { useAuth } from '@/hooks/useAuth';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '@/components/Auth/AuthProvider';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { UserProfileSection } from '@/components/Settings/UserProfileSection';
@@ -10,9 +10,10 @@ import { DangerZoneSection } from '@/components/Settings/DangerZoneSection';
 import { AppInfoSection } from '@/components/Settings/AppInfoSection';
 import { UserConfig } from '@/types/user';
 import { validateUserProfile } from '@/utils/validators';
+import { supabase } from '@/integrations/supabase/client';
 
 export const Configuracoes: React.FC = () => {
-  const { updateProfile } = useAuth();
+  const { updateProfile, user } = useAuth();
   const { toast } = useToast();
   
   const [userConfig, setUserConfig] = useState<UserConfig>({
@@ -23,7 +24,57 @@ export const Configuracoes: React.FC = () => {
     backupAutomatico: true,
   });
 
-  const handleSaveConfig = () => {
+  // Load user profile data from Supabase
+  useEffect(() => {
+    const loadUserProfile = async () => {
+      if (!user) return;
+
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('nome, email')
+          .eq('id', user.id)
+          .single();
+
+        if (error) {
+          console.error('Erro ao carregar perfil:', error);
+          // Use user data from auth if profile doesn't exist
+          setUserConfig(prev => ({
+            ...prev,
+            nome: user.user_metadata?.nome || user.email?.split('@')[0] || '',
+            email: user.email || ''
+          }));
+        } else if (data) {
+          setUserConfig(prev => ({
+            ...prev,
+            nome: data.nome || '',
+            email: data.email || user.email || ''
+          }));
+        }
+      } catch (error) {
+        console.error('Erro ao carregar perfil:', error);
+        // Fallback to user auth data
+        setUserConfig(prev => ({
+          ...prev,
+          nome: user.user_metadata?.nome || user.email?.split('@')[0] || '',
+          email: user.email || ''
+        }));
+      }
+    };
+
+    loadUserProfile();
+  }, [user]);
+
+  const handleSaveConfig = async () => {
+    if (!user) {
+      toast({
+        title: "Erro de autenticação",
+        description: "Usuário não encontrado. Faça login novamente.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     // Validar dados antes de tentar salvar
     const validation = validateUserProfile(userConfig.nome, userConfig.email);
     
@@ -36,30 +87,27 @@ export const Configuracoes: React.FC = () => {
       return;
     }
 
-    // Atualizar perfil do usuário
-    const result = updateProfile(userConfig.nome, userConfig.email);
-    
-    if (result.success) {
-      toast({
-        title: "Configurações salvas",
-        description: result.message,
-      });
+    try {
+      // Atualizar perfil do usuário
+      const result = await updateProfile(userConfig.nome, userConfig.email);
       
-      // Sincronizar estado local após pequeno delay
-      setTimeout(() => {
-        const currentUser = JSON.parse(localStorage.getItem('financas-jk-user') || '{}');
-        if (currentUser.id) {
-          setUserConfig(prev => ({
-            ...prev,
-            nome: currentUser.name || '',
-            email: currentUser.email || ''
-          }));
-        }
-      }, 100);
-    } else {
+      if (result.success) {
+        toast({
+          title: "Configurações salvas",
+          description: result.message,
+        });
+      } else {
+        toast({
+          title: "Erro ao salvar",
+          description: result.message,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Erro ao salvar configurações:', error);
       toast({
-        title: "Erro ao salvar",
-        description: result.message,
+        title: "Erro interno",
+        description: "Erro ao salvar configurações. Tente novamente.",
         variant: "destructive",
       });
     }

@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/components/Auth/AuthProvider';
 import { useTheme } from '@/hooks/useTheme';
 import { Sun, Moon } from 'lucide-react';
 import { toast } from 'sonner';
@@ -19,7 +19,7 @@ export const Cadastro: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   
-  const { register } = useAuth();
+  const { signUp } = useAuth();
   const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
@@ -64,7 +64,7 @@ export const Cadastro: React.FC = () => {
     setIsLoading(true);
     
     try {
-      const result = await register(formData.name, formData.email, formData.password);
+      const result = await signUp(formData.name, formData.email, formData.password);
       
       if (result.success) {
         toast.success(result.message);

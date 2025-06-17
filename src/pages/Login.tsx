@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/components/Auth/AuthProvider';
 import { useTheme } from '@/hooks/useTheme';
 import { Sun, Moon } from 'lucide-react';
 import { toast } from 'sonner';
@@ -17,7 +17,7 @@ export const Login: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   
-  const { login } = useAuth();
+  const { signIn } = useAuth();
   const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
@@ -48,7 +48,7 @@ export const Login: React.FC = () => {
     setIsLoading(true);
     
     try {
-      const result = await login(formData.email, formData.password);
+      const result = await signIn(formData.email, formData.password);
       
       if (result.success) {
         toast.success(result.message);
