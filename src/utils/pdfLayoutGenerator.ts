@@ -14,73 +14,110 @@ export const addHeaderToPDF = async (doc: jsPDF) => {
       logoImg.src = logoUrl;
     });
 
+    // Logo positioned similar to your example
     doc.addImage(
       logoImg, 
       'PNG', 
-      PDF_CONFIG.layout.logoPosition.x, 
-      PDF_CONFIG.layout.logoPosition.y, 
-      PDF_CONFIG.layout.logoSize.width, 
-      PDF_CONFIG.layout.logoSize.height
+      20, 
+      15, 
+      40, 
+      40
     );
   } catch (error) {
     console.warn('Failed to load logo for PDF');
   }
 
-  // Title
-  doc.setFontSize(PDF_CONFIG.fonts.title);
+  // Main title - positioned next to logo
+  doc.setFontSize(20);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(0, 0, 0);
-  doc.text('Finanças JK - Resumo Financeiro', 105, PDF_CONFIG.layout.titleY, { align: 'center' });
+  doc.text('Finanças JK', 70, 30);
   
   // Subtitle with generation date
-  doc.setFontSize(PDF_CONFIG.fonts.subtitle);
+  doc.setFontSize(14);
   doc.setFont('helvetica', 'normal');
-  doc.setTextColor(...PDF_CONFIG.colors.gray);
+  doc.setTextColor(100, 100, 100);
   const currentDate = new Date().toLocaleDateString('pt-BR', {
     year: 'numeric',
     month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
+    day: 'numeric'
   });
-  doc.text(`Gerado em: ${currentDate}`, 105, PDF_CONFIG.layout.subtitleY, { align: 'center' });
+  doc.text(`Relatório gerado em ${currentDate}`, 70, 42);
+
+  // Section title
+  doc.setFontSize(16);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(0, 0, 0);
+  doc.text('Resumo Financeiro', 20, 70);
 };
 
-export const addTotalsToPDF = (
+export const addFinancialSummarySection = (
   doc: jsPDF,
   startY: number,
   totalEntradas: number,
   totalSaidas: number,
-  saldoFinal: number
+  saldoFinal: number,
+  transactionsCount: number
 ) => {
-  const totalY = startY + 20;
+  const summaryData = [
+    ['Total de Entradas', `R$ ${totalEntradas.toFixed(2).replace('.', ',')}`],
+    ['Total de Saídas', `R$ ${totalSaidas.toFixed(2).replace('.', ',')}`],
+    ['Saldo Final', `R$ ${saldoFinal.toFixed(2).replace('.', ',')}`],
+    ['Total de Transações', transactionsCount.toString()]
+  ];
 
-  // Totals section title
-  doc.setFontSize(14);
+  doc.autoTable({
+    startY,
+    head: [['Descrição', 'Valor']],
+    body: summaryData,
+    styles: { 
+      fontSize: 11,
+      textColor: [60, 60, 60],
+      cellPadding: 8
+    },
+    headStyles: { 
+      fillColor: [41, 128, 185],
+      textColor: [255, 255, 255],
+      fontSize: 12,
+      fontStyle: 'bold',
+      halign: 'center'
+    },
+    columnStyles: {
+      0: { halign: 'left', cellWidth: 100 },
+      1: { halign: 'right', cellWidth: 80, fontStyle: 'bold' }
+    },
+    margin: { left: 20, right: 20 },
+    didParseCell: function(data) {
+      if (data.column.index === 1 && data.cell.section === 'body') {
+        if (data.row.index === 0) { // Entradas
+          data.cell.styles.textColor = [22, 163, 74]; // Green
+        } else if (data.row.index === 1) { // Saídas
+          data.cell.styles.textColor = [220, 38, 38]; // Red
+        } else if (data.row.index === 2) { // Saldo Final
+          const color = saldoFinal >= 0 ? [22, 163, 74] : [220, 38, 38];
+          data.cell.styles.textColor = color;
+        }
+      }
+    }
+  });
+
+  return doc.lastAutoTable.finalY + 20;
+};
+
+export const addTransactionsTitle = (doc: jsPDF, startY: number) => {
+  doc.setFontSize(16);
   doc.setFont('helvetica', 'bold');
-  doc.setTextColor(60, 60, 60);
-  doc.text('Resumo dos Totais', 14, totalY);
-
-  // Total entries
-  doc.setFontSize(PDF_CONFIG.fonts.normal);
-  doc.setTextColor(...PDF_CONFIG.colors.green);
-  doc.text(`Total de Entradas: R$ ${totalEntradas.toFixed(2).replace('.', ',')}`, 14, totalY + 15);
-
-  // Total exits
-  doc.setTextColor(...PDF_CONFIG.colors.yellow);
-  doc.text(`Total de Saídas: R$ ${totalSaidas.toFixed(2).replace('.', ',')}`, 14, totalY + 25);
-
-  // Final balance
-  const saldoColor = saldoFinal >= 0 ? PDF_CONFIG.colors.green : PDF_CONFIG.colors.red;
-  doc.setTextColor(...saldoColor);
-  doc.setFontSize(14);
-  doc.setFont('helvetica', 'bold');
-  doc.text(`Saldo Final: R$ ${saldoFinal.toFixed(2).replace('.', ',')}`, 14, totalY + 35);
+  doc.setTextColor(0, 0, 0);
+  doc.text('Detalhamento das Transações', 20, startY);
+  
+  return startY + 15;
 };
 
 export const addFooterToPDF = (doc: jsPDF) => {
   const pageHeight = doc.internal.pageSize.height;
-  doc.setFontSize(PDF_CONFIG.fonts.tiny);
+  const pageWidth = doc.internal.pageSize.width;
+  
+  doc.setFontSize(10);
   doc.setTextColor(120, 120, 120);
-  doc.text('Finanças JK - Sistema de Controle Financeiro', 105, pageHeight - 15, { align: 'center' });
+  doc.text(`Página 1 de 1 - Finanças JK`, pageWidth / 2, pageHeight - 15, { align: 'center' });
 };

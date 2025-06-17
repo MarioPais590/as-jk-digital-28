@@ -3,10 +3,9 @@ import { useState } from 'react';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import { Transaction } from '@/types/financial';
-import { addHeaderToPDF, addTotalsToPDF, addFooterToPDF } from '@/utils/pdfLayoutGenerator';
+import { addHeaderToPDF, addFinancialSummarySection, addTransactionsTitle, addFooterToPDF } from '@/utils/pdfLayoutGenerator';
 import { generateTransactionTable } from '@/utils/pdfTableGenerator';
 import { generateFallbackPDF } from '@/utils/pdfFallback';
-import { PDF_CONFIG } from '@/utils/pdfConfig';
 
 declare module 'jspdf' {
   interface jsPDF {
@@ -32,11 +31,21 @@ export const usePDFGenerator = () => {
       // Add header with logo and title
       await addHeaderToPDF(doc);
 
-      // Generate transaction table
-      const tableEndY = generateTransactionTable(doc, transactions, PDF_CONFIG.layout.tableStartY);
+      // Add financial summary section
+      const summaryEndY = addFinancialSummarySection(
+        doc, 
+        85, 
+        totalEntradas, 
+        totalSaidas, 
+        saldoFinal, 
+        transactions.length
+      );
 
-      // Add totals section
-      addTotalsToPDF(doc, tableEndY, totalEntradas, totalSaidas, saldoFinal);
+      // Add transactions section title
+      const transactionsTitleY = addTransactionsTitle(doc, summaryEndY);
+
+      // Generate transaction table
+      const tableEndY = generateTransactionTable(doc, transactions, transactionsTitleY);
 
       // Add footer
       addFooterToPDF(doc);

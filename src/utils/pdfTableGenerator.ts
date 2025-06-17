@@ -8,57 +8,77 @@ export const generateTransactionTable = (
   transactions: Transaction[],
   startY: number
 ) => {
-  const tableData = transactions.map(transaction => [
-    transaction.type === 'entrada' ? 'Entrada' : 'Saída',
-    `R$ ${transaction.amount.toFixed(2).replace('.', ',')}`,
+  if (transactions.length === 0) {
+    doc.setFontSize(12);
+    doc.setTextColor(100, 100, 100);
+    doc.text('Nenhuma transação encontrada', 20, startY);
+    return startY + 20;
+  }
+
+  // Sort transactions by date (most recent first)
+  const sortedTransactions = [...transactions].sort((a, b) => 
+    new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+
+  const tableData = sortedTransactions.map(transaction => [
     new Date(transaction.date).toLocaleDateString('pt-BR'),
-    `${transaction.category} - ${transaction.description}${transaction.notes ? ` (${transaction.notes})` : ''}`
+    transaction.type === 'entrada' ? 'Entrada' : 'Saída',
+    transaction.category,
+    transaction.description,
+    `R$ ${transaction.amount.toFixed(2).replace('.', ',')}`,
+    transaction.notes || '-'
   ]);
 
   doc.autoTable({
     startY,
-    head: [['Tipo', 'Valor', 'Data', 'Observação']],
+    head: [['Data', 'Tipo', 'Categoria', 'Descrição', 'Valor', 'Observações']],
     body: tableData,
     styles: { 
-      fontSize: PDF_CONFIG.fonts.small,
-      textColor: PDF_CONFIG.colors.darkGray,
-      cellPadding: 5
+      fontSize: 9,
+      textColor: [60, 60, 60],
+      cellPadding: 6
     },
     headStyles: { 
-      fillColor: PDF_CONFIG.colors.green,
+      fillColor: [41, 128, 185],
       textColor: [255, 255, 255],
-      fontSize: 11,
+      fontSize: 10,
       fontStyle: 'bold',
       halign: 'center'
     },
     columnStyles: {
-      0: { halign: 'center', cellWidth: 25 },
-      1: { halign: 'right', cellWidth: 30 },
-      2: { halign: 'center', cellWidth: 25 },
-      3: { halign: 'left', cellWidth: 'auto' }
+      0: { halign: 'center', cellWidth: 25 }, // Data
+      1: { halign: 'center', cellWidth: 20 }, // Tipo
+      2: { halign: 'left', cellWidth: 30 },   // Categoria
+      3: { halign: 'left', cellWidth: 40 },   // Descrição
+      4: { halign: 'right', cellWidth: 25 },  // Valor
+      5: { halign: 'left', cellWidth: 'auto' } // Observações
     },
     alternateRowStyles: { 
-      fillColor: PDF_CONFIG.colors.lightGray
+      fillColor: [245, 245, 245]
     },
-    margin: PDF_CONFIG.layout.margins,
+    margin: { left: 20, right: 20 },
     didParseCell: function(data) {
-      if (data.column.index === 0 && data.cell.section === 'body') {
-        if (data.cell.text[0] === 'Entrada') {
-          data.cell.styles.textColor = PDF_CONFIG.colors.green;
+      const rowIndex = data.row.index;
+      const transaction = sortedTransactions[rowIndex];
+      
+      if (data.column.index === 1 && data.cell.section === 'body') {
+        // Color code the transaction type
+        if (transaction?.type === 'entrada') {
+          data.cell.styles.textColor = [22, 163, 74]; // Green
           data.cell.styles.fontStyle = 'bold';
         } else {
-          data.cell.styles.textColor = PDF_CONFIG.colors.yellow;
+          data.cell.styles.textColor = [220, 38, 38]; // Red
           data.cell.styles.fontStyle = 'bold';
         }
       }
-      if (data.column.index === 1 && data.cell.section === 'body') {
-        const rowIndex = data.row.index;
-        const transactionType = transactions[rowIndex]?.type;
-        if (transactionType === 'entrada') {
-          data.cell.styles.textColor = PDF_CONFIG.colors.green;
+      
+      if (data.column.index === 4 && data.cell.section === 'body') {
+        // Color code the amount
+        if (transaction?.type === 'entrada') {
+          data.cell.styles.textColor = [22, 163, 74]; // Green
           data.cell.styles.fontStyle = 'bold';
         } else {
-          data.cell.styles.textColor = PDF_CONFIG.colors.yellow;
+          data.cell.styles.textColor = [220, 38, 38]; // Red
           data.cell.styles.fontStyle = 'bold';
         }
       }
