@@ -9,7 +9,174 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      monthly_reports: {
+        Row: {
+          ano: number
+          created_at: string | null
+          id: string
+          mes: number
+          saldo: number | null
+          total_entradas: number | null
+          total_saidas: number | null
+          transacoes_count: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          ano: number
+          created_at?: string | null
+          id?: string
+          mes: number
+          saldo?: number | null
+          total_entradas?: number | null
+          total_saidas?: number | null
+          transacoes_count?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          ano?: number
+          created_at?: string | null
+          id?: string
+          mes?: number
+          saldo?: number | null
+          total_entradas?: number | null
+          total_saidas?: number | null
+          transacoes_count?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "monthly_reports_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          email: string
+          id: string
+          nome: string
+          preferencia_tema: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          email: string
+          id: string
+          nome: string
+          preferencia_tema?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          email?: string
+          id?: string
+          nome?: string
+          preferencia_tema?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      transactions: {
+        Row: {
+          amount: number
+          category: string
+          created_at: string | null
+          date: string
+          description: string | null
+          id: string
+          notes: string | null
+          type: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          category: string
+          created_at?: string | null
+          date: string
+          description?: string | null
+          id?: string
+          notes?: string | null
+          type: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          category?: string
+          created_at?: string | null
+          date?: string
+          description?: string | null
+          id?: string
+          notes?: string | null
+          type?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      yearly_reports: {
+        Row: {
+          ano: number
+          created_at: string | null
+          id: string
+          saldo: number | null
+          total_entradas: number | null
+          total_saidas: number | null
+          transacoes_count: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          ano: number
+          created_at?: string | null
+          id?: string
+          saldo?: number | null
+          total_entradas?: number | null
+          total_saidas?: number | null
+          transacoes_count?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          ano?: number
+          created_at?: string | null
+          id?: string
+          saldo?: number | null
+          total_entradas?: number | null
+          total_saidas?: number | null
+          transacoes_count?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "yearly_reports_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
