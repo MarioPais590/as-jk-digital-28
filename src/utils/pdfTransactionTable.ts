@@ -2,7 +2,6 @@
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { Transaction } from '@/types/financial';
-import { PDF_CONFIG } from './pdfConfig';
 
 // Extend jsPDF interface to include autoTable
 interface jsPDFWithPlugin extends jsPDF {
@@ -66,7 +65,7 @@ export const generateTransactionTable = (
       fillColor: [245, 245, 245]
     },
     margin: { left: 20, right: 20 },
-    didParseCell: function(data) {
+    didParseCell: function(data: any) {
       const rowIndex = data.row.index;
       const transaction = sortedTransactions[rowIndex];
       

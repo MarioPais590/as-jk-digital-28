@@ -1,6 +1,8 @@
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { PDF_CONFIG } from './pdfConfig';
+import { generateTransactionTable } from './pdfTransactionTable';
+import { Transaction } from '@/types/financial';
 
 // Extend jsPDF interface to include autoTable
 interface jsPDFWithPlugin extends jsPDF {
@@ -129,3 +131,6 @@ export const addFooterToPDF = (doc: jsPDFWithPlugin) => {
   doc.setTextColor(120, 120, 120);
   doc.text(`Página 1 de 1 - Finanças JK`, pageWidth / 2, pageHeight - 15, { align: 'center' });
 };
+
+// Re-export the transaction table generator for convenience
+export { generateTransactionTable };
