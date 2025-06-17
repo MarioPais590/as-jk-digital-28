@@ -26,7 +26,7 @@ export const Saidas: React.FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
   const [formData, setFormData] = useState({
     amount: '',
@@ -41,7 +41,7 @@ export const Saidas: React.FC = () => {
   const filteredSaidas = saidas.filter(saida => {
     const matchesSearch = saida.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          saida.category.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = !selectedCategory || saida.category === selectedCategory;
+    const matchesCategory = selectedCategory === 'all' || saida.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
@@ -209,7 +209,7 @@ export const Saidas: React.FC = () => {
               <SelectValue placeholder="Todas as categorias" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Todas as categorias</SelectItem>
+              <SelectItem value="all">Todas as categorias</SelectItem>
               {categorias.map(categoria => (
                 <SelectItem key={categoria} value={categoria}>
                   {categoria}
