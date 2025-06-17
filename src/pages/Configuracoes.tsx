@@ -1,31 +1,89 @@
-
 import React, { useState } from 'react';
-import { User, Shield, Bell, Database, Trash2 } from 'lucide-react';
+import { User, Shield, Bell, Database, Trash2, Upload } from 'lucide-react';
 import { useTheme } from '@/hooks/useTheme';
+import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
 
 export const Configuracoes: React.FC = () => {
   const { isDark, toggleTheme } = useTheme();
+  const { user } = useAuth();
   const { toast } = useToast();
   
   const [userConfig, setUserConfig] = useState({
-    nome: 'Usuário',
-    email: 'usuario@email.com',
+    nome: user?.name || 'Usuário',
+    email: user?.email || 'usuario@email.com',
     moeda: 'BRL',
     notificacoes: true,
     backupAutomatico: true,
   });
 
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(
+    localStorage.getItem('financas-jk-user-avatar')
+  );
+
   const handleSaveConfig = () => {
-    // Aqui você salvaria as configurações
+    // Salvar configurações do usuário
     toast({
       title: "Configurações salvas",
       description: "Suas configurações foram atualizadas com sucesso.",
+    });
+  };
+
+  const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validar tipo de arquivo
+      if (!file.type.match(/^image\/(png|jpg|jpeg)$/)) {
+        toast({
+          title: "Formato inválido",
+          description: "Por favor, selecione uma imagem PNG ou JPG.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Validar tamanho do arquivo (máximo 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "Arquivo muito grande",
+          description: "Por favor, selecione uma imagem de até 5MB.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Criar preview da imagem
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const result = event.target?.result as string;
+        setAvatarPreview(result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSaveAvatar = () => {
+    if (avatarPreview) {
+      localStorage.setItem('financas-jk-user-avatar', avatarPreview);
+      toast({
+        title: "Avatar salvo",
+        description: "Seu avatar foi atualizado com sucesso.",
+      });
+    }
+  };
+
+  const handleRemoveAvatar = () => {
+    setAvatarPreview(null);
+    localStorage.removeItem('financas-jk-user-avatar');
+    toast({
+      title: "Avatar removido",
+      description: "Seu avatar foi removido com sucesso.",
     });
   };
 
@@ -105,6 +163,51 @@ export const Configuracoes: React.FC = () => {
           </div>
           
           <div className="space-y-4">
+            {/* Avatar Upload Section */}
+            <div className="flex flex-col items-center space-y-4">
+              <Avatar className="h-24 w-24">
+                {avatarPreview && (
+                  <AvatarImage src={avatarPreview} alt="Preview do avatar" />
+                )}
+                <AvatarFallback className="text-2xl bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400">
+                  {userConfig.nome.charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              
+              <div className="flex flex-col sm:flex-row gap-2 w-full">
+                <Label htmlFor="avatar-upload" className="cursor-pointer flex-1">
+                  <div className="flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                    <Upload size={16} />
+                    <span className="text-sm">Selecionar Imagem</span>
+                  </div>
+                </Label>
+                <Input
+                  id="avatar-upload"
+                  type="file"
+                  accept="image/png,image/jpg,image/jpeg"
+                  onChange={handleAvatarUpload}
+                  className="hidden"
+                />
+                
+                {avatarPreview && (
+                  <>
+                    <Button onClick={handleSaveAvatar} size="sm" className="flex-1">
+                      Salvar Avatar
+                    </Button>
+                    <Button onClick={handleRemoveAvatar} variant="outline" size="sm" className="flex-1">
+                      Remover
+                    </Button>
+                  </>
+                )}
+              </div>
+              
+              <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+                Formatos aceitos: PNG, JPG. Tamanho recomendado: 512x512px (máx. 5MB)
+              </p>
+            </div>
+
+            <Separator />
+            
             <div>
               <Label htmlFor="nome">Nome</Label>
               <Input
