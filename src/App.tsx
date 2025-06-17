@@ -10,6 +10,7 @@ import { Entradas } from '@/pages/Entradas';
 import { Saidas } from '@/pages/Saidas';
 import { RelatoriosMensais } from '@/pages/RelatoriosMensais';
 import { RelatoriosAnuais } from '@/pages/RelatoriosAnuais';
+import { ResumoFinanceiro } from '@/pages/ResumoFinanceiro';
 import { Configuracoes } from '@/pages/Configuracoes';
 import { Login } from '@/pages/Login';
 import { Cadastro } from '@/pages/Cadastro';
@@ -30,6 +31,7 @@ function App() {
               <Route path="/saidas" element={<Saidas />} />
               <Route path="/relatorios-mensais" element={<RelatoriosMensais />} />
               <Route path="/relatorios-anuais" element={<RelatoriosAnuais />} />
+              <Route path="/resumo-financeiro" element={<ResumoFinanceiro />} />
               <Route path="/configuracoes" element={<Configuracoes />} />
             </Routes>
           </Layout>
