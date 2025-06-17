@@ -39,6 +39,25 @@ export const Configuracoes: React.FC = () => {
   }, [user]);
 
   const handleSaveConfig = () => {
+    // Validações básicas antes de tentar salvar
+    if (!userConfig.nome.trim()) {
+      toast({
+        title: "Campo obrigatório",
+        description: "O nome não pode estar vazio.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!userConfig.email.trim()) {
+      toast({
+        title: "Campo obrigatório", 
+        description: "O e-mail não pode estar vazio.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     // Atualizar perfil do usuário usando o contexto de autenticação
     const result = updateProfile(userConfig.nome, userConfig.email);
     
@@ -48,13 +67,14 @@ export const Configuracoes: React.FC = () => {
         description: result.message,
       });
       
-      // Força uma re-renderização para garantir que os dados estão sincronizados
+      // Sincronizar estado local com o usuário atualizado após um pequeno delay
       setTimeout(() => {
-        if (user) {
+        const currentUser = JSON.parse(localStorage.getItem('financas-jk-user') || '{}');
+        if (currentUser.id) {
           setUserConfig(prev => ({
             ...prev,
-            nome: user.name,
-            email: user.email
+            nome: currentUser.name || '',
+            email: currentUser.email || ''
           }));
         }
       }, 100);

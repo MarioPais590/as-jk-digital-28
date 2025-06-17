@@ -36,17 +36,38 @@ export const useAuth = () => {
 
   const updateProfile = (name: string, email: string): { success: boolean; message: string } => {
     try {
-      if (!authState.user) {
-        return { success: false, message: 'Usuário não encontrado.' };
+      // Tentar recuperar o usuário do localStorage se não estiver no estado
+      let currentUser = authState.user;
+      
+      if (!currentUser) {
+        const savedUser = localStorage.getItem('financas-jk-user');
+        if (savedUser) {
+          currentUser = JSON.parse(savedUser);
+        }
+      }
+
+      if (!currentUser || !currentUser.id) {
+        return { success: false, message: 'Usuário não encontrado. Faça login novamente.' };
+      }
+
+      // Validar se nome e email não estão vazios
+      if (!name.trim() || !email.trim()) {
+        return { success: false, message: 'Nome e e-mail são obrigatórios.' };
+      }
+
+      // Validar formato do email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return { success: false, message: 'Por favor, insira um e-mail válido.' };
       }
 
       // Atualizar dados do usuário no localStorage
-      const updatedUser = { ...authState.user, name, email };
+      const updatedUser = { ...currentUser, name, email };
       localStorage.setItem('financas-jk-user', JSON.stringify(updatedUser));
 
       // Atualizar lista de usuários também
       const savedUsers = JSON.parse(localStorage.getItem('financas-jk-users') || '[]');
-      const userIndex = savedUsers.findIndex((u: any) => u.id === authState.user!.id);
+      const userIndex = savedUsers.findIndex((u: any) => u.id === currentUser.id);
       if (userIndex !== -1) {
         savedUsers[userIndex] = { ...savedUsers[userIndex], name, email };
         localStorage.setItem('financas-jk-users', JSON.stringify(savedUsers));
@@ -55,7 +76,8 @@ export const useAuth = () => {
       // Atualizar estado local IMEDIATAMENTE
       setAuthState(prev => ({
         ...prev,
-        user: updatedUser
+        user: updatedUser,
+        isAuthenticated: true
       }));
 
       // Disparar evento customizado para notificar outros componentes sobre a mudança
@@ -65,6 +87,7 @@ export const useAuth = () => {
 
       return { success: true, message: 'Perfil atualizado com sucesso!' };
     } catch (error) {
+      console.error('Erro ao atualizar perfil:', error);
       return { success: false, message: 'Erro ao atualizar perfil. Tente novamente.' };
     }
   };
