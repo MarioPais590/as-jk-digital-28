@@ -32,7 +32,7 @@ export const useSupabaseFinancialData = () => {
       const formattedTransactions: Transaction[] = data.map(item => ({
         id: item.id,
         type: item.type as 'entrada' | 'saida',
-        amount: parseFloat(item.amount),
+        amount: Number(item.amount),
         date: item.date,
         category: item.category,
         description: item.description || '',
@@ -62,7 +62,7 @@ export const useSupabaseFinancialData = () => {
         .insert({
           user_id: user.id,
           type: transaction.type,
-          amount: transaction.amount.toString(),
+          amount: transaction.amount,
           date: transaction.date,
           category: transaction.category,
           description: transaction.description,
@@ -80,7 +80,7 @@ export const useSupabaseFinancialData = () => {
       const newTransaction: Transaction = {
         id: data.id,
         type: data.type as 'entrada' | 'saida',
-        amount: parseFloat(data.amount),
+        amount: Number(data.amount),
         date: data.date,
         category: data.category,
         description: data.description || '',
@@ -104,7 +104,7 @@ export const useSupabaseFinancialData = () => {
         .from('transactions')
         .update({
           type: updates.type,
-          amount: updates.amount?.toString(),
+          amount: updates.amount,
           date: updates.date,
           category: updates.category,
           description: updates.description,
@@ -127,7 +127,7 @@ export const useSupabaseFinancialData = () => {
             ? {
                 ...transaction,
                 type: data.type as 'entrada' | 'saida',
-                amount: parseFloat(data.amount),
+                amount: Number(data.amount),
                 date: data.date,
                 category: data.category,
                 description: data.description || '',
