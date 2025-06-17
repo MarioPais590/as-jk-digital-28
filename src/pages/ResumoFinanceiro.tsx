@@ -2,6 +2,7 @@
 import React from 'react';
 import { useFinancialData } from '@/hooks/useFinancialData';
 import { usePDFGenerator } from '@/hooks/usePDFGenerator';
+import { useFinancialCalculations } from '@/hooks/useFinancialCalculations';
 import { FinancialSummaryHeader } from '@/components/FinancialSummary/FinancialSummaryHeader';
 import { FinancialSummaryCards } from '@/components/FinancialSummary/FinancialSummaryCards';
 import { TransactionsTable } from '@/components/FinancialSummary/TransactionsTable';
@@ -9,17 +10,7 @@ import { TransactionsTable } from '@/components/FinancialSummary/TransactionsTab
 export const ResumoFinanceiro: React.FC = () => {
   const { transactions } = useFinancialData();
   const { generateFinancialPDF, isGenerating } = usePDFGenerator();
-
-  // Calcular totais
-  const totalEntradas = transactions
-    .filter(t => t.type === 'entrada')
-    .reduce((sum, t) => sum + t.amount, 0);
-
-  const totalSaidas = transactions
-    .filter(t => t.type === 'saida')
-    .reduce((sum, t) => sum + t.amount, 0);
-
-  const saldoFinal = totalEntradas - totalSaidas;
+  const { totalEntradas, totalSaidas, saldoFinal } = useFinancialCalculations(transactions);
 
   const handleExportPDF = () => {
     generateFinancialPDF(transactions, totalEntradas, totalSaidas, saldoFinal);
