@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { User, Shield, Bell, Database, Trash2, Upload } from 'lucide-react';
 import { useTheme } from '@/hooks/useTheme';
 import { useAuth } from '@/hooks/useAuth';
@@ -12,12 +12,12 @@ import { useToast } from '@/hooks/use-toast';
 
 export const Configuracoes: React.FC = () => {
   const { isDark, toggleTheme } = useTheme();
-  const { user } = useAuth();
+  const { user, updateProfile } = useAuth();
   const { toast } = useToast();
   
   const [userConfig, setUserConfig] = useState({
-    nome: user?.name || 'Usuário',
-    email: user?.email || 'usuario@email.com',
+    nome: '',
+    email: '',
     moeda: 'BRL',
     notificacoes: true,
     backupAutomatico: true,
@@ -27,12 +27,33 @@ export const Configuracoes: React.FC = () => {
     localStorage.getItem('financas-jk-user-avatar')
   );
 
+  // Sincronizar dados do usuário com o estado local quando o usuário for carregado
+  useEffect(() => {
+    if (user) {
+      setUserConfig(prev => ({
+        ...prev,
+        nome: user.name,
+        email: user.email
+      }));
+    }
+  }, [user]);
+
   const handleSaveConfig = () => {
-    // Salvar configurações do usuário
-    toast({
-      title: "Configurações salvas",
-      description: "Suas configurações foram atualizadas com sucesso.",
-    });
+    // Atualizar perfil do usuário usando o contexto de autenticação
+    const result = updateProfile(userConfig.nome, userConfig.email);
+    
+    if (result.success) {
+      toast({
+        title: "Configurações salvas",
+        description: result.message,
+      });
+    } else {
+      toast({
+        title: "Erro ao salvar",
+        description: result.message,
+        variant: "destructive",
+      });
+    }
   };
 
   const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {

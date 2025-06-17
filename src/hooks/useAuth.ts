@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 
 interface User {
@@ -34,6 +33,36 @@ export const useAuth = () => {
       setAuthState(prev => ({ ...prev, isLoading: false }));
     }
   }, []);
+
+  const updateProfile = (name: string, email: string): { success: boolean; message: string } => {
+    try {
+      if (!authState.user) {
+        return { success: false, message: 'Usuário não encontrado.' };
+      }
+
+      // Atualizar dados do usuário no localStorage
+      const updatedUser = { ...authState.user, name, email };
+      localStorage.setItem('financas-jk-user', JSON.stringify(updatedUser));
+
+      // Atualizar lista de usuários também
+      const savedUsers = JSON.parse(localStorage.getItem('financas-jk-users') || '[]');
+      const userIndex = savedUsers.findIndex((u: any) => u.id === authState.user!.id);
+      if (userIndex !== -1) {
+        savedUsers[userIndex] = { ...savedUsers[userIndex], name, email };
+        localStorage.setItem('financas-jk-users', JSON.stringify(savedUsers));
+      }
+
+      // Atualizar estado local
+      setAuthState(prev => ({
+        ...prev,
+        user: updatedUser
+      }));
+
+      return { success: true, message: 'Perfil atualizado com sucesso!' };
+    } catch (error) {
+      return { success: false, message: 'Erro ao atualizar perfil. Tente novamente.' };
+    }
+  };
 
   const login = async (email: string, password: string): Promise<{ success: boolean; message: string }> => {
     try {
@@ -107,5 +136,6 @@ export const useAuth = () => {
     login,
     register,
     logout,
+    updateProfile,
   };
 };
