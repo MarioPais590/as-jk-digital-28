@@ -11,6 +11,8 @@ import { Saidas } from '@/pages/Saidas';
 import { RelatoriosMensais } from '@/pages/RelatoriosMensais';
 import { RelatoriosAnuais } from '@/pages/RelatoriosAnuais';
 import { Configuracoes } from '@/pages/Configuracoes';
+import { Login } from '@/pages/Login';
+import { Cadastro } from '@/pages/Cadastro';
 
 const queryClient = new QueryClient();
 
@@ -21,6 +23,8 @@ function App() {
         <Router>
           <Layout>
             <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route path="/cadastro" element={<Cadastro />} />
               <Route path="/" element={<Dashboard />} />
               <Route path="/entradas" element={<Entradas />} />
               <Route path="/saidas" element={<Saidas />} />

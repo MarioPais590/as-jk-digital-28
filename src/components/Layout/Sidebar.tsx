@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   TrendingUp, 
@@ -13,6 +13,8 @@ import {
   X
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/hooks/useAuth';
+import { toast } from 'sonner';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -30,6 +32,14 @@ const menuItems = [
 
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    toast.success('Logout realizado com sucesso!');
+    navigate('/login');
+  };
 
   return (
     <>
@@ -93,6 +103,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
           
           {/* Sair */}
           <button
+            onClick={handleLogout}
             className={cn(
               "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors w-full text-left",
               "hover:bg-red-100 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400",
