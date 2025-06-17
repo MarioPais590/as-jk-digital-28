@@ -47,6 +47,17 @@ export const Configuracoes: React.FC = () => {
         title: "Configurações salvas",
         description: result.message,
       });
+      
+      // Força uma re-renderização para garantir que os dados estão sincronizados
+      setTimeout(() => {
+        if (user) {
+          setUserConfig(prev => ({
+            ...prev,
+            nome: user.name,
+            email: user.email
+          }));
+        }
+      }, 100);
     } else {
       toast({
         title: "Erro ao salvar",

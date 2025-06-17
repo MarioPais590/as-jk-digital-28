@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Menu, Sun, Moon } from 'lucide-react';
 import { useTheme } from '@/hooks/useTheme';
 import { useAuth } from '@/hooks/useAuth';
@@ -13,9 +13,28 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ onMenuClick, sidebarOpen }) => {
   const { isDark, toggleTheme } = useTheme();
   const { user } = useAuth();
+  const [savedAvatar, setSavedAvatar] = useState<string | null>(null);
 
-  // Recuperar avatar do localStorage
-  const savedAvatar = localStorage.getItem('financas-jk-user-avatar');
+  // Recuperar avatar do localStorage e escutar mudanças
+  useEffect(() => {
+    const updateAvatar = () => {
+      setSavedAvatar(localStorage.getItem('financas-jk-user-avatar'));
+    };
+
+    // Carregar avatar inicial
+    updateAvatar();
+
+    // Escutar eventos de atualização de perfil
+    const handleProfileUpdate = () => {
+      updateAvatar();
+    };
+
+    window.addEventListener('userProfileUpdated', handleProfileUpdate);
+    
+    return () => {
+      window.removeEventListener('userProfileUpdated', handleProfileUpdate);
+    };
+  }, []);
 
   return (
     <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 py-3">

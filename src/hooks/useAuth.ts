@@ -52,10 +52,15 @@ export const useAuth = () => {
         localStorage.setItem('financas-jk-users', JSON.stringify(savedUsers));
       }
 
-      // Atualizar estado local
+      // Atualizar estado local IMEDIATAMENTE
       setAuthState(prev => ({
         ...prev,
         user: updatedUser
+      }));
+
+      // Disparar evento customizado para notificar outros componentes sobre a mudança
+      window.dispatchEvent(new CustomEvent('userProfileUpdated', { 
+        detail: updatedUser 
       }));
 
       return { success: true, message: 'Perfil atualizado com sucesso!' };
