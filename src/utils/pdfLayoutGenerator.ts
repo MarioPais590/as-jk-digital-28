@@ -1,4 +1,3 @@
-
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { PDF_CONFIG } from './pdfConfig';
@@ -103,7 +102,7 @@ export const addFinancialSummarySection = (
         } else if (data.row.index === 1) { // Saídas
           data.cell.styles.textColor = [220, 38, 38]; // Red
         } else if (data.row.index === 2) { // Saldo Final
-          const color = saldoFinal >= 0 ? [22, 163, 74] : [220, 38, 38];
+          const color: [number, number, number] = saldoFinal >= 0 ? [22, 163, 74] : [220, 38, 38];
           data.cell.styles.textColor = color;
         }
       }
