@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
@@ -70,7 +69,7 @@ export const usePDFGenerator = () => {
       // Linha decorativa sutil
       doc.setDrawColor(22, 163, 74);
       doc.setLineWidth(0.3);
-      doc.line(30, 78, pageWidth - 30, 78);
+      doc.line(30, pageWidth - 30, 78);
       
       // Cards de resumo primeiro (antes da tabela)
       let currentY = 88;
@@ -117,8 +116,8 @@ export const usePDFGenerator = () => {
       
       // Card Saldo Final
       const card3X = startX + 2 * (cardWidth + cardSpacing);
-      const saldoColor = saldoFinal >= 0 ? [22, 163, 74] : [239, 68, 68];
-      const saldoBgColor = saldoFinal >= 0 ? [240, 253, 244] : [254, 242, 242];
+      const saldoColor: [number, number, number] = saldoFinal >= 0 ? [22, 163, 74] : [239, 68, 68];
+      const saldoBgColor: [number, number, number] = saldoFinal >= 0 ? [240, 253, 244] : [254, 242, 242];
       
       doc.setFillColor(...saldoBgColor);
       doc.roundedRect(card3X, currentY, cardWidth, cardHeight, 3, 3, 'F');
