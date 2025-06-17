@@ -35,143 +35,207 @@ export const usePDFGenerator = () => {
         logoImg.src = logoUrl;
       });
 
-      // Adicionar logo centralizada (melhorado)
-      const logoWidth = 45;
-      const logoHeight = 45;
+      // Adicionar logo centralizada de forma mais discreta
+      const logoWidth = 30;
+      const logoHeight = 30;
       const pageWidth = doc.internal.pageSize.width;
       const logoX = (pageWidth - logoWidth) / 2;
       
-      doc.addImage(logoImg, 'PNG', logoX, 10, logoWidth, logoHeight);
+      doc.addImage(logoImg, 'PNG', logoX, 15, logoWidth, logoHeight);
       
       // Título principal - Finanças JK
-      doc.setFontSize(26);
+      doc.setFontSize(22);
       doc.setFont('helvetica', 'bold');
-      doc.setTextColor(22, 163, 74); // Verde #16A34A
-      doc.text('Finanças JK', pageWidth / 2, 70, { align: 'center' });
+      doc.setTextColor(22, 163, 74); // Verde do logotipo
+      doc.text('Finanças JK', pageWidth / 2, 55, { align: 'center' });
       
       // Subtítulo - Resumo financeiro completo
-      doc.setFontSize(12);
+      doc.setFontSize(11);
       doc.setFont('helvetica', 'normal');
-      doc.setTextColor(80, 80, 80);
-      doc.text('Resumo financeiro completo', pageWidth / 2, 82, { align: 'center' });
+      doc.setTextColor(100, 100, 100);
+      doc.text('Resumo Financeiro Completo', pageWidth / 2, 65, { align: 'center' });
       
       // Data de geração
       doc.setFontSize(9);
-      doc.setTextColor(120, 120, 120);
+      doc.setTextColor(130, 130, 130);
       const currentDate = new Date().toLocaleDateString('pt-BR', {
         year: 'numeric',
         month: 'long',
-        day: 'numeric'
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
       });
-      doc.text(`Gerado em: ${currentDate}`, pageWidth / 2, 92, { align: 'center' });
+      doc.text(`Gerado em: ${currentDate}`, pageWidth / 2, 73, { align: 'center' });
       
-      // Linha decorativa abaixo do cabeçalho
+      // Linha decorativa sutil
+      doc.setDrawColor(22, 163, 74);
+      doc.setLineWidth(0.3);
+      doc.line(30, 78, pageWidth - 30, 78);
+      
+      // Cards de resumo primeiro (antes da tabela)
+      let currentY = 88;
+      
+      // Título da seção de resumo
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(60, 60, 60);
+      doc.text('Resumo Geral', 20, currentY);
+      currentY += 15;
+      
+      // Cards em layout horizontal
+      const cardWidth = 55;
+      const cardHeight = 25;
+      const cardSpacing = 10;
+      const startX = (pageWidth - (3 * cardWidth + 2 * cardSpacing)) / 2;
+      
+      // Card Total Entradas
+      doc.setFillColor(240, 253, 244); // Verde muito claro
+      doc.roundedRect(startX, currentY, cardWidth, cardHeight, 3, 3, 'F');
       doc.setDrawColor(22, 163, 74);
       doc.setLineWidth(0.5);
-      doc.line(20, 98, pageWidth - 20, 98);
+      doc.roundedRect(startX, currentY, cardWidth, cardHeight, 3, 3, 'S');
+      
+      doc.setFontSize(9);
+      doc.setTextColor(22, 163, 74);
+      doc.setFont('helvetica', 'bold');
+      doc.text('TOTAL ENTRADAS', startX + cardWidth/2, currentY + 8, { align: 'center' });
+      doc.setFontSize(12);
+      doc.text(`R$ ${totalEntradas.toFixed(2).replace('.', ',')}`, startX + cardWidth/2, currentY + 17, { align: 'center' });
+      
+      // Card Total Saídas
+      const card2X = startX + cardWidth + cardSpacing;
+      doc.setFillColor(255, 251, 235); // Amarelo muito claro
+      doc.roundedRect(card2X, currentY, cardWidth, cardHeight, 3, 3, 'F');
+      doc.setDrawColor(245, 158, 11);
+      doc.roundedRect(card2X, currentY, cardWidth, cardHeight, 3, 3, 'S');
+      
+      doc.setTextColor(245, 158, 11);
+      doc.setFontSize(9);
+      doc.text('TOTAL SAÍDAS', card2X + cardWidth/2, currentY + 8, { align: 'center' });
+      doc.setFontSize(12);
+      doc.text(`R$ ${totalSaidas.toFixed(2).replace('.', ',')}`, card2X + cardWidth/2, currentY + 17, { align: 'center' });
+      
+      // Card Saldo Final
+      const card3X = startX + 2 * (cardWidth + cardSpacing);
+      const saldoColor = saldoFinal >= 0 ? [22, 163, 74] : [239, 68, 68];
+      const saldoBgColor = saldoFinal >= 0 ? [240, 253, 244] : [254, 242, 242];
+      
+      doc.setFillColor(...saldoBgColor);
+      doc.roundedRect(card3X, currentY, cardWidth, cardHeight, 3, 3, 'F');
+      doc.setDrawColor(...saldoColor);
+      doc.roundedRect(card3X, currentY, cardWidth, cardHeight, 3, 3, 'S');
+      
+      doc.setTextColor(...saldoColor);
+      doc.setFontSize(9);
+      doc.text('SALDO FINAL', card3X + cardWidth/2, currentY + 8, { align: 'center' });
+      doc.setFontSize(12);
+      doc.text(`R$ ${saldoFinal.toFixed(2).replace('.', ',')}`, card3X + cardWidth/2, currentY + 17, { align: 'center' });
+      
+      currentY += cardHeight + 20;
+      
+      // Verificar se precisa de nova página antes da tabela
+      if (currentY > 200) {
+        doc.addPage();
+        currentY = 30;
+      }
+      
+      // Título da tabela
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(60, 60, 60);
+      doc.text('Detalhamento das Transações', 20, currentY);
+      currentY += 10;
       
       // Ordenar transações por data (mais recente primeiro)
       const sortedTransactions = [...transactions].sort((a, b) => 
         new Date(b.date).getTime() - new Date(a.date).getTime()
       );
       
-      // Preparar dados da tabela
+      // Preparar dados da tabela com informações mais organizadas
       const tableData = sortedTransactions.map(transaction => [
-        transaction.type === 'entrada' ? 'Entrada' : 'Saída',
-        `R$ ${transaction.amount.toFixed(2).replace('.', ',')}`,
         new Date(transaction.date).toLocaleDateString('pt-BR'),
-        transaction.description + (transaction.notes ? ` - ${transaction.notes}` : '')
+        transaction.type === 'entrada' ? 'Entrada' : 'Saída',
+        transaction.category,
+        transaction.description,
+        `R$ ${transaction.amount.toFixed(2).replace('.', ',')}`,
+        transaction.notes || '-'
       ]);
       
-      // Configurar tabela com autoTable (melhorada)
+      // Tabela principal com design melhorado
       doc.autoTable({
-        head: [['Tipo', 'Valor', 'Data', 'Observação']],
+        head: [['Data', 'Tipo', 'Categoria', 'Descrição', 'Valor', 'Observações']],
         body: tableData,
-        startY: 105,
+        startY: currentY,
         theme: 'grid',
         headStyles: {
-          fillColor: [22, 163, 74], // Verde #16A34A
+          fillColor: [22, 163, 74], // Verde do logotipo
           textColor: [255, 255, 255],
-          fontSize: 11,
+          fontSize: 10,
           fontStyle: 'bold',
           halign: 'center',
-          cellPadding: 6
+          cellPadding: 5
         },
         bodyStyles: {
-          fontSize: 9,
+          fontSize: 8,
           textColor: [40, 40, 40],
-          cellPadding: 4
+          cellPadding: 4,
+          lineWidth: 0.1,
+          lineColor: [200, 200, 200]
         },
         columnStyles: {
-          0: { halign: 'center', cellWidth: 25 },
-          1: { halign: 'right', cellWidth: 30 },
-          2: { halign: 'center', cellWidth: 25 },
-          3: { halign: 'left', cellWidth: 'auto' }
+          0: { halign: 'center', cellWidth: 22 }, // Data
+          1: { halign: 'center', cellWidth: 20 }, // Tipo
+          2: { halign: 'left', cellWidth: 25 },   // Categoria
+          3: { halign: 'left', cellWidth: 40 },   // Descrição
+          4: { halign: 'right', cellWidth: 25 },  // Valor
+          5: { halign: 'left', cellWidth: 'auto' } // Observações
         },
         alternateRowStyles: {
-          fillColor: [248, 248, 248]
+          fillColor: [249, 250, 251] // Cinza muito claro
         },
-        margin: { left: 20, right: 20 },
+        margin: { left: 15, right: 15 },
         didParseCell: function(data) {
-          if (data.column.index === 0 && data.cell.section === 'body') {
+          // Colorir células de tipo
+          if (data.column.index === 1 && data.cell.section === 'body') {
             if (data.cell.text[0] === 'Entrada') {
-              data.cell.styles.fillColor = [220, 252, 231]; // Verde claro
-              data.cell.styles.textColor = [22, 163, 74]; // Verde escuro
+              data.cell.styles.fillColor = [240, 253, 244]; // Verde muito claro
+              data.cell.styles.textColor = [22, 163, 74];
               data.cell.styles.fontStyle = 'bold';
             } else {
-              data.cell.styles.fillColor = [254, 249, 195]; // Amarelo claro
-              data.cell.styles.textColor = [180, 83, 9]; // Laranja
+              data.cell.styles.fillColor = [255, 251, 235]; // Amarelo muito claro
+              data.cell.styles.textColor = [245, 158, 11];
+              data.cell.styles.fontStyle = 'bold';
+            }
+          }
+          // Colorir valores
+          if (data.column.index === 4 && data.cell.section === 'body') {
+            const rowIndex = data.row.index;
+            const transactionType = sortedTransactions[rowIndex]?.type;
+            if (transactionType === 'entrada') {
+              data.cell.styles.textColor = [22, 163, 74];
+              data.cell.styles.fontStyle = 'bold';
+            } else {
+              data.cell.styles.textColor = [245, 158, 11];
               data.cell.styles.fontStyle = 'bold';
             }
           }
         }
       });
       
-      // Calcular posição do rodapé
-      const finalY = (doc as any).lastAutoTable.finalY || 105;
-      let footerY = finalY + 25;
+      // Rodapé discreto
+      const finalY = (doc as any).lastAutoTable.finalY || currentY;
       
-      // Verificar se precisa de nova página
-      if (footerY > 240) {
+      // Verificar se precisa de nova página para o rodapé
+      if (finalY > 250) {
         doc.addPage();
-        footerY = 30;
+        doc.setFontSize(8);
+        doc.setTextColor(120, 120, 120);
+        doc.text('Finanças JK - Sistema de Controle Financeiro', pageWidth / 2, 20, { align: 'center' });
+      } else {
+        doc.setFontSize(8);
+        doc.setTextColor(120, 120, 120);
+        doc.text('Finanças JK - Sistema de Controle Financeiro', pageWidth / 2, finalY + 15, { align: 'center' });
       }
-      
-      // Linha decorativa antes dos totais
-      doc.setDrawColor(232, 192, 6); // Amarelo #E8C006
-      doc.setLineWidth(1);
-      doc.line(20, footerY - 5, pageWidth - 20, footerY - 5);
-      
-      // Título da seção de totais
-      doc.setFontSize(14);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(60, 60, 60);
-      doc.text('Resumo Financeiro', 20, footerY + 10);
-      
-      // Totais com formatação melhorada
-      doc.setFontSize(12);
-      doc.setFont('helvetica', 'bold');
-      
-      // Total de Entradas - Verde #16A34A
-      doc.setTextColor(22, 163, 74);
-      doc.text('Total de Entradas:', 20, footerY + 25);
-      doc.text(`R$ ${totalEntradas.toFixed(2).replace('.', ',')}`, 70, footerY + 25);
-      
-      // Total de Saídas - Amarelo/Laranja #E8C006
-      doc.setTextColor(232, 192, 6);
-      doc.text('Total de Saídas:', 20, footerY + 35);
-      doc.text(`R$ ${totalSaidas.toFixed(2).replace('.', ',')}`, 70, footerY + 35);
-      
-      // Saldo Final - Verde para positivo, vermelho para negativo
-      doc.setTextColor(saldoFinal >= 0 ? 22 : 220, saldoFinal >= 0 ? 163 : 38, saldoFinal >= 0 ? 74 : 38);
-      doc.setFontSize(14);
-      doc.text('Saldo Final:', 20, footerY + 50);
-      doc.text(`R$ ${saldoFinal.toFixed(2).replace('.', ',')}`, 70, footerY + 50);
-      
-      // Rodapé final com informações adicionais
-      doc.setFontSize(8);
-      doc.setTextColor(120, 120, 120);
-      doc.text('Finanças JK - Controle Financeiro Inteligente', pageWidth / 2, footerY + 65, { align: 'center' });
       
       // Salvar PDF com nome personalizado
       const fileName = `financas-jk-resumo-${new Date().toISOString().split('T')[0]}.pdf`;
@@ -180,9 +244,9 @@ export const usePDFGenerator = () => {
     } catch (error) {
       console.error('Erro ao gerar PDF:', error);
       
-      // Fallback simplificado em caso de erro
+      // Fallback simplificado
       const doc = new jsPDF();
-      doc.setFontSize(20);
+      doc.setFontSize(18);
       doc.setTextColor(22, 163, 74);
       doc.text('Finanças JK - Resumo Financeiro', 20, 20);
       
@@ -194,10 +258,10 @@ export const usePDFGenerator = () => {
       doc.setTextColor(22, 163, 74);
       doc.text(`Total de Entradas: R$ ${totalEntradas.toFixed(2).replace('.', ',')}`, 20, yPosition);
       
-      doc.setTextColor(232, 192, 6);
+      doc.setTextColor(245, 158, 11);
       doc.text(`Total de Saídas: R$ ${totalSaidas.toFixed(2).replace('.', ',')}`, 20, yPosition + 15);
       
-      doc.setTextColor(saldoFinal >= 0 ? 22 : 220, saldoFinal >= 0 ? 163 : 38, saldoFinal >= 0 ? 74 : 38);
+      doc.setTextColor(saldoFinal >= 0 ? 22 : 239, saldoFinal >= 0 ? 163 : 68, saldoFinal >= 0 ? 74 : 68);
       doc.text(`Saldo Final: R$ ${saldoFinal.toFixed(2).replace('.', ',')}`, 20, yPosition + 30);
       
       doc.save('financas-jk-resumo-fallback.pdf');
