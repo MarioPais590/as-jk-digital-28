@@ -69,7 +69,7 @@ export const usePDFGenerator = () => {
       // Linha decorativa sutil
       doc.setDrawColor(22, 163, 74);
       doc.setLineWidth(0.3);
-      doc.line(30, pageWidth - 30, 78);
+      doc.line(30, 78, pageWidth - 30, 78);
       
       // Cards de resumo primeiro (antes da tabela)
       let currentY = 88;
