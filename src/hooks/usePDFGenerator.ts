@@ -4,8 +4,13 @@ import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { Transaction } from '@/types/financial';
 
-// Register the autoTable plugin
-const jsPDFWithAutoTable = jsPDF as any;
+// Extend jsPDF interface to include autoTable
+interface jsPDFWithPlugin extends jsPDF {
+  autoTable: typeof autoTable;
+  lastAutoTable: {
+    finalY: number;
+  };
+}
 
 export const usePDFGenerator = () => {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -19,7 +24,7 @@ export const usePDFGenerator = () => {
     setIsGenerating(true);
     
     try {
-      const doc = new jsPDF() as any;
+      const doc = new jsPDF() as jsPDFWithPlugin;
       
       // Add header with logo and title
       await addHeaderToPDF(doc);
@@ -57,7 +62,7 @@ export const usePDFGenerator = () => {
     }
   };
 
-  const addHeaderToPDF = async (doc: any) => {
+  const addHeaderToPDF = async (doc: jsPDFWithPlugin) => {
     try {
       const logoUrl = '/lovable-uploads/e6254b16-9322-4b60-866d-3e65af6c400b.png';
       const logoImg = new Image();
@@ -107,7 +112,7 @@ export const usePDFGenerator = () => {
   };
 
   const addFinancialSummarySection = (
-    doc: any,
+    doc: jsPDFWithPlugin,
     startY: number,
     totalEntradas: number,
     totalSaidas: number,
@@ -156,10 +161,10 @@ export const usePDFGenerator = () => {
       }
     });
 
-    return (doc as any).lastAutoTable.finalY + 20;
+    return doc.lastAutoTable.finalY + 20;
   };
 
-  const addTransactionsTitle = (doc: any, startY: number) => {
+  const addTransactionsTitle = (doc: jsPDFWithPlugin, startY: number) => {
     doc.setFontSize(16);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(0, 0, 0);
@@ -169,7 +174,7 @@ export const usePDFGenerator = () => {
   };
 
   const generateTransactionTable = (
-    doc: any,
+    doc: jsPDFWithPlugin,
     transactions: Transaction[],
     startY: number
   ) => {
@@ -250,10 +255,10 @@ export const usePDFGenerator = () => {
       }
     });
 
-    return (doc as any).lastAutoTable.finalY;
+    return doc.lastAutoTable.finalY;
   };
 
-  const addFooterToPDF = (doc: any) => {
+  const addFooterToPDF = (doc: jsPDFWithPlugin) => {
     const pageHeight = doc.internal.pageSize.height;
     const pageWidth = doc.internal.pageSize.width;
     
@@ -287,7 +292,7 @@ export const usePDFGenerator = () => {
     doc.text(`Total de Saídas: R$ ${totalSaidas.toFixed(2).replace('.', ',')}`, 20, yPosition + 10);
     
     const saldoColor = saldoFinal >= 0 ? [22, 163, 74] : [220, 38, 38];
-    doc.setTextColor(...saldoColor);
+    doc.setTextColor(saldoColor[0], saldoColor[1], saldoColor[2]);
     doc.text(`Saldo Final: R$ ${saldoFinal.toFixed(2).replace('.', ',')}`, 20, yPosition + 20);
     
     doc.save('financas-jk-resumo-fallback.pdf');

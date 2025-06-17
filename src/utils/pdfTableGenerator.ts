@@ -1,10 +1,19 @@
 
 import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { Transaction } from '@/types/financial';
 import { PDF_CONFIG } from './pdfConfig';
 
+// Extend jsPDF interface to include autoTable
+interface jsPDFWithPlugin extends jsPDF {
+  autoTable: typeof autoTable;
+  lastAutoTable: {
+    finalY: number;
+  };
+}
+
 export const generateTransactionTable = (
-  doc: jsPDF,
+  doc: jsPDFWithPlugin,
   transactions: Transaction[],
   startY: number
 ) => {
@@ -29,7 +38,7 @@ export const generateTransactionTable = (
     transaction.notes || '-'
   ]);
 
-  doc.autoTable({
+  autoTable(doc, {
     startY,
     head: [['Data', 'Tipo', 'Categoria', 'Descrição', 'Valor', 'Observações']],
     body: tableData,

@@ -1,8 +1,17 @@
 
 import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { PDF_CONFIG } from './pdfConfig';
 
-export const addHeaderToPDF = async (doc: jsPDF) => {
+// Extend jsPDF interface to include autoTable
+interface jsPDFWithPlugin extends jsPDF {
+  autoTable: typeof autoTable;
+  lastAutoTable: {
+    finalY: number;
+  };
+}
+
+export const addHeaderToPDF = async (doc: jsPDFWithPlugin) => {
   try {
     const logoUrl = '/lovable-uploads/e6254b16-9322-4b60-866d-3e65af6c400b.png';
     const logoImg = new Image();
@@ -52,7 +61,7 @@ export const addHeaderToPDF = async (doc: jsPDF) => {
 };
 
 export const addFinancialSummarySection = (
-  doc: jsPDF,
+  doc: jsPDFWithPlugin,
   startY: number,
   totalEntradas: number,
   totalSaidas: number,
@@ -66,7 +75,7 @@ export const addFinancialSummarySection = (
     ['Total de Transações', transactionsCount.toString()]
   ];
 
-  doc.autoTable({
+  autoTable(doc, {
     startY,
     head: [['Descrição', 'Valor']],
     body: summaryData,
@@ -104,7 +113,7 @@ export const addFinancialSummarySection = (
   return doc.lastAutoTable.finalY + 20;
 };
 
-export const addTransactionsTitle = (doc: jsPDF, startY: number) => {
+export const addTransactionsTitle = (doc: jsPDFWithPlugin, startY: number) => {
   doc.setFontSize(16);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(0, 0, 0);
@@ -113,7 +122,7 @@ export const addTransactionsTitle = (doc: jsPDF, startY: number) => {
   return startY + 15;
 };
 
-export const addFooterToPDF = (doc: jsPDF) => {
+export const addFooterToPDF = (doc: jsPDFWithPlugin) => {
   const pageHeight = doc.internal.pageSize.height;
   const pageWidth = doc.internal.pageSize.width;
   
