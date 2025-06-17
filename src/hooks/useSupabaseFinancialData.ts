@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Transaction, FinancialSummary, MonthlyBalance, DailyBalance } from '@/types/financial';
@@ -63,7 +62,7 @@ export const useSupabaseFinancialData = () => {
         .insert({
           user_id: user.id,
           type: transaction.type,
-          amount: transaction.amount,
+          amount: transaction.amount.toString(),
           date: transaction.date,
           category: transaction.category,
           description: transaction.description,
@@ -105,7 +104,7 @@ export const useSupabaseFinancialData = () => {
         .from('transactions')
         .update({
           type: updates.type,
-          amount: updates.amount,
+          amount: updates.amount?.toString(),
           date: updates.date,
           category: updates.category,
           description: updates.description,
