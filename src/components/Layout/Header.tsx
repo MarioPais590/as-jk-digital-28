@@ -14,6 +14,14 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, sidebarOpen }) => {
   const { isDark, toggleTheme } = useTheme();
   const { user } = useAuth();
   const [savedAvatar, setSavedAvatar] = useState<string | null>(null);
+  const [currentUserName, setCurrentUserName] = useState<string>('');
+
+  // Atualizar nome do usuário quando o contexto de autenticação mudar
+  useEffect(() => {
+    if (user?.name) {
+      setCurrentUserName(user.name);
+    }
+  }, [user]);
 
   // Recuperar avatar do localStorage e escutar mudanças
   useEffect(() => {
@@ -21,20 +29,46 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, sidebarOpen }) => {
       setSavedAvatar(localStorage.getItem('financas-jk-user-avatar'));
     };
 
-    // Carregar avatar inicial
-    updateAvatar();
+    const updateUserData = () => {
+      // Atualizar avatar
+      updateAvatar();
+      
+      // Atualizar nome do usuário diretamente do localStorage
+      const savedUser = localStorage.getItem('financas-jk-user');
+      if (savedUser) {
+        try {
+          const userData = JSON.parse(savedUser);
+          if (userData.name) {
+            setCurrentUserName(userData.name);
+          }
+        } catch (error) {
+          console.error('Erro ao parsear dados do usuário:', error);
+        }
+      }
+    };
+
+    // Carregar dados iniciais
+    updateUserData();
 
     // Escutar eventos de atualização de perfil
-    const handleProfileUpdate = () => {
-      updateAvatar();
+    const handleProfileUpdate = (event: any) => {
+      console.log('Profile updated event received:', event.detail);
+      updateUserData();
     };
 
     window.addEventListener('userProfileUpdated', handleProfileUpdate);
     
+    // Também escutar mudanças no localStorage (fallback)
+    window.addEventListener('storage', updateUserData);
+    
     return () => {
       window.removeEventListener('userProfileUpdated', handleProfileUpdate);
+      window.removeEventListener('storage', updateUserData);
     };
   }, []);
+
+  // Garantir que o nome seja exibido corretamente, priorizando o estado local atualizado
+  const displayName = currentUserName || user?.name || 'Usuário';
 
   return (
     <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 py-3">
@@ -58,16 +92,16 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, sidebarOpen }) => {
         <div className="flex items-center gap-3">
           {/* Nome do usuário - oculto em telas pequenas */}
           <span className="hidden sm:block text-sm font-medium text-gray-700 dark:text-gray-300">
-            {user?.name || 'Usuário'}
+            {displayName}
           </span>
           
           {/* Avatar do usuário */}
           <Avatar className="h-8 w-8">
             {savedAvatar && (
-              <AvatarImage src={savedAvatar} alt={user?.name || 'Avatar'} />
+              <AvatarImage src={savedAvatar} alt={displayName} />
             )}
             <AvatarFallback className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400">
-              {(user?.name || 'U').charAt(0).toUpperCase()}
+              {displayName.charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
 

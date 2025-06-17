@@ -81,8 +81,16 @@ export const useAuth = () => {
       }));
 
       // Disparar evento customizado para notificar outros componentes sobre a mudança
+      console.log('Disparando evento userProfileUpdated com:', updatedUser);
       window.dispatchEvent(new CustomEvent('userProfileUpdated', { 
         detail: updatedUser 
+      }));
+
+      // Também disparar um evento de mudança no storage como fallback
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'financas-jk-user',
+        newValue: JSON.stringify(updatedUser),
+        storageArea: localStorage
       }));
 
       return { success: true, message: 'Perfil atualizado com sucesso!' };
