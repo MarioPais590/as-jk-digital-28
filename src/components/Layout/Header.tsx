@@ -84,6 +84,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, sidebarOpen }) => {
           <button
             onClick={onMenuClick}
             className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 lg:hidden"
+            aria-label="Toggle menu"
           >
             <Menu size={20} />
           </button>
@@ -91,6 +92,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, sidebarOpen }) => {
           <button
             onClick={onMenuClick}
             className="hidden lg:block p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+            aria-label="Toggle menu"
           >
             <Menu size={20} />
           </button>
@@ -118,7 +120,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, sidebarOpen }) => {
             variant="ghost"
             size="sm"
             className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-            title="Sair"
+            aria-label="Sair"
           >
             <LogOut size={16} />
           </Button>
@@ -127,7 +129,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, sidebarOpen }) => {
           <button
             onClick={toggleTheme}
             className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-            title={isDark ? 'Modo Claro' : 'Modo Escuro'}
+            aria-label={isDark ? 'Modo Claro' : 'Modo Escuro'}
           >
             {isDark ? <Sun size={20} /> : <Moon size={20} />}
           </button>
