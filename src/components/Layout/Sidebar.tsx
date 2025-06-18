@@ -9,8 +9,11 @@ import {
   Calendar,
   FileText,
   Settings,
-  X
+  X,
+  LogOut
 } from 'lucide-react';
+import { useAuth } from '@/components/Auth/AuthProvider';
+import { toast } from 'sonner';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -56,6 +59,19 @@ const menuItems = [
 ];
 
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
+  const { signOut } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      toast.success('Logout realizado com sucesso!');
+      onClose();
+    } catch (error) {
+      console.error('Erro no logout:', error);
+      toast.error('Erro ao fazer logout. Tente novamente.');
+    }
+  };
+
   return (
     <>
       {/* Overlay para mobile */}
@@ -116,6 +132,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
               ))}
             </ul>
           </nav>
+
+          {/* Logout Button */}
+          <div className="p-4 border-t border-gray-200 dark:border-gray-800">
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors w-full text-gray-700 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400"
+            >
+              <LogOut size={20} />
+              <span>Sair</span>
+            </button>
+          </div>
         </div>
       </aside>
     </>

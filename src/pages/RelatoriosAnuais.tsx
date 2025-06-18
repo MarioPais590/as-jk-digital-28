@@ -1,13 +1,12 @@
-
 import React, { useState } from 'react';
 import { Calendar, TrendingUp, TrendingDown } from 'lucide-react';
-import { useFinancialData } from '@/hooks/useFinancialData';
+import { useSupabaseFinancialData } from '@/hooks/useSupabaseFinancialData';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FinancialCard } from '@/components/FinancialCard';
 import { YearlyChart } from '@/components/Charts/YearlyChart';
 
 export const RelatoriosAnuais: React.FC = () => {
-  const { getYearlyData, transactions } = useFinancialData();
+  const { getYearlyData, transactions, loading } = useSupabaseFinancialData();
   
   const currentYear = new Date().getFullYear();
   const [selectedYear, setSelectedYear] = useState(currentYear.toString());
@@ -45,6 +44,17 @@ export const RelatoriosAnuais: React.FC = () => {
   const worstMonth = yearlyData.reduce((worst, current) => 
     current.saldo < worst.saldo ? current : worst
   );
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Carregando relatórios...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
