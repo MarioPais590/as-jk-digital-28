@@ -45,13 +45,10 @@ if (!container) {
 
 const root = createRoot(container);
 
-// Ensure React is properly initialized before rendering
-Promise.resolve().then(() => {
-  root.render(
-    <React.StrictMode>
-      <ErrorBoundary>
-        <App />
-      </ErrorBoundary>
-    </React.StrictMode>
-  );
-});
+root.render(
+  <React.StrictMode>
+    <ErrorBoundary>
+      <App />
+    </ErrorBoundary>
+  </React.StrictMode>
+);
