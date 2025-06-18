@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,9 +17,16 @@ export const Login: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   
-  const { signIn } = useAuth();
+  const { signIn, isAuthenticated } = useAuth();
   const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/');
+    }
+  }, [isAuthenticated, navigate]);
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
@@ -57,6 +64,7 @@ export const Login: React.FC = () => {
         toast.error(result.message);
       }
     } catch (error) {
+      console.error('Erro no login:', error);
       toast.error('Erro interno. Tente novamente.');
     } finally {
       setIsLoading(false);
@@ -111,6 +119,7 @@ export const Login: React.FC = () => {
                 onChange={(e) => handleInputChange('email', e.target.value)}
                 className={errors.email ? 'border-red-500' : ''}
                 placeholder="seu@email.com"
+                disabled={isLoading}
               />
               {errors.email && (
                 <p className="text-red-500 text-sm mt-1">{errors.email}</p>
@@ -126,6 +135,7 @@ export const Login: React.FC = () => {
                 onChange={(e) => handleInputChange('password', e.target.value)}
                 className={errors.password ? 'border-red-500' : ''}
                 placeholder="Digite sua senha"
+                disabled={isLoading}
               />
               {errors.password && (
                 <p className="text-red-500 text-sm mt-1">{errors.password}</p>

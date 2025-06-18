@@ -6,17 +6,20 @@ import { useSupabaseAuth } from './useSupabaseAuth';
 export const useSupabaseFinancialData = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
-  const { user, isAuthenticated } = useSupabaseAuth();
+  const { user, isAuthenticated, isLoading: authLoading } = useSupabaseAuth();
 
   // Load transactions from Supabase
   const loadTransactions = async () => {
-    if (!isAuthenticated || !user) {
+    // Don't load if auth is still loading or user is not authenticated
+    if (authLoading || !isAuthenticated || !user) {
       setTransactions([]);
       setLoading(false);
       return;
     }
 
     try {
+      console.log('Loading transactions for user:', user.id);
+      
       const { data, error } = await supabase
         .from('transactions')
         .select('*')
@@ -25,11 +28,12 @@ export const useSupabaseFinancialData = () => {
 
       if (error) {
         console.error('Erro ao carregar transações:', error);
+        setTransactions([]);
         return;
       }
 
       // Convert Supabase data to app format
-      const formattedTransactions: Transaction[] = data.map(item => ({
+      const formattedTransactions: Transaction[] = (data || []).map(item => ({
         id: item.id,
         type: item.type as 'entrada' | 'saida',
         amount: Number(item.amount),
@@ -44,17 +48,23 @@ export const useSupabaseFinancialData = () => {
       setTransactions(formattedTransactions);
     } catch (error) {
       console.error('Erro ao carregar transações:', error);
+      setTransactions([]);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadTransactions();
-  }, [isAuthenticated, user]);
+    // Only load transactions when auth is ready and user is authenticated
+    if (!authLoading) {
+      loadTransactions();
+    }
+  }, [isAuthenticated, user, authLoading]);
 
   const addTransaction = async (transaction: Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'>) => {
-    if (!user) return;
+    if (!user) {
+      throw new Error('Usuário não autenticado');
+    }
 
     try {
       const { data, error } = await supabase
@@ -97,7 +107,9 @@ export const useSupabaseFinancialData = () => {
   };
 
   const updateTransaction = async (id: string, updates: Partial<Transaction>) => {
-    if (!user) return;
+    if (!user) {
+      throw new Error('Usuário não autenticado');
+    }
 
     try {
       const { data, error } = await supabase
@@ -144,7 +156,9 @@ export const useSupabaseFinancialData = () => {
   };
 
   const deleteTransaction = async (id: string) => {
-    if (!user) return;
+    if (!user) {
+      throw new Error('Usuário não autenticado');
+    }
 
     try {
       const { error } = await supabase
@@ -244,7 +258,7 @@ export const useSupabaseFinancialData = () => {
 
   return {
     transactions,
-    loading,
+    loading: loading || authLoading,
     addTransaction,
     updateTransaction,
     deleteTransaction,

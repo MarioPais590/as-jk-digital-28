@@ -1,10 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
-import { Menu, Sun, Moon } from 'lucide-react';
+import { Menu, Sun, Moon, LogOut } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@/hooks/useTheme';
 import { useAuth } from '@/components/Auth/AuthProvider';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -13,7 +16,8 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ onMenuClick, sidebarOpen }) => {
   const { isDark, toggleTheme } = useTheme();
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   const [savedAvatar, setSavedAvatar] = useState<string | null>(null);
   const [currentUserName, setCurrentUserName] = useState<string>('');
 
@@ -62,6 +66,17 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, sidebarOpen }) => {
     };
   }, [user]);
 
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      toast.success('Logout realizado com sucesso!');
+      navigate('/login');
+    } catch (error) {
+      console.error('Erro no logout:', error);
+      toast.error('Erro ao fazer logout');
+    }
+  };
+
   return (
     <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 py-3">
       <div className="flex items-center justify-between">
@@ -96,6 +111,17 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, sidebarOpen }) => {
               {currentUserName.charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
+
+          {/* Botão de logout */}
+          <Button
+            onClick={handleLogout}
+            variant="ghost"
+            size="sm"
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            title="Sair"
+          >
+            <LogOut size={16} />
+          </Button>
 
           {/* Botão de alternância de tema */}
           <button

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,9 +19,16 @@ export const Cadastro: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   
-  const { signUp } = useAuth();
+  const { signUp, isAuthenticated } = useAuth();
   const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/');
+    }
+  }, [isAuthenticated, navigate]);
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
@@ -73,6 +80,7 @@ export const Cadastro: React.FC = () => {
         toast.error(result.message);
       }
     } catch (error) {
+      console.error('Erro no cadastro:', error);
       toast.error('Erro interno. Tente novamente.');
     } finally {
       setIsLoading(false);
@@ -127,6 +135,7 @@ export const Cadastro: React.FC = () => {
                 onChange={(e) => handleInputChange('name', e.target.value)}
                 className={errors.name ? 'border-red-500' : ''}
                 placeholder="Seu nome completo"
+                disabled={isLoading}
               />
               {errors.name && (
                 <p className="text-red-500 text-sm mt-1">{errors.name}</p>
@@ -142,6 +151,7 @@ export const Cadastro: React.FC = () => {
                 onChange={(e) => handleInputChange('email', e.target.value)}
                 className={errors.email ? 'border-red-500' : ''}
                 placeholder="seu@email.com"
+                disabled={isLoading}
               />
               {errors.email && (
                 <p className="text-red-500 text-sm mt-1">{errors.email}</p>
@@ -157,6 +167,7 @@ export const Cadastro: React.FC = () => {
                 onChange={(e) => handleInputChange('password', e.target.value)}
                 className={errors.password ? 'border-red-500' : ''}
                 placeholder="Mínimo 6 caracteres"
+                disabled={isLoading}
               />
               {errors.password && (
                 <p className="text-red-500 text-sm mt-1">{errors.password}</p>
@@ -172,6 +183,7 @@ export const Cadastro: React.FC = () => {
                 onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
                 className={errors.confirmPassword ? 'border-red-500' : ''}
                 placeholder="Digite a senha novamente"
+                disabled={isLoading}
               />
               {errors.confirmPassword && (
                 <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>

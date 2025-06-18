@@ -31,14 +31,20 @@ export const usePWA = () => {
 
     // Listen for beforeinstallprompt event
     const handleBeforeInstallPrompt = (e: Event) => {
+      // Prevent the mini-infobar from appearing on mobile
       e.preventDefault();
       const event = e as BeforeInstallPromptEvent;
+      
+      // Stash the event so it can be triggered later
       setDeferredPrompt(event);
       setIsInstallable(true);
+      
+      console.log('PWA install prompt ready');
     };
 
     // Listen for appinstalled event
     const handleAppInstalled = () => {
+      console.log('PWA installed successfully');
       setIsInstalled(true);
       setDeferredPrompt(null);
       setIsInstallable(false);
@@ -53,17 +59,28 @@ export const usePWA = () => {
     };
   }, []);
 
-  const installApp = async () => {
-    if (!deferredPrompt) return false;
+  const installApp = async (): Promise<boolean> => {
+    if (!deferredPrompt) {
+      console.log('No install prompt available');
+      return false;
+    }
 
     try {
+      // Show the install prompt
       await deferredPrompt.prompt();
+      
+      // Wait for the user to respond to the prompt
       const choiceResult = await deferredPrompt.userChoice;
       
+      console.log('User choice:', choiceResult.outcome);
+      
       if (choiceResult.outcome === 'accepted') {
+        console.log('User accepted the install prompt');
         setDeferredPrompt(null);
         setIsInstallable(false);
         return true;
+      } else {
+        console.log('User dismissed the install prompt');
       }
       
       return false;
@@ -73,10 +90,18 @@ export const usePWA = () => {
     }
   };
 
+  const showInstallBanner = () => {
+    if (isInstallable && !isInstalled) {
+      return installApp();
+    }
+    return Promise.resolve(false);
+  };
+
   return {
     isInstalled,
     isInstallable,
     installApp,
+    showInstallBanner,
     canInstall: !!deferredPrompt
   };
 };
