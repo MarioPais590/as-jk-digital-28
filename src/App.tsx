@@ -1,8 +1,8 @@
 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
+import { Toaster } from 'sonner';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ThemeProvider } from '@/components/ThemeProvider';
 import { AuthProvider } from '@/components/Auth/AuthProvider';
 import { AuthGuard } from '@/components/Auth/AuthGuard';
 import { Layout } from '@/components/Layout/Layout';
@@ -21,34 +21,35 @@ const queryClient = new QueryClient();
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <Router>
-          <Routes>
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/login" element={<Auth />} />
-            <Route path="/cadastro" element={<Auth />} />
-            <Route path="/*" element={
-              <AuthGuard>
-                <Layout>
-                  <Routes>
-                    <Route path="/" element={<Dashboard />} />
-                    <Route path="/entradas" element={<Entradas />} />
-                    <Route path="/saidas" element={<Saidas />} />
-                    <Route path="/relatorios-mensais" element={<RelatoriosMensais />} />
-                    <Route path="/relatorios-anuais" element={<RelatoriosAnuais />} />
-                    <Route path="/resumo-financeiro" element={<ResumoFinanceiro />} />
-                    <Route path="/configuracoes" element={<Configuracoes />} />
-                  </Routes>
-                </Layout>
-              </AuthGuard>
-            } />
-          </Routes>
-        </Router>
-        <Toaster />
-        <Sonner />
-      </AuthProvider>
-    </QueryClientProvider>
+    <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <Router>
+            <Routes>
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/login" element={<Auth />} />
+              <Route path="/cadastro" element={<Auth />} />
+              <Route path="/*" element={
+                <AuthGuard>
+                  <Layout>
+                    <Routes>
+                      <Route path="/" element={<Dashboard />} />
+                      <Route path="/entradas" element={<Entradas />} />
+                      <Route path="/saidas" element={<Saidas />} />
+                      <Route path="/relatorios-mensais" element={<RelatoriosMensais />} />
+                      <Route path="/relatorios-anuais" element={<RelatoriosAnuais />} />
+                      <Route path="/resumo-financeiro" element={<ResumoFinanceiro />} />
+                      <Route path="/configuracoes" element={<Configuracoes />} />
+                    </Routes>
+                  </Layout>
+                </AuthGuard>
+              } />
+            </Routes>
+          </Router>
+          <Toaster />
+        </AuthProvider>
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 }
 

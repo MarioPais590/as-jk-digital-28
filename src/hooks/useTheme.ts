@@ -1,21 +1,19 @@
 
-import { useState, useEffect } from 'react';
-import { storageUtils } from '@/utils/localStorage';
+import { useTheme as useNextTheme } from '@/components/ThemeProvider';
 
 export const useTheme = () => {
-  const [isDark, setIsDark] = useState(() => storageUtils.getTheme());
+  const { theme, setTheme } = useNextTheme();
+  
+  const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  
+  const toggleTheme = () => {
+    setTheme(isDark ? 'light' : 'dark');
+  };
 
-  useEffect(() => {
-    storageUtils.setTheme(isDark);
-    
-    if (isDark) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [isDark]);
-
-  const toggleTheme = () => setIsDark(!isDark);
-
-  return { isDark, toggleTheme };
+  return {
+    theme,
+    setTheme,
+    isDark,
+    toggleTheme,
+  };
 };
