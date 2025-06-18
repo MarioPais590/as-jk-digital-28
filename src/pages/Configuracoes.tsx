@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/components/Auth/AuthProvider';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { UserProfileSection } from '@/components/Settings/UserProfileSection';
 import { SystemPreferencesSection } from '@/components/Settings/SystemPreferencesSection';
 import { DataManagementSection } from '@/components/Settings/DataManagementSection';
@@ -14,7 +14,6 @@ import { supabase } from '@/integrations/supabase/client';
 
 export const Configuracoes: React.FC = () => {
   const { updateProfile, user } = useAuth();
-  const { toast } = useToast();
   
   const [userConfig, setUserConfig] = useState<UserConfig>({
     nome: '',
@@ -24,12 +23,20 @@ export const Configuracoes: React.FC = () => {
     backupAutomatico: true,
   });
 
+  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+
   // Load user profile data from Supabase
   useEffect(() => {
     const loadUserProfile = async () => {
-      if (!user) return;
+      if (!user) {
+        setIsLoadingProfile(false);
+        return;
+      }
 
       try {
+        console.log('Loading profile for user:', user.id);
+        
         const { data, error } = await supabase
           .from('profiles')
           .select('nome, email')
@@ -59,6 +66,8 @@ export const Configuracoes: React.FC = () => {
           nome: user.user_metadata?.nome || user.email?.split('@')[0] || '',
           email: user.email || ''
         }));
+      } finally {
+        setIsLoadingProfile(false);
       }
     };
 
@@ -67,11 +76,7 @@ export const Configuracoes: React.FC = () => {
 
   const handleSaveConfig = async () => {
     if (!user) {
-      toast({
-        title: "Erro de autenticação",
-        description: "Usuário não encontrado. Faça login novamente.",
-        variant: "destructive",
-      });
+      toast.error('Usuário não encontrado. Faça login novamente.');
       return;
     }
 
@@ -79,39 +84,39 @@ export const Configuracoes: React.FC = () => {
     const validation = validateUserProfile(userConfig.nome, userConfig.email);
     
     if (!validation.isValid) {
-      toast({
-        title: "Campo obrigatório",
-        description: validation.message,
-        variant: "destructive",
-      });
+      toast.error(validation.message);
       return;
     }
 
+    setIsSaving(true);
+
     try {
-      // Atualizar perfil do usuário
+      // Atualizar perfil do usuário no Supabase
       const result = await updateProfile(userConfig.nome, userConfig.email);
       
       if (result.success) {
-        toast({
-          title: "Configurações salvas",
-          description: result.message,
-        });
+        toast.success(result.message);
       } else {
-        toast({
-          title: "Erro ao salvar",
-          description: result.message,
-          variant: "destructive",
-        });
+        toast.error(result.message);
       }
     } catch (error) {
       console.error('Erro ao salvar configurações:', error);
-      toast({
-        title: "Erro interno",
-        description: "Erro ao salvar configurações. Tente novamente.",
-        variant: "destructive",
-      });
+      toast.error('Erro interno. Tente novamente.');
+    } finally {
+      setIsSaving(false);
     }
   };
+
+  if (isLoadingProfile) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Carregando configurações...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -148,8 +153,12 @@ export const Configuracoes: React.FC = () => {
 
       {/* Botão de Salvar */}
       <div className="flex justify-end">
-        <Button onClick={handleSaveConfig} className="px-8">
-          Salvar Configurações
+        <Button 
+          onClick={handleSaveConfig} 
+          className="px-8"
+          disabled={isSaving}
+        >
+          {isSaving ? 'Salvando...' : 'Salvar Configurações'}
         </Button>
       </div>
 

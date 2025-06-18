@@ -3,11 +3,11 @@ import React from 'react';
 import { FinancialCard } from '@/components/FinancialCard';
 import { MonthlyChart } from '@/components/Charts/MonthlyChart';
 import { YearlyChart } from '@/components/Charts/YearlyChart';
-import { useFinancialData } from '@/hooks/useFinancialData';
+import { useSupabaseFinancialData } from '@/hooks/useSupabaseFinancialData';
 import { CURRENCY_CONFIG, DATE_CONFIG } from '@/constants/app';
 
 export const Dashboard: React.FC = () => {
-  const { getMonthlyData, getDailyBalances, getYearlyData } = useFinancialData();
+  const { getMonthlyData, getDailyBalances, getYearlyData, loading } = useSupabaseFinancialData();
   
   const currentDate = new Date();
   const currentYear = currentDate.getFullYear();
@@ -27,6 +27,17 @@ export const Dashboard: React.FC = () => {
   const getCurrentMonthYear = () => {
     return currentDate.toLocaleDateString(DATE_CONFIG.LOCALE, DATE_CONFIG.FORMATS.LONG_MONTH_YEAR);
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Carregando dados...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

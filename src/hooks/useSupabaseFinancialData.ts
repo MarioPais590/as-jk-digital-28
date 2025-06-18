@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Transaction, FinancialSummary, MonthlyBalance, DailyBalance } from '@/types/financial';
@@ -23,7 +24,6 @@ export const useSupabaseFinancialData = () => {
       const { data, error } = await supabase
         .from('transactions')
         .select('*')
-        .eq('user_id', user.id)
         .order('date', { ascending: false });
 
       if (error) {
@@ -123,7 +123,6 @@ export const useSupabaseFinancialData = () => {
           notes: updates.notes
         })
         .eq('id', id)
-        .eq('user_id', user.id)
         .select()
         .single();
 
@@ -164,8 +163,7 @@ export const useSupabaseFinancialData = () => {
       const { error } = await supabase
         .from('transactions')
         .delete()
-        .eq('id', id)
-        .eq('user_id', user.id);
+        .eq('id', id);
 
       if (error) {
         console.error('Erro ao deletar transação:', error);

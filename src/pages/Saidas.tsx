@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Plus, Edit, Trash2, Search } from 'lucide-react';
-import { useFinancialData } from '@/hooks/useFinancialData';
+import { useSupabaseFinancialData } from '@/hooks/useSupabaseFinancialData';
 import { Transaction } from '@/types/financial';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { toast } from 'sonner';
 
 const categorias = [
   'Alimentação',
@@ -22,11 +23,12 @@ const categorias = [
 ];
 
 export const Saidas: React.FC = () => {
-  const { transactions, addTransaction, updateTransaction, deleteTransaction } = useFinancialData();
+  const { transactions, addTransaction, updateTransaction, deleteTransaction, loading } = useSupabaseFinancialData();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
     amount: '',
@@ -45,35 +47,49 @@ export const Saidas: React.FC = () => {
     return matchesSearch && matchesCategory;
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.amount || !formData.category || !formData.description) return;
-
-    const transactionData = {
-      type: 'saida' as const,
-      amount: parseFloat(formData.amount),
-      date: formData.date,
-      category: formData.category,
-      description: formData.description,
-      notes: formData.notes
-    };
-
-    if (editingTransaction) {
-      updateTransaction(editingTransaction.id, transactionData);
-    } else {
-      addTransaction(transactionData);
+    if (!formData.amount || !formData.category || !formData.description) {
+      toast.error('Por favor, preencha todos os campos obrigatórios.');
+      return;
     }
 
-    setFormData({
-      amount: '',
-      date: new Date().toISOString().split('T')[0],
-      category: '',
-      description: '',
-      notes: ''
-    });
-    setEditingTransaction(null);
-    setIsDialogOpen(false);
+    setIsSubmitting(true);
+
+    try {
+      const transactionData = {
+        type: 'saida' as const,
+        amount: parseFloat(formData.amount),
+        date: formData.date,
+        category: formData.category,
+        description: formData.description,
+        notes: formData.notes
+      };
+
+      if (editingTransaction) {
+        await updateTransaction(editingTransaction.id, transactionData);
+        toast.success('Saída atualizada com sucesso!');
+      } else {
+        await addTransaction(transactionData);
+        toast.success('Saída adicionada com sucesso!');
+      }
+
+      setFormData({
+        amount: '',
+        date: new Date().toISOString().split('T')[0],
+        category: '',
+        description: '',
+        notes: ''
+      });
+      setEditingTransaction(null);
+      setIsDialogOpen(false);
+    } catch (error) {
+      console.error('Erro ao salvar saída:', error);
+      toast.error('Erro ao salvar saída. Tente novamente.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleEdit = (transaction: Transaction) => {
@@ -88,13 +104,30 @@ export const Saidas: React.FC = () => {
     setIsDialogOpen(true);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm('Tem certeza que deseja excluir esta saída?')) {
-      deleteTransaction(id);
+      try {
+        await deleteTransaction(id);
+        toast.success('Saída excluída com sucesso!');
+      } catch (error) {
+        console.error('Erro ao excluir saída:', error);
+        toast.error('Erro ao excluir saída. Tente novamente.');
+      }
     }
   };
 
   const totalSaidas = filteredSaidas.reduce((sum, saida) => sum + saida.amount, 0);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Carregando saídas...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -183,8 +216,8 @@ export const Saidas: React.FC = () => {
                 />
               </div>
               
-              <Button type="submit" className="w-full">
-                {editingTransaction ? 'Atualizar' : 'Salvar'}
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting ? 'Salvando...' : (editingTransaction ? 'Atualizar' : 'Salvar')}
               </Button>
             </form>
           </DialogContent>
