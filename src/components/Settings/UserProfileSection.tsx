@@ -7,7 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 interface UserConfig {
   nome: string;
@@ -27,32 +28,53 @@ export const UserProfileSection: React.FC<UserProfileSectionProps> = ({
   onSave
 }) => {
   const { user } = useAuth();
-  const { toast } = useToast();
   
   const [avatarPreview, setAvatarPreview] = useState<string | null>(
     localStorage.getItem('financas-jk-user-avatar')
   );
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+
+  // Load avatar from Supabase profile
+  useEffect(() => {
+    const loadAvatarFromSupabase = async () => {
+      if (!user) return;
+
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('avatar_url')
+          .eq('id', user.id)
+          .single();
+
+        if (error) {
+          console.error('Erro ao carregar avatar do Supabase:', error);
+          return;
+        }
+
+        if (data?.avatar_url) {
+          setAvatarPreview(data.avatar_url);
+          localStorage.setItem('financas-jk-user-avatar', data.avatar_url);
+        }
+      } catch (error) {
+        console.error('Erro ao carregar avatar:', error);
+      }
+    };
+
+    loadAvatarFromSupabase();
+  }, [user]);
 
   const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       // Validar tipo de arquivo
       if (!file.type.match(/^image\/(png|jpg|jpeg)$/)) {
-        toast({
-          title: "Formato inválido",
-          description: "Por favor, selecione uma imagem PNG ou JPG.",
-          variant: "destructive",
-        });
+        toast.error('Por favor, selecione uma imagem PNG ou JPG.');
         return;
       }
 
       // Validar tamanho do arquivo (máximo 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        toast({
-          title: "Arquivo muito grande",
-          description: "Por favor, selecione uma imagem de até 5MB.",
-          variant: "destructive",
-        });
+        toast.error('Por favor, selecione uma imagem de até 5MB.');
         return;
       }
 
@@ -66,23 +88,76 @@ export const UserProfileSection: React.FC<UserProfileSectionProps> = ({
     }
   };
 
-  const handleSaveAvatar = () => {
-    if (avatarPreview) {
+  const handleSaveAvatar = async () => {
+    if (!avatarPreview || !user) {
+      toast.error('Nenhuma imagem selecionada ou usuário não encontrado.');
+      return;
+    }
+
+    setIsUploadingAvatar(true);
+
+    try {
+      // Update avatar_url in profiles table
+      const { error } = await supabase
+        .from('profiles')
+        .update({ avatar_url: avatarPreview })
+        .eq('id', user.id);
+
+      if (error) {
+        console.error('Erro ao salvar avatar no Supabase:', error);
+        toast.error('Erro ao salvar avatar. Tente novamente.');
+        return;
+      }
+
+      // Update localStorage
       localStorage.setItem('financas-jk-user-avatar', avatarPreview);
-      toast({
-        title: "Avatar salvo",
-        description: "Seu avatar foi atualizado com sucesso.",
-      });
+      
+      // Dispatch storage event to update other components
+      window.dispatchEvent(new Event('storage'));
+      
+      toast.success('Avatar atualizado com sucesso!');
+    } catch (error) {
+      console.error('Erro ao salvar avatar:', error);
+      toast.error('Erro ao salvar avatar. Tente novamente.');
+    } finally {
+      setIsUploadingAvatar(false);
     }
   };
 
-  const handleRemoveAvatar = () => {
-    setAvatarPreview(null);
-    localStorage.removeItem('financas-jk-user-avatar');
-    toast({
-      title: "Avatar removido",
-      description: "Seu avatar foi removido com sucesso.",
-    });
+  const handleRemoveAvatar = async () => {
+    if (!user) {
+      toast.error('Usuário não encontrado.');
+      return;
+    }
+
+    setIsUploadingAvatar(true);
+
+    try {
+      // Remove avatar_url from profiles table
+      const { error } = await supabase
+        .from('profiles')
+        .update({ avatar_url: null })
+        .eq('id', user.id);
+
+      if (error) {
+        console.error('Erro ao remover avatar do Supabase:', error);
+        toast.error('Erro ao remover avatar. Tente novamente.');
+        return;
+      }
+
+      setAvatarPreview(null);
+      localStorage.removeItem('financas-jk-user-avatar');
+      
+      // Dispatch storage event to update other components
+      window.dispatchEvent(new Event('storage'));
+      
+      toast.success('Avatar removido com sucesso!');
+    } catch (error) {
+      console.error('Erro ao remover avatar:', error);
+      toast.error('Erro ao remover avatar. Tente novamente.');
+    } finally {
+      setIsUploadingAvatar(false);
+    }
   };
 
   return (
@@ -123,11 +198,22 @@ export const UserProfileSection: React.FC<UserProfileSectionProps> = ({
             
             {avatarPreview && (
               <>
-                <Button onClick={handleSaveAvatar} size="sm" className="flex-1">
-                  Salvar Avatar
+                <Button 
+                  onClick={handleSaveAvatar} 
+                  size="sm" 
+                  className="flex-1"
+                  disabled={isUploadingAvatar}
+                >
+                  {isUploadingAvatar ? 'Salvando...' : 'Salvar Avatar'}
                 </Button>
-                <Button onClick={handleRemoveAvatar} variant="outline" size="sm" className="flex-1">
-                  Remover
+                <Button 
+                  onClick={handleRemoveAvatar} 
+                  variant="outline" 
+                  size="sm" 
+                  className="flex-1"
+                  disabled={isUploadingAvatar}
+                >
+                  {isUploadingAvatar ? 'Removendo...' : 'Remover'}
                 </Button>
               </>
             )}

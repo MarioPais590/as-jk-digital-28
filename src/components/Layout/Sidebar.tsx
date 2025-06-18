@@ -18,6 +18,8 @@ import { toast } from 'sonner';
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
+  collapsed?: boolean;
+  onCollapsedChange?: (collapsed: boolean) => void;
 }
 
 const menuItems = [
@@ -58,7 +60,12 @@ const menuItems = [
   }
 ];
 
-export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ 
+  isOpen, 
+  onClose, 
+  collapsed = false,
+  onCollapsedChange 
+}) => {
   const { signOut } = useAuth();
 
   const handleLogout = async () => {
@@ -84,22 +91,25 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       
       {/* Sidebar */}
       <aside className={`
-        fixed top-0 left-0 z-50 h-full w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transform transition-transform duration-300 ease-in-out
+        fixed top-0 left-0 z-50 h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transform transition-all duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+        ${collapsed ? 'w-16' : 'w-64'}
         lg:translate-x-0 lg:static lg:z-auto
       `}>
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800">
-            <div className="flex items-center gap-3">
+            <div className={`flex items-center gap-3 ${collapsed ? 'justify-center' : ''}`}>
               <img 
                 src="/lovable-uploads/e6254b16-9322-4b60-866d-3e65af6c400b.png" 
                 alt="Finanças JK" 
                 className="h-8 w-8"
               />
-              <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-                Finanças JK
-              </h1>
+              {!collapsed && (
+                <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+                  Finanças JK
+                </h1>
+              )}
             </div>
             <button
               onClick={onClose}
@@ -119,28 +129,33 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                     onClick={onClose}
                     className={({ isActive }) => `
                       flex items-center gap-3 px-3 py-2 rounded-lg transition-colors
+                      ${collapsed ? 'justify-center' : ''}
                       ${isActive 
                         ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300' 
                         : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                       }
                     `}
+                    title={collapsed ? item.label : undefined}
                   >
                     <item.icon size={20} />
-                    <span>{item.label}</span>
+                    {!collapsed && <span>{item.label}</span>}
                   </NavLink>
                 </li>
               ))}
             </ul>
           </nav>
 
-          {/* Logout Button */}
-          <div className="p-4 border-t border-gray-200 dark:border-gray-800">
+          {/* Logout Button - Only visible on mobile/tablet */}
+          <div className="p-4 border-t border-gray-200 dark:border-gray-800 lg:hidden">
             <button
               onClick={handleLogout}
-              className="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors w-full text-gray-700 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400"
+              className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors w-full text-gray-700 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 ${
+                collapsed ? 'justify-center' : ''
+              }`}
+              title={collapsed ? 'Sair' : undefined}
             >
               <LogOut size={20} />
-              <span>Sair</span>
+              {!collapsed && <span>Sair</span>}
             </button>
           </div>
         </div>

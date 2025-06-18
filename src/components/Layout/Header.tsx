@@ -12,9 +12,10 @@ import { toast } from 'sonner';
 interface HeaderProps {
   onMenuClick: () => void;
   sidebarOpen: boolean;
+  onSidebarToggle: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onMenuClick, sidebarOpen }) => {
+export const Header: React.FC<HeaderProps> = ({ onMenuClick, sidebarOpen, onSidebarToggle }) => {
   const { isDark, toggleTheme } = useTheme();
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
@@ -26,15 +27,10 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, sidebarOpen }) => {
     const loadUserData = async () => {
       if (!user) return;
 
-      // Load avatar from localStorage
-      const avatar = localStorage.getItem('financas-jk-user-avatar');
-      setSavedAvatar(avatar);
-
-      // Load user profile from Supabase
       try {
         const { data, error } = await supabase
           .from('profiles')
-          .select('nome')
+          .select('nome, avatar_url')
           .eq('id', user.id)
           .single();
 
@@ -42,27 +38,50 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, sidebarOpen }) => {
           console.error('Erro ao carregar perfil:', error);
           // Fallback to user metadata or email
           setCurrentUserName(user.user_metadata?.nome || user.email?.split('@')[0] || 'Usuário');
+          // Load avatar from localStorage as fallback
+          const localAvatar = localStorage.getItem('financas-jk-user-avatar');
+          setSavedAvatar(localAvatar);
         } else if (data) {
           setCurrentUserName(data.nome || user.email?.split('@')[0] || 'Usuário');
+          if (data.avatar_url) {
+            setSavedAvatar(data.avatar_url);
+            localStorage.setItem('financas-jk-user-avatar', data.avatar_url);
+          } else {
+            // Load from localStorage if Supabase doesn't have avatar
+            const localAvatar = localStorage.getItem('financas-jk-user-avatar');
+            setSavedAvatar(localAvatar);
+          }
         }
       } catch (error) {
         console.error('Erro ao carregar dados do usuário:', error);
         setCurrentUserName(user.user_metadata?.nome || user.email?.split('@')[0] || 'Usuário');
+        // Load avatar from localStorage as fallback
+        const localAvatar = localStorage.getItem('financas-jk-user-avatar');
+        setSavedAvatar(localAvatar);
       }
     };
 
     loadUserData();
 
     // Listen for storage changes (avatar updates)
-    const handleStorageChange = () => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'financas-jk-user-avatar') {
+        setSavedAvatar(e.newValue);
+      }
+    };
+
+    // Listen for custom storage events
+    const handleCustomStorageChange = () => {
       const avatar = localStorage.getItem('financas-jk-user-avatar');
       setSavedAvatar(avatar);
     };
 
     window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('storage', handleCustomStorageChange);
     
     return () => {
       window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('storage', handleCustomStorageChange);
     };
   }, [user]);
 
@@ -81,6 +100,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, sidebarOpen }) => {
     <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 py-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
+          {/* Mobile menu button */}
           <button
             onClick={onMenuClick}
             className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 lg:hidden"
@@ -89,10 +109,11 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, sidebarOpen }) => {
             <Menu size={20} />
           </button>
           
+          {/* Desktop sidebar toggle button */}
           <button
-            onClick={onMenuClick}
+            onClick={onSidebarToggle}
             className="hidden lg:block p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
-            aria-label="Toggle menu"
+            aria-label="Toggle sidebar"
           >
             <Menu size={20} />
           </button>
@@ -114,12 +135,12 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, sidebarOpen }) => {
             </AvatarFallback>
           </Avatar>
 
-          {/* Botão de logout */}
+          {/* Botão de logout - Only visible on desktop */}
           <Button
             onClick={handleLogout}
             variant="ghost"
             size="sm"
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            className="hidden lg:flex p-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             aria-label="Sair"
           >
             <LogOut size={16} />
