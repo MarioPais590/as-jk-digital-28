@@ -15,7 +15,6 @@ import { ResumoFinanceiro } from '@/pages/ResumoFinanceiro';
 import { Configuracoes } from '@/pages/Configuracoes';
 import { Login } from '@/pages/Login';
 import { Cadastro } from '@/pages/Cadastro';
-import { Auth } from '@/pages/Auth';
 
 function App() {
   console.log('App component rendering');
@@ -27,7 +26,6 @@ function App() {
           <Routes>
             {/* Auth routes - now inside AuthProvider */}
             <Route path="/login" element={<Login />} />
-            <Route path="/auth" element={<Auth />} />
             <Route path="/cadastro" element={<Cadastro />} />
             
             {/* Protected routes */}
