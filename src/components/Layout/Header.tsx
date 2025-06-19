@@ -4,7 +4,6 @@ import { Menu, Sun, Moon, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@/components/ThemeProvider';
 import { useAuth } from '@/components/Auth/AuthProvider';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -17,10 +16,21 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ onMenuClick, sidebarOpen, onSidebarToggle }) => {
   const { theme, setTheme } = useTheme();
-  const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [savedAvatar, setSavedAvatar] = useState<string | null>(null);
   const [currentUserName, setCurrentUserName] = useState<string>('');
+
+  // Safe auth hook usage with error boundary
+  let user = null;
+  let signOut = null;
+  
+  try {
+    const authContext = useAuth();
+    user = authContext.user;
+    signOut = authContext.signOut;
+  } catch (error) {
+    console.log('Auth context not available yet');
+  }
 
   const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
@@ -99,14 +109,27 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, sidebarOpen, onSide
 
   const handleLogout = async () => {
     try {
-      await signOut();
-      toast.success('Logout realizado com sucesso!');
-      navigate('/login');
+      if (signOut) {
+        await signOut();
+        toast.success('Logout realizado com sucesso!');
+        navigate('/login');
+      }
     } catch (error) {
       console.error('Erro no logout:', error);
       toast.error('Erro ao fazer logout');
     }
   };
+
+  // Simple avatar component to avoid Radix UI issues
+  const SimpleAvatar = ({ src, alt, fallback }: { src?: string | null; alt?: string; fallback: string }) => (
+    <div className="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xs font-medium overflow-hidden">
+      {src ? (
+        <img src={src} alt={alt} className="h-full w-full object-cover rounded-full" />
+      ) : (
+        fallback
+      )}
+    </div>
+  );
 
   return (
     <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 py-3 flex-shrink-0">
@@ -138,14 +161,11 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, sidebarOpen, onSide
           </span>
           
           {/* Avatar do usuário */}
-          <Avatar className="h-8 w-8">
-            {savedAvatar && (
-              <AvatarImage src={savedAvatar} alt={currentUserName} />
-            )}
-            <AvatarFallback className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400">
-              {currentUserName.charAt(0).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
+          <SimpleAvatar 
+            src={savedAvatar} 
+            alt={currentUserName} 
+            fallback={currentUserName.charAt(0).toUpperCase()}
+          />
 
           {/* Botão de logout - Only visible on desktop */}
           <Button
