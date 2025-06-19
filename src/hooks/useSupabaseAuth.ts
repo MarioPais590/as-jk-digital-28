@@ -9,7 +9,7 @@ export const useSupabaseAuth = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     let mounted = true;
 
     // Set up auth state listener first
