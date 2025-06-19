@@ -2,6 +2,8 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 
+console.log('Loading custom tabs component');
+
 interface TabsContextType {
   value: string
   onValueChange: (value: string) => void
@@ -25,10 +27,13 @@ interface TabsProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
   ({ className, value, onValueChange, defaultValue, children, ...props }, ref) => {
+    console.log('Tabs component rendering with value:', value || defaultValue);
+    
     const [internalValue, setInternalValue] = React.useState(defaultValue || "")
     
     const currentValue = value !== undefined ? value : internalValue
     const handleValueChange = React.useCallback((newValue: string) => {
+      console.log('Tab value changing to:', newValue);
       if (onValueChange) {
         onValueChange(newValue)
       } else {
