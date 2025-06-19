@@ -24,7 +24,7 @@ function App() {
       <AuthProvider>
         <Router>
           <Routes>
-            {/* Auth routes */}
+            {/* Auth routes - now inside AuthProvider */}
             <Route path="/login" element={<Login />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/cadastro" element={<Auth />} />
