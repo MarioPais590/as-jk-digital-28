@@ -22,6 +22,7 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
+  console.log('AuthProvider rendering');
   const auth = useSupabaseAuth();
 
   return (

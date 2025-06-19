@@ -2,7 +2,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'sonner';
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { AuthProvider } from '@/components/Auth/AuthProvider';
 import { AuthGuard } from '@/components/Auth/AuthGuard';
@@ -16,77 +15,73 @@ import { ResumoFinanceiro } from '@/pages/ResumoFinanceiro';
 import { Configuracoes } from '@/pages/Configuracoes';
 import { Auth } from '@/pages/Auth';
 
-const queryClient = new QueryClient();
-
 function App() {
   console.log('App component rendering');
   
   return (
     <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <Router>
-            <Routes>
-              {/* Auth routes - not protected but inside Router context */}
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/login" element={<Auth />} />
-              <Route path="/cadastro" element={<Auth />} />
-              
-              {/* Protected routes */}
-              <Route path="/" element={
-                <AuthGuard>
-                  <Layout>
-                    <Dashboard />
-                  </Layout>
-                </AuthGuard>
-              } />
-              <Route path="/entradas" element={
-                <AuthGuard>
-                  <Layout>
-                    <Entradas />
-                  </Layout>
-                </AuthGuard>
-              } />
-              <Route path="/saidas" element={
-                <AuthGuard>
-                  <Layout>
-                    <Saidas />
-                  </Layout>
-                </AuthGuard>
-              } />
-              <Route path="/relatorios-mensais" element={
-                <AuthGuard>
-                  <Layout>
-                    <RelatoriosMensais />
-                  </Layout>
-                </AuthGuard>
-              } />
-              <Route path="/relatorios-anuais" element={
-                <AuthGuard>
-                  <Layout>
-                    <RelatoriosAnuais />
-                  </Layout>
-                </AuthGuard>
-              } />
-              <Route path="/resumo-financeiro" element={
-                <AuthGuard>
-                  <Layout>
-                    <ResumoFinanceiro />
-                  </Layout>
-                </AuthGuard>
-              } />
-              <Route path="/configuracoes" element={
-                <AuthGuard>
-                  <Layout>
-                    <Configuracoes />
-                  </Layout>
-                </AuthGuard>
-              } />
-            </Routes>
-          </Router>
+      <AuthProvider>
+        <Router>
+          <Routes>
+            {/* Auth routes - not protected but inside Router context */}
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/login" element={<Auth />} />
+            <Route path="/cadastro" element={<Auth />} />
+            
+            {/* Protected routes */}
+            <Route path="/" element={
+              <AuthGuard>
+                <Layout>
+                  <Dashboard />
+                </Layout>
+              </AuthGuard>
+            } />
+            <Route path="/entradas" element={
+              <AuthGuard>
+                <Layout>
+                  <Entradas />
+                </Layout>
+              </AuthGuard>
+            } />
+            <Route path="/saidas" element={
+              <AuthGuard>
+                <Layout>
+                  <Saidas />
+                </Layout>
+              </AuthGuard>
+            } />
+            <Route path="/relatorios-mensais" element={
+              <AuthGuard>
+                <Layout>
+                  <RelatoriosMensais />
+                </Layout>
+              </AuthGuard>
+            } />
+            <Route path="/relatorios-anuais" element={
+              <AuthGuard>
+                <Layout>
+                  <RelatoriosAnuais />
+                </Layout>
+              </AuthGuard>
+            } />
+            <Route path="/resumo-financeiro" element={
+              <AuthGuard>
+                <Layout>
+                  <ResumoFinanceiro />
+                </Layout>
+              </AuthGuard>
+            } />
+            <Route path="/configuracoes" element={
+              <AuthGuard>
+                <Layout>
+                  <Configuracoes />
+                </Layout>
+              </AuthGuard>
+            } />
+          </Routes>
           <Toaster />
-        </AuthProvider>
-      </QueryClientProvider>
+        </Router>
+      </AuthProvider>
     </ThemeProvider>
   );
 }
