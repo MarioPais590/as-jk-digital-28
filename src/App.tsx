@@ -21,67 +21,71 @@ function App() {
   
   return (
     <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-      <AuthProvider>
-        <Router>
-          <Routes>
-            {/* Auth routes - now inside AuthProvider */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/cadastro" element={<Cadastro />} />
-            
-            {/* Protected routes */}
-            <Route path="/" element={
-              <AuthGuard>
-                <Layout>
-                  <Dashboard />
-                </Layout>
-              </AuthGuard>
-            } />
-            <Route path="/entradas" element={
-              <AuthGuard>
-                <Layout>
-                  <Entradas />
-                </Layout>
-              </AuthGuard>
-            } />
-            <Route path="/saidas" element={
-              <AuthGuard>
-                <Layout>
-                  <Saidas />
-                </Layout>
-              </AuthGuard>
-            } />
-            <Route path="/relatorios-mensais" element={
-              <AuthGuard>
-                <Layout>
-                  <RelatoriosMensais />
-                </Layout>
-              </AuthGuard>
-            } />
-            <Route path="/relatorios-anuais" element={
-              <AuthGuard>
-                <Layout>
-                  <RelatoriosAnuais />
-                </Layout>
-              </AuthGuard>
-            } />
-            <Route path="/resumo-financeiro" element={
-              <AuthGuard>
-                <Layout>
-                  <ResumoFinanceiro />
-                </Layout>
-              </AuthGuard>
-            } />
-            <Route path="/configuracoes" element={
-              <AuthGuard>
-                <Layout>
-                  <Configuracoes />
-                </Layout>
-              </AuthGuard>
-            } />
-          </Routes>
-          <Toaster />
-        </Router>
-      </AuthProvider>
+      <Router>
+        <Routes>
+          {/* Auth routes - outside AuthProvider to avoid circular dependency */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/cadastro" element={<Cadastro />} />
+          
+          {/* Protected routes - wrapped in AuthProvider only when needed */}
+          <Route path="/*" element={
+            <AuthProvider>
+              <Routes>
+                <Route path="/" element={
+                  <AuthGuard>
+                    <Layout>
+                      <Dashboard />
+                    </Layout>
+                  </AuthGuard>
+                } />
+                <Route path="/entradas" element={
+                  <AuthGuard>
+                    <Layout>
+                      <Entradas />
+                    </Layout>
+                  </AuthGuard>
+                } />
+                <Route path="/saidas" element={
+                  <AuthGuard>
+                    <Layout>
+                      <Saidas />
+                    </Layout>
+                  </AuthGuard>
+                } />
+                <Route path="/relatorios-mensais" element={
+                  <AuthGuard>
+                    <Layout>
+                      <RelatoriosMensais />
+                    </Layout>
+                  </AuthGuard>
+                } />
+                <Route path="/relatorios-anuais" element={
+                  <AuthGuard>
+                    <Layout>
+                      <RelatoriosAnuais />
+                    </Layout>
+                  </AuthGuard>
+                } />
+                <Route path="/resumo-financeiro" element={
+                  <AuthGuard>
+                    <Layout>
+                      <ResumoFinanceiro />
+                    </Layout>
+                  </AuthGuard>
+                } />
+                <Route path="/configuracoes" element={
+                  <AuthGuard>
+                    <Layout>
+                      <Configuracoes />
+                    </Layout>
+                  </AuthGuard>
+                } />
+              </Routes>
+            </AuthProvider>
+          } />
+        </Routes>
+        <Toaster />
+      </Router>
     </ThemeProvider>
   );
 }
