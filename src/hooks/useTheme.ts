@@ -1,9 +1,9 @@
 
 import React from 'react';
-import { useTheme as useNextTheme } from '@/components/ThemeProvider';
+import { useTheme as useThemeContext } from '@/components/ThemeProvider';
 
 export const useTheme = () => {
-  const { theme, setTheme } = useNextTheme();
+  const { theme, setTheme } = useThemeContext();
   
   const isDark = React.useMemo(() => {
     if (typeof window === 'undefined') return false;
