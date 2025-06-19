@@ -26,9 +26,12 @@ function App() {
         <AuthProvider>
           <Router>
             <Routes>
+              {/* Auth routes - not protected */}
               <Route path="/auth" element={<Auth />} />
               <Route path="/login" element={<Auth />} />
               <Route path="/cadastro" element={<Auth />} />
+              
+              {/* Protected routes */}
               <Route path="/*" element={
                 <AuthGuard>
                   <Layout>
