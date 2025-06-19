@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/components/Auth/AuthProvider';
@@ -5,10 +6,78 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Eye, EyeOff, DollarSign } from "lucide-react";
 import { toast } from "sonner";
+
+// Custom Tabs Component - inline to avoid any import issues
+const CustomTabs = ({ defaultValue, className, children }: { 
+  defaultValue: string; 
+  className?: string; 
+  children: React.ReactNode 
+}) => {
+  const [activeTab, setActiveTab] = useState(defaultValue);
+  
+  return (
+    <div className={className} data-active-tab={activeTab}>
+      {React.Children.map(children, child => 
+        React.isValidElement(child) 
+          ? React.cloneElement(child as React.ReactElement<any>, { activeTab, setActiveTab })
+          : child
+      )}
+    </div>
+  );
+};
+
+const CustomTabsList = ({ className, children, activeTab, setActiveTab }: { 
+  className?: string; 
+  children: React.ReactNode;
+  activeTab?: string;
+  setActiveTab?: (tab: string) => void;
+}) => (
+  <div className={`inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground w-full ${className || ''}`}>
+    {React.Children.map(children, child => 
+      React.isValidElement(child) 
+        ? React.cloneElement(child as React.ReactElement<any>, { activeTab, setActiveTab })
+        : child
+    )}
+  </div>
+);
+
+const CustomTabsTrigger = ({ value, children, activeTab, setActiveTab }: { 
+  value: string; 
+  children: React.ReactNode;
+  activeTab?: string;
+  setActiveTab?: (tab: string) => void;
+}) => {
+  const isActive = activeTab === value;
+  
+  return (
+    <button
+      className={`inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 flex-1 ${
+        isActive ? 'bg-background text-foreground shadow-sm' : ''
+      }`}
+      onClick={() => setActiveTab?.(value)}
+      type="button"
+    >
+      {children}
+    </button>
+  );
+};
+
+const CustomTabsContent = ({ value, children, activeTab }: { 
+  value: string; 
+  children: React.ReactNode;
+  activeTab?: string;
+}) => {
+  if (activeTab !== value) return null;
+  
+  return (
+    <div className="mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+      {children}
+    </div>
+  );
+};
 
 export const Auth = () => {
   console.log('Auth component rendering');
@@ -103,11 +172,11 @@ export const Auth = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Tabs defaultValue="login" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="login">Entrar</TabsTrigger>
-                  <TabsTrigger value="register">Cadastrar</TabsTrigger>
-                </TabsList>
+              <CustomTabs defaultValue="login" className="w-full">
+                <CustomTabsList className="grid w-full grid-cols-2">
+                  <CustomTabsTrigger value="login">Entrar</CustomTabsTrigger>
+                  <CustomTabsTrigger value="register">Cadastrar</CustomTabsTrigger>
+                </CustomTabsList>
 
                 {error && (
                   <Alert variant="destructive" className="mt-4">
@@ -115,8 +184,8 @@ export const Auth = () => {
                   </Alert>
                 )}
 
-                <TabsContent value="login" className="space-y-4">
-                  <form onSubmit={handleLogin} className="space-y-4">
+                <CustomTabsContent value="login">
+                  <form onSubmit={handleLogin} className="space-y-4 mt-4">
                     <div className="space-y-2">
                       <Label htmlFor="login-email">E-mail</Label>
                       <Input
@@ -158,10 +227,10 @@ export const Auth = () => {
                       {isLoading ? "Entrando..." : "Entrar"}
                     </Button>
                   </form>
-                </TabsContent>
+                </CustomTabsContent>
 
-                <TabsContent value="register" className="space-y-4">
-                  <form onSubmit={handleRegister} className="space-y-4">
+                <CustomTabsContent value="register">
+                  <form onSubmit={handleRegister} className="space-y-4 mt-4">
                     <div className="space-y-2">
                       <Label htmlFor="register-name">Nome completo</Label>
                       <Input
@@ -226,8 +295,8 @@ export const Auth = () => {
                       {isLoading ? "Cadastrando..." : "Criar conta"}
                     </Button>
                   </form>
-                </TabsContent>
-              </Tabs>
+                </CustomTabsContent>
+              </CustomTabs>
             </CardContent>
           </Card>
 
