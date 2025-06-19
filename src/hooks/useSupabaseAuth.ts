@@ -1,19 +1,16 @@
 
-import * as React from 'react';
+import { useState, useEffect } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { AuthResponse } from '@/types/user';
 
 export const useSupabaseAuth = () => {
-  console.log('useSupabaseAuth: React object:', React);
-  console.log('useSupabaseAuth: useState function:', React.useState);
-  
-  const [user, setUser] = React.useState<User | null>(null);
-  const [session, setSession] = React.useState<Session | null>(null);
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     let mounted = true;
 
     // Set up auth state listener first
