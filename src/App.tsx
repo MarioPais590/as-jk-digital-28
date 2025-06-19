@@ -29,84 +29,20 @@ function App() {
           
           {/* Protected routes wrapped with AuthProvider */}
           <Route 
-            path="/" 
+            path="/*" 
             element={
               <AuthProvider>
                 <AuthGuard>
                   <Layout>
-                    <Dashboard />
-                  </Layout>
-                </AuthGuard>
-              </AuthProvider>
-            } 
-          />
-          <Route 
-            path="/entradas" 
-            element={
-              <AuthProvider>
-                <AuthGuard>
-                  <Layout>
-                    <Entradas />
-                  </Layout>
-                </AuthGuard>
-              </AuthProvider>
-            } 
-          />
-          <Route 
-            path="/saidas" 
-            element={
-              <AuthProvider>
-                <AuthGuard>
-                  <Layout>
-                    <Saidas />
-                  </Layout>
-                </AuthGuard>
-              </AuthProvider>
-            } 
-          />
-          <Route 
-            path="/relatorios-mensais" 
-            element={
-              <AuthProvider>
-                <AuthGuard>
-                  <Layout>
-                    <RelatoriosMensais />
-                  </Layout>
-                </AuthGuard>
-              </AuthProvider>
-            } 
-          />
-          <Route 
-            path="/relatorios-anuais" 
-            element={
-              <AuthProvider>
-                <AuthGuard>
-                  <Layout>
-                    <RelatoriosAnuais />
-                  </Layout>
-                </AuthGuard>
-              </AuthProvider>
-            } 
-          />
-          <Route 
-            path="/resumo-financeiro" 
-            element={
-              <AuthProvider>
-                <AuthGuard>
-                  <Layout>
-                    <ResumoFinanceiro />
-                  </Layout>
-                </AuthGuard>
-              </AuthProvider>
-            } 
-          />
-          <Route 
-            path="/configuracoes" 
-            element={
-              <AuthProvider>
-                <AuthGuard>
-                  <Layout>
-                    <Configuracoes />
+                    <Routes>
+                      <Route path="/" element={<Dashboard />} />
+                      <Route path="/entradas" element={<Entradas />} />
+                      <Route path="/saidas" element={<Saidas />} />
+                      <Route path="/relatorios-mensais" element={<RelatoriosMensais />} />
+                      <Route path="/relatorios-anuais" element={<RelatoriosAnuais />} />
+                      <Route path="/resumo-financeiro" element={<ResumoFinanceiro />} />
+                      <Route path="/configuracoes" element={<Configuracoes />} />
+                    </Routes>
                   </Layout>
                 </AuthGuard>
               </AuthProvider>
