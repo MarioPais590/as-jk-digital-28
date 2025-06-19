@@ -14,6 +14,7 @@ import { RelatoriosAnuais } from '@/pages/RelatoriosAnuais';
 import { ResumoFinanceiro } from '@/pages/ResumoFinanceiro';
 import { Configuracoes } from '@/pages/Configuracoes';
 import { Login } from '@/pages/Login';
+import { Cadastro } from '@/pages/Cadastro';
 import { Auth } from '@/pages/Auth';
 
 function App() {
@@ -27,7 +28,7 @@ function App() {
             {/* Auth routes - now inside AuthProvider */}
             <Route path="/login" element={<Login />} />
             <Route path="/auth" element={<Auth />} />
-            <Route path="/cadastro" element={<Auth />} />
+            <Route path="/cadastro" element={<Cadastro />} />
             
             {/* Protected routes */}
             <Route path="/" element={

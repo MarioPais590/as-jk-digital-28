@@ -1,9 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Sun, Moon } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/components/Auth/AuthProvider';
-import { useTheme } from '@/hooks/useTheme';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -19,7 +18,6 @@ export const Cadastro: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   
   const { signUp, isAuthenticated } = useAuth();
-  const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -66,73 +64,60 @@ export const Cadastro: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
-      {/* Theme Toggle */}
-      <button
-        onClick={toggleTheme}
-        className="fixed top-4 right-4 p-3 rounded-full bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-200 z-10"
-        title={isDark ? 'Modo Claro' : 'Modo Escuro'}
-      >
-        {isDark ? (
-          <Sun className="h-5 w-5 text-yellow-500" />
-        ) : (
-          <Moon className="h-5 w-5 text-gray-600" />
-        )}
-      </button>
-
-      <div className="max-w-md w-full space-y-8 bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-2xl">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="max-w-md w-full bg-white rounded-3xl shadow-lg p-8">
         {/* Logo */}
-        <div className="text-center">
+        <div className="text-center mb-8">
           <img 
             src="/lovable-uploads/e6254b16-9322-4b60-866d-3e65af6c400b.png" 
             alt="Finanças JK" 
             className="h-16 w-16 mx-auto mb-4"
           />
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Criar conta
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            Finanças JK
           </h2>
-          <p className="mt-2 text-gray-600 dark:text-gray-400">
-            Comece a gerenciar suas finanças hoje
+          <p className="text-blue-600 text-sm font-medium">
+            Crie sua conta
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <Label htmlFor="nome">Nome completo</Label>
+            <Label htmlFor="nome" className="text-gray-700 font-medium">Nome Completo</Label>
             <Input
               id="nome"
               type="text"
               value={nome}
               onChange={(e) => setNome(e.target.value)}
-              className="mt-1"
+              className="mt-2 border-gray-300 rounded-lg h-12"
               placeholder="Seu nome completo"
               required
             />
           </div>
 
           <div>
-            <Label htmlFor="email">E-mail</Label>
+            <Label htmlFor="email" className="text-gray-700 font-medium">E-mail</Label>
             <Input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="mt-1"
+              className="mt-2 border-gray-300 rounded-lg h-12"
               placeholder="seu@email.com"
               required
             />
           </div>
 
           <div>
-            <Label htmlFor="password">Senha</Label>
-            <div className="mt-1 relative">
+            <Label htmlFor="password" className="text-gray-700 font-medium">Senha</Label>
+            <div className="mt-2 relative">
               <Input
                 id="password"
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="pr-10"
-                placeholder="••••••••"
+                className="pr-10 border-gray-300 rounded-lg h-12"
+                placeholder="Mínimo 6 caracteres"
                 required
                 minLength={6}
               />
@@ -151,15 +136,15 @@ export const Cadastro: React.FC = () => {
           </div>
 
           <div>
-            <Label htmlFor="confirmPassword">Confirmar senha</Label>
-            <div className="mt-1 relative">
+            <Label htmlFor="confirmPassword" className="text-gray-700 font-medium">Confirmar Senha</Label>
+            <div className="mt-2 relative">
               <Input
                 id="confirmPassword"
                 type={showConfirmPassword ? 'text' : 'password'}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="pr-10"
-                placeholder="••••••••"
+                className="pr-10 border-gray-300 rounded-lg h-12"
+                placeholder="Digite a senha novamente"
                 required
                 minLength={6}
               />
@@ -179,21 +164,21 @@ export const Cadastro: React.FC = () => {
 
           <Button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+            className="w-full bg-gray-900 hover:bg-gray-800 text-white rounded-lg h-12 text-base font-medium"
             disabled={isLoading}
           >
-            {isLoading ? 'Criando conta...' : 'Criar conta'}
+            {isLoading ? 'Criando conta...' : 'Cadastrar'}
           </Button>
         </form>
 
-        <div className="text-center">
-          <p className="text-gray-600 dark:text-gray-400">
+        <div className="text-center mt-6">
+          <p className="text-gray-600 text-sm">
             Já tem uma conta?{' '}
             <Link 
               to="/login" 
-              className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
+              className="text-green-600 hover:text-green-700 font-medium"
             >
-              Faça login
+              Entrar
             </Link>
           </p>
         </div>
