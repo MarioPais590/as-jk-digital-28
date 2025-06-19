@@ -3,7 +3,7 @@ import * as React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Sun, Moon } from 'lucide-react';
 import { useTheme } from '@/components/ThemeProvider';
-import { useAuth } from '@/components/Auth/AuthProvider';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -16,7 +16,6 @@ export const Login: React.FC = () => {
   const [isLoading, setIsLoading] = React.useState(false);
   
   const { theme, setTheme } = useTheme();
-  const { signIn, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   // Determine if current theme is dark
@@ -26,11 +25,16 @@ export const Login: React.FC = () => {
     setTheme(isDark ? 'light' : 'dark');
   };
 
+  // Check if user is already authenticated
   React.useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/');
-    }
-  }, [isAuthenticated, navigate]);
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        navigate('/');
+      }
+    };
+    checkAuth();
+  }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,13 +47,20 @@ export const Login: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const result = await signIn(email, password);
-      
-      if (result.success) {
-        toast.success(result.message);
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) {
+        console.error('Erro no login:', error);
+        toast.error(error.message);
+        return;
+      }
+
+      if (data.user) {
+        toast.success('Login realizado com sucesso!');
         navigate('/');
-      } else {
-        toast.error(result.message);
       }
     } catch (error) {
       console.error('Erro no login:', error);
