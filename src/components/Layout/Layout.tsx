@@ -31,9 +31,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           onCollapsedChange={setSidebarCollapsed}
         />
         
-        <div className={`flex flex-col flex-1 min-w-0 transition-all duration-300 ${
-          sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'
-        }`}>
+        <div className={`flex flex-col flex-1 min-w-0 transition-all duration-300`}>
           <Header 
             onMenuClick={() => setSidebarOpen(!sidebarOpen)} 
             sidebarOpen={sidebarOpen}

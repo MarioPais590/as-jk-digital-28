@@ -94,7 +94,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         fixed top-0 left-0 z-50 h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transform transition-all duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         ${collapsed ? 'w-16' : 'w-64'}
-        lg:translate-x-0 lg:static lg:z-auto
+        lg:translate-x-0 lg:static lg:z-auto lg:flex-shrink-0
       `}>
         <div className="flex flex-col h-full">
           {/* Header */}
