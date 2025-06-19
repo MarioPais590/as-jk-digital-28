@@ -13,8 +13,6 @@ import { RelatoriosMensais } from '@/pages/RelatoriosMensais';
 import { RelatoriosAnuais } from '@/pages/RelatoriosAnuais';
 import { ResumoFinanceiro } from '@/pages/ResumoFinanceiro';
 import { Configuracoes } from '@/pages/Configuracoes';
-import { Login } from '@/pages/Login';
-import { Cadastro } from '@/pages/Cadastro';
 import { Auth } from '@/pages/Auth';
 
 const queryClient = new QueryClient();
