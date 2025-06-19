@@ -1,21 +1,22 @@
 
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Sun, Moon } from 'lucide-react';
 import { useTheme } from '@/components/ThemeProvider';
+import { useAuth } from '@/components/Auth/AuthProvider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
 
 export const Login: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
   
   const { theme, setTheme } = useTheme();
+  const { signIn, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   // Determine if current theme is dark
@@ -25,16 +26,11 @@ export const Login: React.FC = () => {
     setTheme(isDark ? 'light' : 'dark');
   };
 
-  useEffect(() => {
-    // Check if user is already authenticated
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        navigate('/');
-      }
-    };
-    checkAuth();
-  }, [navigate]);
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/');
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,19 +43,14 @@ export const Login: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-
-      if (error) {
-        console.error('Erro no login:', error);
-        toast.error(error.message);
-        return;
+      const result = await signIn(email, password);
+      
+      if (result.success) {
+        toast.success(result.message);
+        navigate('/');
+      } else {
+        toast.error(result.message);
       }
-
-      toast.success('Login realizado com sucesso!');
-      navigate('/');
     } catch (error) {
       console.error('Erro no login:', error);
       toast.error('Erro interno. Tente novamente.');

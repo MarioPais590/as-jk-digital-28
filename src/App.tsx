@@ -1,5 +1,5 @@
 
-import React from 'react';
+import * as React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { ThemeProvider } from '@/components/ThemeProvider';
@@ -22,76 +22,64 @@ function App() {
   return (
     <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
       <Router>
-        <Routes>
-          {/* Public auth routes - NO AuthProvider */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/cadastro" element={<Cadastro />} />
-          
-          {/* Protected routes - wrapped in AuthProvider */}
-          <Route path="/" element={
-            <AuthProvider>
+        <AuthProvider>
+          <Routes>
+            {/* Public auth routes */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/cadastro" element={<Cadastro />} />
+            
+            {/* Protected routes */}
+            <Route path="/" element={
               <AuthGuard>
                 <Layout>
                   <Dashboard />
                 </Layout>
               </AuthGuard>
-            </AuthProvider>
-          } />
-          <Route path="/entradas" element={
-            <AuthProvider>
+            } />
+            <Route path="/entradas" element={
               <AuthGuard>
                 <Layout>
                   <Entradas />
                 </Layout>
               </AuthGuard>
-            </AuthProvider>
-          } />
-          <Route path="/saidas" element={
-            <AuthProvider>
+            } />
+            <Route path="/saidas" element={
               <AuthGuard>
                 <Layout>
                   <Saidas />
                 </Layout>
               </AuthGuard>
-            </AuthProvider>
-          } />
-          <Route path="/relatorios-mensais" element={
-            <AuthProvider>
+            } />
+            <Route path="/relatorios-mensais" element={
               <AuthGuard>
                 <Layout>
                   <RelatoriosMensais />
                 </Layout>
               </AuthGuard>
-            </AuthProvider>
-          } />
-          <Route path="/relatorios-anuais" element={
-            <AuthProvider>
+            } />
+            <Route path="/relatorios-anuais" element={
               <AuthGuard>
                 <Layout>
                   <RelatoriosAnuais />
                 </Layout>
               </AuthGuard>
-            </AuthProvider>
-          } />
-          <Route path="/resumo-financeiro" element={
-            <AuthProvider>
+            } />
+            <Route path="/resumo-financeiro" element={
               <AuthGuard>
                 <Layout>
                   <ResumoFinanceiro />
                 </Layout>
               </AuthGuard>
-            </AuthProvider>
-          } />
-          <Route path="/configuracoes" element={
-            <AuthProvider>
+            } />
+            <Route path="/configuracoes" element={
               <AuthGuard>
                 <Layout>
                   <Configuracoes />
                 </Layout>
               </AuthGuard>
-            </AuthProvider>
-          } />
-        </Routes>
+            } />
+          </Routes>
+        </AuthProvider>
         <Toaster />
       </Router>
     </ThemeProvider>

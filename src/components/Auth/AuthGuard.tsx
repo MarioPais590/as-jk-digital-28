@@ -1,5 +1,5 @@
 
-import React from 'react';
+import * as React from 'react';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { Navigate, useLocation } from 'react-router-dom';
 
