@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { Menu, Sun, Moon, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useTheme } from '@/hooks/useTheme';
+import { useTheme } from '@/components/ThemeProvider';
 import { useAuth } from '@/components/Auth/AuthProvider';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -16,11 +15,23 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ onMenuClick, sidebarOpen, onSidebarToggle }) => {
-  const { isDark, toggleTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [savedAvatar, setSavedAvatar] = useState<string | null>(null);
   const [currentUserName, setCurrentUserName] = useState<string>('');
+
+  const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+  const toggleTheme = () => {
+    if (theme === 'light') {
+      setTheme('dark');
+    } else if (theme === 'dark') {
+      setTheme('system');
+    } else {
+      setTheme('light');
+    }
+  };
 
   // Load user profile data and avatar
   useEffect(() => {
