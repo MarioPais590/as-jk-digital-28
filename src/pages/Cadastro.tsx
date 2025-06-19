@@ -1,8 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff } from 'lucide-react';
-import { useAuth } from '@/components/Auth/AuthProvider';
+import { Eye, EyeOff, Sun, Moon } from 'lucide-react';
+import { useTheme } from '@/components/ThemeProvider';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -17,14 +18,32 @@ export const Cadastro: React.FC = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   
-  const { signUp, isAuthenticated } = useAuth();
+  const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
 
+  console.log('Cadastro component rendering');
+
+  // Determine if current theme is dark
+  const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+  const toggleTheme = () => {
+    setTheme(isDark ? 'light' : 'dark');
+  };
+
+  // Check if user is already authenticated
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/');
-    }
-  }, [isAuthenticated, navigate]);
+    const checkAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          navigate('/');
+        }
+      } catch (error) {
+        console.error('Error checking auth:', error);
+      }
+    };
+    checkAuth();
+  }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,13 +66,28 @@ export const Cadastro: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const result = await signUp(nome, email, password);
+      const redirectUrl = `${window.location.origin}/`;
       
-      if (result.success) {
-        toast.success(result.message);
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: redirectUrl,
+          data: {
+            nome: nome
+          }
+        }
+      });
+
+      if (error) {
+        console.error('Erro no cadastro:', error);
+        toast.error(error.message);
+        return;
+      }
+
+      if (data.user) {
+        toast.success('Cadastro realizado com sucesso! Verifique seu email para confirmar a conta.');
         navigate('/');
-      } else {
-        toast.error(result.message);
       }
     } catch (error) {
       console.error('Erro no cadastro:', error);
@@ -65,6 +99,19 @@ export const Cadastro: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      {/* Theme Toggle */}
+      <button
+        onClick={toggleTheme}
+        className="fixed top-4 right-4 p-3 rounded-full bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-200 z-10"
+        title={isDark ? 'Modo Claro' : 'Modo Escuro'}
+      >
+        {isDark ? (
+          <Sun className="h-5 w-5 text-yellow-500" />
+        ) : (
+          <Moon className="h-5 w-5 text-gray-600" />
+        )}
+      </button>
+
       <div className="max-w-md w-full bg-white rounded-3xl shadow-lg p-8">
         {/* Logo */}
         <div className="text-center mb-8">
