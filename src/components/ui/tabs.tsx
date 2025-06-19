@@ -1,7 +1,5 @@
-
 import * as React from "react"
 import * as TabsPrimitive from "@radix-ui/react-tabs"
-import { DirectionProvider } from "@radix-ui/react-direction"
 
 import { cn } from "@/lib/utils"
 
@@ -9,13 +7,11 @@ const Tabs = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.Root>
 >(({ className, ...props }, ref) => (
-  <DirectionProvider dir="ltr">
-    <TabsPrimitive.Root
-      ref={ref}
-      className={cn("", className)}
-      {...props}
-    />
-  </DirectionProvider>
+  <TabsPrimitive.Root
+    ref={ref}
+    className={cn("", className)}
+    {...props}
+  />
 ))
 Tabs.displayName = TabsPrimitive.Root.displayName
 
