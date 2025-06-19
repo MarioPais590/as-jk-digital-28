@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Sun, Moon } from 'lucide-react';
 import { useAuth } from '@/components/Auth/AuthProvider';
-import { useTheme } from '@/hooks/useTheme';
+import { useTheme } from '@/components/ThemeProvider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -16,8 +16,15 @@ export const Login: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   
   const { signIn, isAuthenticated } = useAuth();
-  const { isDark, toggleTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
+
+  // Determine if current theme is dark
+  const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+  const toggleTheme = () => {
+    setTheme(isDark ? 'light' : 'dark');
+  };
 
   useEffect(() => {
     if (isAuthenticated) {
