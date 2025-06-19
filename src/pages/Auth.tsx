@@ -104,7 +104,7 @@ export const Auth = () => {
           </CardHeader>
           <CardContent>
             <div className="w-full">
-              {/* Simple Tab Navigation - No Radix UI */}
+              {/* Simple Tab Navigation */}
               <div className="flex bg-gray-100 rounded-lg p-1 mb-6">
                 <button
                   className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
