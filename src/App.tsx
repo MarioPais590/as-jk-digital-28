@@ -23,64 +23,72 @@ function App() {
     <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
       <Router>
         <Routes>
-          {/* Auth routes - outside AuthProvider to avoid circular dependency */}
+          {/* Public auth routes - NO AuthProvider */}
           <Route path="/login" element={<Login />} />
           <Route path="/cadastro" element={<Cadastro />} />
           
-          {/* Protected routes - wrapped in AuthProvider only when needed */}
-          <Route path="/*" element={
+          {/* Protected routes - wrapped in AuthProvider */}
+          <Route path="/" element={
             <AuthProvider>
-              <Routes>
-                <Route path="/" element={
-                  <AuthGuard>
-                    <Layout>
-                      <Dashboard />
-                    </Layout>
-                  </AuthGuard>
-                } />
-                <Route path="/entradas" element={
-                  <AuthGuard>
-                    <Layout>
-                      <Entradas />
-                    </Layout>
-                  </AuthGuard>
-                } />
-                <Route path="/saidas" element={
-                  <AuthGuard>
-                    <Layout>
-                      <Saidas />
-                    </Layout>
-                  </AuthGuard>
-                } />
-                <Route path="/relatorios-mensais" element={
-                  <AuthGuard>
-                    <Layout>
-                      <RelatoriosMensais />
-                    </Layout>
-                  </AuthGuard>
-                } />
-                <Route path="/relatorios-anuais" element={
-                  <AuthGuard>
-                    <Layout>
-                      <RelatoriosAnuais />
-                    </Layout>
-                  </AuthGuard>
-                } />
-                <Route path="/resumo-financeiro" element={
-                  <AuthGuard>
-                    <Layout>
-                      <ResumoFinanceiro />
-                    </Layout>
-                  </AuthGuard>
-                } />
-                <Route path="/configuracoes" element={
-                  <AuthGuard>
-                    <Layout>
-                      <Configuracoes />
-                    </Layout>
-                  </AuthGuard>
-                } />
-              </Routes>
+              <AuthGuard>
+                <Layout>
+                  <Dashboard />
+                </Layout>
+              </AuthGuard>
+            </AuthProvider>
+          } />
+          <Route path="/entradas" element={
+            <AuthProvider>
+              <AuthGuard>
+                <Layout>
+                  <Entradas />
+                </Layout>
+              </AuthGuard>
+            </AuthProvider>
+          } />
+          <Route path="/saidas" element={
+            <AuthProvider>
+              <AuthGuard>
+                <Layout>
+                  <Saidas />
+                </Layout>
+              </AuthGuard>
+            </AuthProvider>
+          } />
+          <Route path="/relatorios-mensais" element={
+            <AuthProvider>
+              <AuthGuard>
+                <Layout>
+                  <RelatoriosMensais />
+                </Layout>
+              </AuthGuard>
+            </AuthProvider>
+          } />
+          <Route path="/relatorios-anuais" element={
+            <AuthProvider>
+              <AuthGuard>
+                <Layout>
+                  <RelatoriosAnuais />
+                </Layout>
+              </AuthGuard>
+            </AuthProvider>
+          } />
+          <Route path="/resumo-financeiro" element={
+            <AuthProvider>
+              <AuthGuard>
+                <Layout>
+                  <ResumoFinanceiro />
+                </Layout>
+              </AuthGuard>
+            </AuthProvider>
+          } />
+          <Route path="/configuracoes" element={
+            <AuthProvider>
+              <AuthGuard>
+                <Layout>
+                  <Configuracoes />
+                </Layout>
+              </AuthGuard>
             </AuthProvider>
           } />
         </Routes>
