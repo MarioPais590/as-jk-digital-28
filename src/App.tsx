@@ -13,6 +13,7 @@ import { RelatoriosMensais } from '@/pages/RelatoriosMensais';
 import { RelatoriosAnuais } from '@/pages/RelatoriosAnuais';
 import { ResumoFinanceiro } from '@/pages/ResumoFinanceiro';
 import { Configuracoes } from '@/pages/Configuracoes';
+import { Login } from '@/pages/Login';
 import { Auth } from '@/pages/Auth';
 
 function App() {
@@ -23,9 +24,9 @@ function App() {
       <AuthProvider>
         <Router>
           <Routes>
-            {/* Auth routes - not protected but inside Router context */}
+            {/* Auth routes */}
+            <Route path="/login" element={<Login />} />
             <Route path="/auth" element={<Auth />} />
-            <Route path="/login" element={<Auth />} />
             <Route path="/cadastro" element={<Auth />} />
             
             {/* Protected routes */}
