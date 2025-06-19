@@ -59,12 +59,26 @@ export class SupabaseService {
   }
 
   static async updateProfile(userId: string, updates: { nome?: string; email?: string; avatar_url?: string | null }) {
+    // First get the current profile to ensure we have required fields
+    const { data: currentProfile, error: getError } = await supabase
+      .from('profiles')
+      .select('nome, email')
+      .eq('id', userId)
+      .single();
+
+    if (getError) throw getError;
+
+    // Prepare the data with required fields
+    const profileData = {
+      id: userId,
+      nome: updates.nome || currentProfile.nome,
+      email: updates.email || currentProfile.email,
+      ...(updates.avatar_url !== undefined && { avatar_url: updates.avatar_url })
+    };
+
     const { error } = await supabase
       .from('profiles')
-      .upsert({ 
-        id: userId, 
-        ...updates 
-      }, {
+      .upsert(profileData, {
         onConflict: 'id'
       });
     
