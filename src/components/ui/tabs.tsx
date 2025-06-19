@@ -1,3 +1,4 @@
+
 import * as React from "react"
 import * as TabsPrimitive from "@radix-ui/react-tabs"
 
@@ -10,6 +11,7 @@ const Tabs = React.forwardRef<
   <TabsPrimitive.Root
     ref={ref}
     className={cn("", className)}
+    dir="ltr"
     {...props}
   />
 ))
