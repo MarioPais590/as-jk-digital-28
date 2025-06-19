@@ -1,6 +1,6 @@
 
-import { useState } from 'react';
-import { Link, Navigate, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/components/Auth/AuthProvider';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -230,9 +230,9 @@ export const Auth = () => {
         </Card>
 
         <div className="text-center mt-6">
-          <Link to="/" className="text-sm text-blue-600 hover:underline">
+          <a href="/" className="text-sm text-blue-600 hover:underline">
             ← Voltar para o início
-          </Link>
+          </a>
         </div>
       </div>
     </div>
