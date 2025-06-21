@@ -10,7 +10,8 @@ import {
   FileText,
   Settings,
   X,
-  LogOut
+  LogOut,
+  Tag
 } from 'lucide-react';
 import { useAuth } from '@/components/Auth/AuthProvider';
 import { toast } from 'sonner';
@@ -37,6 +38,11 @@ const menuItems = [
     path: '/saidas', 
     icon: TrendingDown, 
     label: 'Saídas' 
+  },
+  { 
+    path: '/categorias', 
+    icon: Tag, 
+    label: 'Categorias' 
   },
   { 
     path: '/relatorios-mensais', 

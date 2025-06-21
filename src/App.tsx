@@ -13,6 +13,7 @@ import { RelatoriosMensais } from '@/pages/RelatoriosMensais';
 import { RelatoriosAnuais } from '@/pages/RelatoriosAnuais';
 import { ResumoFinanceiro } from '@/pages/ResumoFinanceiro';
 import { Configuracoes } from '@/pages/Configuracoes';
+import { Categorias } from '@/pages/Categorias';
 import { Login } from '@/pages/Login';
 import { Cadastro } from '@/pages/Cadastro';
 
@@ -47,6 +48,13 @@ function App() {
               <AuthGuard>
                 <Layout>
                   <Saidas />
+                </Layout>
+              </AuthGuard>
+            } />
+            <Route path="/categorias" element={
+              <AuthGuard>
+                <Layout>
+                  <Categorias />
                 </Layout>
               </AuthGuard>
             } />
