@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useCategories } from '@/hooks/useCategories';
+import { useCategoryContext } from '@/contexts/CategoryContext';
 
 interface CategorySelectProps {
   value?: string;
@@ -16,7 +16,7 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({
   type,
   placeholder = "Selecione uma categoria"
 }) => {
-  const { getCategoriesByType, loading } = useCategories();
+  const { getCategoriesByType, loading } = useCategoryContext();
   
   const categories = getCategoriesByType(type);
 

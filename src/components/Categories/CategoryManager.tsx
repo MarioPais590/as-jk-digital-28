@@ -4,7 +4,7 @@ import { Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useCategories } from '@/hooks/useCategories';
+import { useCategoryContext } from '@/contexts/CategoryContext';
 import { toast } from 'sonner';
 import { CreateCategoryInput } from '@/types/category';
 
@@ -13,7 +13,7 @@ interface CategoryManagerProps {
 }
 
 export const CategoryManager: React.FC<CategoryManagerProps> = ({ type }) => {
-  const { categories, loading, createCategory, deleteCategory, getCategoriesByType } = useCategories();
+  const { categories, loading, createCategory, deleteCategory, getCategoriesByType } = useCategoryContext();
   const [newCategoryName, setNewCategoryName] = useState('');
   const [newCategoryType, setNewCategoryType] = useState<'entrada' | 'saida'>(type || 'saida');
   const [isCreating, setIsCreating] = useState(false);

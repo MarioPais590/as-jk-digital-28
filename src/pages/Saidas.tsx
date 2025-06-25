@@ -9,21 +9,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { CategorySelect } from '@/components/Categories/CategorySelect';
+import { useCategoryContext } from '@/contexts/CategoryContext';
 import { toast } from 'sonner';
-
-const categorias = [
-  'Alimentação',
-  'Transporte',
-  'Moradia',
-  'Saúde',
-  'Educação',
-  'Lazer',
-  'Compras',
-  'Outros'
-];
 
 export const Saidas: React.FC = () => {
   const { transactions, addTransaction, updateTransaction, deleteTransaction, loading } = useSupabaseFinancialData();
+  const { getCategoriesByType } = useCategoryContext();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -39,6 +31,7 @@ export const Saidas: React.FC = () => {
   });
 
   const saidas = transactions.filter(t => t.type === 'saida');
+  const categorias = getCategoriesByType('saida');
 
   const filteredSaidas = saidas.filter(saida => {
     const matchesSearch = saida.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -183,18 +176,12 @@ export const Saidas: React.FC = () => {
               
               <div>
                 <Label htmlFor="category">Categoria</Label>
-                <Select value={formData.category} onValueChange={(value) => setFormData({...formData, category: value})}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione uma categoria" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categorias.map(categoria => (
-                      <SelectItem key={categoria} value={categoria}>
-                        {categoria}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <CategorySelect
+                  value={formData.category}
+                  onValueChange={(value) => setFormData({...formData, category: value})}
+                  type="saida"
+                  placeholder="Selecione uma categoria"
+                />
               </div>
               
               <div>
@@ -244,8 +231,8 @@ export const Saidas: React.FC = () => {
             <SelectContent>
               <SelectItem value="all">Todas as categorias</SelectItem>
               {categorias.map(categoria => (
-                <SelectItem key={categoria} value={categoria}>
-                  {categoria}
+                <SelectItem key={categoria.id} value={categoria.name}>
+                  {categoria.name}
                 </SelectItem>
               ))}
             </SelectContent>
