@@ -1,13 +1,17 @@
-
 import React from 'react';
 import { FinancialCard } from '@/components/FinancialCard';
 import { MonthlyChart } from '@/components/Charts/MonthlyChart';
 import { YearlyChart } from '@/components/Charts/YearlyChart';
 import { useSupabaseFinancialData } from '@/hooks/useSupabaseFinancialData';
 import { CURRENCY_CONFIG, DATE_CONFIG } from '@/constants/app';
+import { useCreditCards } from '@/hooks/useCreditCards';
+import { useCreditCardCalculations } from '@/hooks/useCreditCardCalculations';
+import { CreditCardsSection } from '@/components/Dashboard/CreditCardsSection';
 
 export const Dashboard: React.FC = () => {
-  const { getMonthlyData, getDailyBalances, getYearlyData, loading } = useSupabaseFinancialData();
+  const { getMonthlyData, getDailyBalances, getYearlyData, loading, transactions } = useSupabaseFinancialData();
+  const { creditCards } = useCreditCards();
+  const { creditCardUsages } = useCreditCardCalculations(creditCards, transactions);
   
   const currentDate = new Date();
   const currentYear = currentDate.getFullYear();
@@ -69,6 +73,9 @@ export const Dashboard: React.FC = () => {
           type="saldo"
         />
       </div>
+
+      {/* Seção de Cartões de Crédito */}
+      <CreditCardsSection creditCardUsages={creditCardUsages} />
 
       {/* Gráficos */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">

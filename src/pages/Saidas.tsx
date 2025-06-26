@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Plus, Edit, Trash2, Search } from 'lucide-react';
 import { useSupabaseFinancialData } from '@/hooks/useSupabaseFinancialData';
@@ -12,10 +11,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { CategorySelect } from '@/components/Categories/CategorySelect';
 import { useCategoryContext } from '@/contexts/CategoryContext';
 import { toast } from 'sonner';
+import { CreditCardSelect } from '@/components/CreditCards/CreditCardSelect';
+import { useCreditCards } from '@/hooks/useCreditCards';
 
 export const Saidas: React.FC = () => {
   const { transactions, addTransaction, updateTransaction, deleteTransaction, loading } = useSupabaseFinancialData();
   const { getCategoriesByType } = useCategoryContext();
+  const { creditCards } = useCreditCards();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -27,7 +29,8 @@ export const Saidas: React.FC = () => {
     date: new Date().toISOString().split('T')[0],
     category: '',
     description: '',
-    notes: ''
+    notes: '',
+    cartao_id: ''
   });
 
   const saidas = transactions.filter(t => t.type === 'saida');
@@ -57,7 +60,8 @@ export const Saidas: React.FC = () => {
         date: formData.date,
         category: formData.category,
         description: formData.description,
-        notes: formData.notes
+        notes: formData.notes,
+        cartao_id: formData.cartao_id || undefined
       };
 
       if (editingTransaction) {
@@ -73,7 +77,8 @@ export const Saidas: React.FC = () => {
         date: new Date().toISOString().split('T')[0],
         category: '',
         description: '',
-        notes: ''
+        notes: '',
+        cartao_id: ''
       });
       setEditingTransaction(null);
       setIsDialogOpen(false);
@@ -92,7 +97,8 @@ export const Saidas: React.FC = () => {
       date: transaction.date,
       category: transaction.category,
       description: transaction.description,
-      notes: transaction.notes || ''
+      notes: transaction.notes || '',
+      cartao_id: transaction.cartao_id || ''
     });
     setIsDialogOpen(true);
   };
@@ -181,6 +187,16 @@ export const Saidas: React.FC = () => {
                   onValueChange={(value) => setFormData({...formData, category: value})}
                   type="saida"
                   placeholder="Selecione uma categoria"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="cartao">Forma de Pagamento</Label>
+                <CreditCardSelect
+                  creditCards={creditCards}
+                  value={formData.cartao_id}
+                  onValueChange={(value) => setFormData({...formData, cartao_id: value})}
+                  placeholder="Dinheiro/Débito"
                 />
               </div>
               

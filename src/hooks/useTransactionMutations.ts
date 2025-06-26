@@ -8,7 +8,7 @@ export const useTransactionMutations = (
 ) => {
   const { user } = useSupabaseAuth();
 
-  const addTransaction = async (transaction: Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const addTransaction = async (transaction: Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'> & { cartao_id?: string }) => {
     if (!user) {
       throw new Error('Usuário não autenticado');
     }
@@ -23,7 +23,8 @@ export const useTransactionMutations = (
           date: transaction.date,
           category: transaction.category,
           description: transaction.description,
-          notes: transaction.notes
+          notes: transaction.notes,
+          cartao_id: transaction.cartao_id || null
         })
         .select()
         .single();
@@ -42,7 +43,8 @@ export const useTransactionMutations = (
         description: data.description || '',
         notes: data.notes || '',
         createdAt: data.created_at,
-        updatedAt: data.updated_at
+        updatedAt: data.updated_at,
+        cartao_id: data.cartao_id
       };
 
       setTransactions(prev => [newTransaction, ...prev]);
@@ -52,7 +54,7 @@ export const useTransactionMutations = (
     }
   };
 
-  const updateTransaction = async (id: string, updates: Partial<Transaction>) => {
+  const updateTransaction = async (id: string, updates: Partial<Transaction> & { cartao_id?: string }) => {
     if (!user) {
       throw new Error('Usuário não autenticado');
     }
@@ -66,7 +68,8 @@ export const useTransactionMutations = (
           date: updates.date,
           category: updates.category,
           description: updates.description,
-          notes: updates.notes
+          notes: updates.notes,
+          cartao_id: updates.cartao_id || null
         })
         .eq('id', id)
         .select()
@@ -88,7 +91,8 @@ export const useTransactionMutations = (
                 category: data.category,
                 description: data.description || '',
                 notes: data.notes || '',
-                updatedAt: data.updated_at
+                updatedAt: data.updated_at,
+                cartao_id: data.cartao_id
               }
             : transaction
         )

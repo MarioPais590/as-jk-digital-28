@@ -2,6 +2,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { Transaction } from '@/types/financial';
 import { Category, CreateCategoryInput } from '@/types/category';
+import { CreditCard, CreateCreditCardInput } from '@/types/creditCard';
 
 export class SupabaseService {
   // Transactions
@@ -15,7 +16,7 @@ export class SupabaseService {
     return data;
   }
 
-  static async createTransaction(transaction: Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'> & { user_id: string }) {
+  static async createTransaction(transaction: Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'> & { user_id: string; cartao_id?: string | null }) {
     const { data, error } = await supabase
       .from('transactions')
       .insert(transaction)
@@ -26,7 +27,7 @@ export class SupabaseService {
     return data;
   }
 
-  static async updateTransaction(id: string, updates: Partial<Transaction>) {
+  static async updateTransaction(id: string, updates: Partial<Transaction & { cartao_id?: string | null }>) {
     const { data, error } = await supabase
       .from('transactions')
       .update(updates)
@@ -72,6 +73,49 @@ export class SupabaseService {
   static async deleteCategory(id: string) {
     const { error } = await supabase
       .from('categories')
+      .delete()
+      .eq('id', id);
+    
+    if (error) throw error;
+  }
+
+  // Credit Cards
+  static async getCreditCards() {
+    const { data, error } = await supabase
+      .from('credit_cards')
+      .select('*')
+      .order('created_at', { ascending: true });
+    
+    if (error) throw error;
+    return data;
+  }
+
+  static async createCreditCard(card: CreateCreditCardInput & { user_id: string }) {
+    const { data, error } = await supabase
+      .from('credit_cards')
+      .insert(card)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  }
+
+  static async updateCreditCard(id: string, updates: Partial<CreateCreditCardInput>) {
+    const { data, error } = await supabase
+      .from('credit_cards')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  }
+
+  static async deleteCreditCard(id: string) {
+    const { error } = await supabase
+      .from('credit_cards')
       .delete()
       .eq('id', id);
     

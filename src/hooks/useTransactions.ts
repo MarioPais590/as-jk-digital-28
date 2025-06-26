@@ -39,7 +39,8 @@ export const useTransactions = () => {
         description: item.description || '',
         notes: item.notes || '',
         createdAt: item.created_at,
-        updatedAt: item.updated_at
+        updatedAt: item.updated_at,
+        cartao_id: item.cartao_id
       }));
 
       setTransactions(formattedTransactions);

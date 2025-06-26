@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -22,6 +21,7 @@ import { RelatoriosMensais } from "./pages/RelatoriosMensais";
 import { RelatoriosAnuais } from "./pages/RelatoriosAnuais";
 import { Configuracoes } from "./pages/Configuracoes";
 import NotFound from "./pages/NotFound";
+import { CartõesCredito } from "./pages/CartõesCredito";
 
 const queryClient = new QueryClient();
 
@@ -65,6 +65,16 @@ const App = () => (
                     <AuthGuard>
                       <Layout>
                         <Saidas />
+                      </Layout>
+                    </AuthGuard>
+                  }
+                />
+                <Route
+                  path="/cartoes-credito"
+                  element={
+                    <AuthGuard>
+                      <Layout>
+                        <CartõesCredito />
                       </Layout>
                     </AuthGuard>
                   }

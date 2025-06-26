@@ -9,6 +9,7 @@ export interface Transaction {
   notes?: string;
   createdAt: string;
   updatedAt: string;
+  cartao_id?: string | null;
 }
 
 export interface MonthlyBalance {

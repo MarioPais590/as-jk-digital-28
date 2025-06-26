@@ -39,6 +39,47 @@ export type Database = {
         }
         Relationships: []
       }
+      credit_cards: {
+        Row: {
+          created_at: string
+          dia_fechamento: number
+          dia_vencimento: number
+          id: string
+          limite: number
+          nome: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          dia_fechamento: number
+          dia_vencimento: number
+          id?: string
+          limite?: number
+          nome: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          dia_fechamento?: number
+          dia_vencimento?: number
+          id?: string
+          limite?: number
+          nome?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credit_cards_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       monthly_reports: {
         Row: {
           ano: number
@@ -119,6 +160,7 @@ export type Database = {
       transactions: {
         Row: {
           amount: number
+          cartao_id: string | null
           category: string
           created_at: string | null
           date: string
@@ -131,6 +173,7 @@ export type Database = {
         }
         Insert: {
           amount: number
+          cartao_id?: string | null
           category: string
           created_at?: string | null
           date: string
@@ -143,6 +186,7 @@ export type Database = {
         }
         Update: {
           amount?: number
+          cartao_id?: string | null
           category?: string
           created_at?: string | null
           date?: string
@@ -154,6 +198,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "transactions_cartao_id_fkey"
+            columns: ["cartao_id"]
+            isOneToOne: false
+            referencedRelation: "credit_cards"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "transactions_user_id_fkey"
             columns: ["user_id"]
