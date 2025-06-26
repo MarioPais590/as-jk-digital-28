@@ -6,10 +6,10 @@ import { useAuth } from '@/components/Auth/AuthProvider';
 const Index = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, loading } = useAuth();
+  const { user, isLoading } = useAuth();
 
   useEffect(() => {
-    if (loading) return;
+    if (isLoading) return;
 
     // Se o usuário não está logado, redireciona para welcome
     if (!user) {
@@ -22,10 +22,10 @@ const Index = () => {
       navigate('/dashboard');
       return;
     }
-  }, [user, loading, navigate, location.pathname]);
+  }, [user, isLoading, navigate, location.pathname]);
 
   // Página de loading enquanto verifica autenticação
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
