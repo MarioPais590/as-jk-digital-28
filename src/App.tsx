@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/components/Auth/AuthProvider";
 import { AuthGuard } from "@/components/Auth/AuthGuard";
 import { CategoryProvider } from "@/contexts/CategoryContext";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import { Layout } from "@/components/Layout/Layout";
 import Index from "./pages/Index";
 import { Login } from "./pages/Login";
@@ -26,103 +27,105 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <CategoryProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/cadastro" element={<Cadastro />} />
-              <Route path="/welcome" element={<Welcome />} />
-              <Route
-                path="/dashboard"
-                element={
-                  <AuthGuard>
-                    <Layout>
-                      <Dashboard />
-                    </Layout>
-                  </AuthGuard>
-                }
-              />
-              <Route
-                path="/entradas"
-                element={
-                  <AuthGuard>
-                    <Layout>
-                      <Entradas />
-                    </Layout>
-                  </AuthGuard>
-                }
-              />
-              <Route
-                path="/saidas"
-                element={
-                  <AuthGuard>
-                    <Layout>
-                      <Saidas />
-                    </Layout>
-                  </AuthGuard>
-                }
-              />
-              <Route
-                path="/categorias"
-                element={
-                  <AuthGuard>
-                    <Layout>
-                      <Categorias />
-                    </Layout>
-                  </AuthGuard>
-                }
-              />
-              <Route
-                path="/resumo-financeiro"
-                element={
-                  <AuthGuard>
-                    <Layout>
-                      <ResumoFinanceiro />
-                    </Layout>
-                  </AuthGuard>
-                }
-              />
-              <Route
-                path="/relatorios-mensais"
-                element={
-                  <AuthGuard>
-                    <Layout>
-                      <RelatoriosMensais />
-                    </Layout>
-                  </AuthGuard>
-                }
-              />
-              <Route
-                path="/relatorios-anuais"
-                element={
-                  <AuthGuard>
-                    <Layout>
-                      <RelatoriosAnuais />
-                    </Layout>
-                  </AuthGuard>
-                }
-              />
-              <Route
-                path="/configuracoes"
-                element={
-                  <AuthGuard>
-                    <Layout>
-                      <Configuracoes />
-                    </Layout>
-                  </AuthGuard>
-                }
-              />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </CategoryProvider>
-    </AuthProvider>
+    <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+      <AuthProvider>
+        <CategoryProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/cadastro" element={<Cadastro />} />
+                <Route path="/welcome" element={<Welcome />} />
+                <Route
+                  path="/dashboard"
+                  element={
+                    <AuthGuard>
+                      <Layout>
+                        <Dashboard />
+                      </Layout>
+                    </AuthGuard>
+                  }
+                />
+                <Route
+                  path="/entradas"
+                  element={
+                    <AuthGuard>
+                      <Layout>
+                        <Entradas />
+                      </Layout>
+                    </AuthGuard>
+                  }
+                />
+                <Route
+                  path="/saidas"
+                  element={
+                    <AuthGuard>
+                      <Layout>
+                        <Saidas />
+                      </Layout>
+                    </AuthGuard>
+                  }
+                />
+                <Route
+                  path="/categorias"
+                  element={
+                    <AuthGuard>
+                      <Layout>
+                        <Categorias />
+                      </Layout>
+                    </AuthGuard>
+                  }
+                />
+                <Route
+                  path="/resumo-financeiro"
+                  element={
+                    <AuthGuard>
+                      <Layout>
+                        <ResumoFinanceiro />
+                      </Layout>
+                    </AuthGuard>
+                  }
+                />
+                <Route
+                  path="/relatorios-mensais"
+                  element={
+                    <AuthGuard>
+                      <Layout>
+                        <RelatoriosMensais />
+                      </Layout>
+                    </AuthGuard>
+                  }
+                />
+                <Route
+                  path="/relatorios-anuais"
+                  element={
+                    <AuthGuard>
+                      <Layout>
+                        <RelatoriosAnuais />
+                      </Layout>
+                    </AuthGuard>
+                  }
+                />
+                <Route
+                  path="/configuracoes"
+                  element={
+                    <AuthGuard>
+                      <Layout>
+                        <Configuracoes />
+                      </Layout>
+                    </AuthGuard>
+                  }
+                />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </CategoryProvider>
+      </AuthProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 
