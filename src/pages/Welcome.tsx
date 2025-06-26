@@ -2,7 +2,7 @@
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, Shield, BarChart3 } from "lucide-react";
+import { DollarSign, TrendingUp, Shield, BarChart3 } from "lucide-react";
 
 export const Welcome = () => {
   return (
@@ -10,18 +10,14 @@ export const Welcome = () => {
       <div className="container mx-auto px-4 py-16">
         <div className="text-center mb-16">
           <div className="flex items-center justify-center mb-6">
-            <img 
-              src="/lovable-uploads/e6254b16-9322-4b60-866d-3e65af6c400b.png" 
-              alt="Finanças JK" 
-              className="h-16 w-16"
-            />
+            <DollarSign className="h-16 w-16 text-blue-600" />
           </div>
           <h1 className="text-5xl font-bold text-gray-900 mb-4">Finanças JK</h1>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
             A plataforma completa para gerenciar suas finanças pessoais com inteligência e simplicidade
           </p>
           <div className="flex gap-4 justify-center">
-            <Link to="/cadastro">
+            <Link to="/auth">
               <Button size="lg" className="px-8">
                 Começar Agora
               </Button>
@@ -83,7 +79,7 @@ export const Welcome = () => {
           <p className="text-xl text-gray-600 mb-8">
             Junte-se a milhares de pessoas que já estão no controle total de seu dinheiro
           </p>
-          <Link to="/cadastro">
+          <Link to="/auth">
             <Button size="lg" className="px-12">
               Criar Conta Gratuita
             </Button>
