@@ -22,7 +22,7 @@ export const CreditCardSelect: React.FC<CreditCardSelectProps> = ({
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="">Dinheiro/Débito</SelectItem>
+        <SelectItem value="cash">Dinheiro/Débito</SelectItem>
         {creditCards.map(card => (
           <SelectItem key={card.id} value={card.id}>
             {card.nome}

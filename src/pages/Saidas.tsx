@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Plus, Edit, Trash2, Search } from 'lucide-react';
 import { useSupabaseFinancialData } from '@/hooks/useSupabaseFinancialData';
@@ -31,7 +30,7 @@ export const Saidas: React.FC = () => {
     category: '',
     description: '',
     notes: '',
-    cartao_id: ''
+    cartao_id: 'cash'
   });
 
   const saidas = transactions.filter(t => t.type === 'saida');
@@ -62,7 +61,7 @@ export const Saidas: React.FC = () => {
         category: formData.category,
         description: formData.description,
         notes: formData.notes,
-        cartao_id: formData.cartao_id || undefined
+        cartao_id: formData.cartao_id === 'cash' ? undefined : formData.cartao_id
       };
 
       if (editingTransaction) {
@@ -79,7 +78,7 @@ export const Saidas: React.FC = () => {
         category: '',
         description: '',
         notes: '',
-        cartao_id: ''
+        cartao_id: 'cash'
       });
       setEditingTransaction(null);
       setIsDialogOpen(false);
@@ -99,7 +98,7 @@ export const Saidas: React.FC = () => {
       category: transaction.category,
       description: transaction.description,
       notes: transaction.notes || '',
-      cartao_id: transaction.cartao_id || ''
+      cartao_id: transaction.cartao_id || 'cash'
     });
     setIsDialogOpen(true);
   };
@@ -206,7 +205,7 @@ export const Saidas: React.FC = () => {
                       <SelectValue placeholder="Dinheiro/Débito" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Dinheiro/Débito</SelectItem>
+                      <SelectItem value="cash">Dinheiro/Débito</SelectItem>
                     </SelectContent>
                   </Select>
                 )}
