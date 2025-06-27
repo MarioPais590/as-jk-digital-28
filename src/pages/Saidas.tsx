@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Plus, Edit, Trash2, Search } from 'lucide-react';
 import { useSupabaseFinancialData } from '@/hooks/useSupabaseFinancialData';
@@ -17,7 +18,7 @@ import { useCreditCards } from '@/hooks/useCreditCards';
 export const Saidas: React.FC = () => {
   const { transactions, addTransaction, updateTransaction, deleteTransaction, loading } = useSupabaseFinancialData();
   const { getCategoriesByType } = useCategoryContext();
-  const { creditCards } = useCreditCards();
+  const { creditCards, loading: creditCardsLoading } = useCreditCards();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -117,7 +118,7 @@ export const Saidas: React.FC = () => {
 
   const totalSaidas = filteredSaidas.reduce((sum, saida) => sum + saida.amount, 0);
 
-  if (loading) {
+  if (loading || creditCardsLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -192,12 +193,23 @@ export const Saidas: React.FC = () => {
               
               <div>
                 <Label htmlFor="cartao">Forma de Pagamento</Label>
-                <CreditCardSelect
-                  creditCards={creditCards}
-                  value={formData.cartao_id}
-                  onValueChange={(value) => setFormData({...formData, cartao_id: value})}
-                  placeholder="Dinheiro/Débito"
-                />
+                {creditCards && creditCards.length > 0 ? (
+                  <CreditCardSelect
+                    creditCards={creditCards}
+                    value={formData.cartao_id}
+                    onValueChange={(value) => setFormData({...formData, cartao_id: value})}
+                    placeholder="Dinheiro/Débito"
+                  />
+                ) : (
+                  <Select value={formData.cartao_id} onValueChange={(value) => setFormData({...formData, cartao_id: value})}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Dinheiro/Débito" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">Dinheiro/Débito</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
               </div>
               
               <div>

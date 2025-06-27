@@ -11,7 +11,8 @@ import {
   Settings,
   X,
   LogOut,
-  Tag
+  Tag,
+  CreditCard
 } from 'lucide-react';
 import { useAuth } from '@/components/Auth/AuthProvider';
 import { toast } from 'sonner';
@@ -38,6 +39,11 @@ const menuItems = [
     path: '/saidas', 
     icon: TrendingDown, 
     label: 'Saídas' 
+  },
+  { 
+    path: '/cartoes-credito', 
+    icon: CreditCard, 
+    label: 'Cartões de Crédito' 
   },
   { 
     path: '/categorias', 
