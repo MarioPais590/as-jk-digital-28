@@ -50,6 +50,7 @@ export type Database = {
           limite: number
           limite_disponivel: number | null
           nome: string
+          numero_cartao: string | null
           updated_at: string
           user_id: string
           valor_proximas_faturas: number | null
@@ -64,6 +65,7 @@ export type Database = {
           limite?: number
           limite_disponivel?: number | null
           nome: string
+          numero_cartao?: string | null
           updated_at?: string
           user_id: string
           valor_proximas_faturas?: number | null
@@ -78,6 +80,7 @@ export type Database = {
           limite?: number
           limite_disponivel?: number | null
           nome?: string
+          numero_cartao?: string | null
           updated_at?: string
           user_id?: string
           valor_proximas_faturas?: number | null
