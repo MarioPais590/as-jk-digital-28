@@ -1,9 +1,10 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { CreateCreditCardInput, CreditCard } from '@/types/creditCard';
+import { getCardBrandImage } from '@/utils/cardBrandDetector';
 
 interface CreditCardFormProps {
   onSubmit: (data: CreateCreditCardInput) => void;
@@ -22,12 +23,27 @@ export const CreditCardForm: React.FC<CreditCardFormProps> = ({
     nome: editingCard?.nome || '',
     limite: editingCard?.limite || 0,
     dia_fechamento: editingCard?.dia_fechamento || 1,
-    dia_vencimento: editingCard?.dia_vencimento || 10
+    dia_vencimento: editingCard?.dia_vencimento || 10,
+    numero_cartao: editingCard?.numero_cartao || '',
+    valor_proximas_faturas: editingCard?.valor_proximas_faturas || 0
   });
+
+  const [brandImage, setBrandImage] = useState<string>('');
+
+  useEffect(() => {
+    if (formData.numero_cartao) {
+      setBrandImage(getCardBrandImage(formData.numero_cartao));
+    }
+  }, [formData.numero_cartao]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(formData);
+  };
+
+  const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+    setFormData({...formData, numero_cartao: value});
   };
 
   return (
@@ -42,6 +58,30 @@ export const CreditCardForm: React.FC<CreditCardFormProps> = ({
           required
         />
       </div>
+
+      <div>
+        <Label htmlFor="numero_cartao">Número do Cartão</Label>
+        <div className="flex items-center gap-2">
+          <Input
+            id="numero_cartao"
+            value={formData.numero_cartao}
+            onChange={handleCardNumberChange}
+            placeholder="1234567890123456"
+            maxLength={16}
+            required
+          />
+          {brandImage && (
+            <img 
+              src={brandImage} 
+              alt="Bandeira do cartão" 
+              className="h-6 w-auto"
+              onError={(e) => {
+                e.currentTarget.src = '/bandeiras/generico.png';
+              }}
+            />
+          )}
+        </div>
+      </div>
       
       <div>
         <Label htmlFor="limite">Limite Total (R$)</Label>
@@ -53,6 +93,18 @@ export const CreditCardForm: React.FC<CreditCardFormProps> = ({
           value={formData.limite}
           onChange={(e) => setFormData({...formData, limite: parseFloat(e.target.value) || 0})}
           required
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="valor_proximas_faturas">Valor das Próximas Faturas (R$)</Label>
+        <Input
+          id="valor_proximas_faturas"
+          type="number"
+          step="0.01"
+          min="0"
+          value={formData.valor_proximas_faturas}
+          onChange={(e) => setFormData({...formData, valor_proximas_faturas: parseFloat(e.target.value) || 0})}
         />
       </div>
       

@@ -41,34 +41,46 @@ export type Database = {
       }
       credit_cards: {
         Row: {
+          bin: string | null
           created_at: string
           dia_fechamento: number
           dia_vencimento: number
           id: string
+          last_four: string | null
           limite: number
+          limite_disponivel: number | null
           nome: string
           updated_at: string
           user_id: string
+          valor_proximas_faturas: number | null
         }
         Insert: {
+          bin?: string | null
           created_at?: string
           dia_fechamento: number
           dia_vencimento: number
           id?: string
+          last_four?: string | null
           limite?: number
+          limite_disponivel?: number | null
           nome: string
           updated_at?: string
           user_id: string
+          valor_proximas_faturas?: number | null
         }
         Update: {
+          bin?: string | null
           created_at?: string
           dia_fechamento?: number
           dia_vencimento?: number
           id?: string
+          last_four?: string | null
           limite?: number
+          limite_disponivel?: number | null
           nome?: string
           updated_at?: string
           user_id?: string
+          valor_proximas_faturas?: number | null
         }
         Relationships: [
           {

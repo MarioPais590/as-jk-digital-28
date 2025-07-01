@@ -4,6 +4,7 @@ import { Edit, Trash2, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CreditCardUsage } from '@/types/creditCard';
+import { formatCardNumber, getCardBrandImage } from '@/utils/cardBrandDetector';
 
 interface CreditCardItemProps {
   usage: CreditCardUsage;
@@ -16,7 +17,7 @@ export const CreditCardItem: React.FC<CreditCardItemProps> = ({
   onEdit,
   onDelete
 }) => {
-  const { card, faturaAtual, percentualUsado } = usage;
+  const { card, faturaAtual, percentualUsado, limiteDisponivel } = usage;
   
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', { 
@@ -37,11 +38,25 @@ export const CreditCardItem: React.FC<CreditCardItemProps> = ({
     return 'bg-green-500';
   };
 
+  const cardBrandImage = card.numero_cartao ? getCardBrandImage(card.numero_cartao) : '';
+  const maskedNumber = card.numero_cartao ? formatCardNumber(card.numero_cartao) : '';
+
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-lg font-medium flex items-center gap-2">
-          <CreditCard size={20} />
+          {cardBrandImage ? (
+            <img 
+              src={cardBrandImage} 
+              alt="Bandeira do cartão" 
+              className="h-6 w-auto"
+              onError={(e) => {
+                e.currentTarget.src = '/bandeiras/generico.png';
+              }}
+            />
+          ) : (
+            <CreditCard size={20} />
+          )}
           {card.nome}
         </CardTitle>
         <div className="flex gap-1">
@@ -65,6 +80,13 @@ export const CreditCardItem: React.FC<CreditCardItemProps> = ({
       </CardHeader>
       
       <CardContent className="space-y-4">
+        {maskedNumber && (
+          <div className="text-sm text-gray-600 dark:text-gray-400">
+            <span className="block">Número</span>
+            <span className="font-mono">{maskedNumber}</span>
+          </div>
+        )}
+        
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
             <span className="text-gray-600 dark:text-gray-400">Fatura Atual</span>
@@ -74,14 +96,28 @@ export const CreditCardItem: React.FC<CreditCardItemProps> = ({
           </div>
           
           <div className="flex justify-between text-sm">
-            <span className="text-gray-600 dark:text-gray-400">Limite Total</span>
-            <span className="font-medium">{formatCurrency(card.limite)}</span>
-          </div>
-          
-          <div className="flex justify-between text-sm">
             <span className="text-gray-600 dark:text-gray-400">Uso do Limite</span>
             <span className={`font-semibold ${getUsageColor(percentualUsado)}`}>
               {percentualUsado.toFixed(1)}%
+            </span>
+          </div>
+          
+          <div className="flex justify-between text-sm">
+            <span className="text-gray-600 dark:text-gray-400">Limite Total</span>
+            <span className="font-medium">{formatCurrency(card.limite)}</span>
+          </div>
+
+          {card.valor_proximas_faturas && card.valor_proximas_faturas > 0 && (
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600 dark:text-gray-400">Próximas Faturas</span>
+              <span className="font-medium">{formatCurrency(card.valor_proximas_faturas)}</span>
+            </div>
+          )}
+
+          <div className="flex justify-between text-sm">
+            <span className="text-gray-600 dark:text-gray-400">Limite Disponível</span>
+            <span className={`font-medium ${limiteDisponivel >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+              {formatCurrency(limiteDisponivel)}
             </span>
           </div>
         </div>

@@ -6,6 +6,11 @@ export interface CreditCard {
   limite: number;
   dia_fechamento: number;
   dia_vencimento: number;
+  numero_cartao?: string;
+  valor_proximas_faturas?: number;
+  bin?: string;
+  last_four?: string;
+  limite_disponivel?: number;
   created_at: string;
   updated_at: string;
 }
@@ -15,6 +20,8 @@ export interface CreateCreditCardInput {
   limite: number;
   dia_fechamento: number;
   dia_vencimento: number;
+  numero_cartao?: string;
+  valor_proximas_faturas?: number;
 }
 
 export interface CreditCardUsage {
@@ -23,4 +30,5 @@ export interface CreditCardUsage {
   percentualUsado: number;
   proximoVencimento: Date;
   proximoFechamento: Date;
+  limiteDisponivel: number;
 }
