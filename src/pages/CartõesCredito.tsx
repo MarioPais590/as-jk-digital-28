@@ -154,7 +154,7 @@ export const CartõesCredito: React.FC = () => {
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="flex flex-wrap gap-6 justify-center lg:justify-start">
           {creditCardUsages.map(usage => (
             <CreditCardItem
               key={usage.card.id}

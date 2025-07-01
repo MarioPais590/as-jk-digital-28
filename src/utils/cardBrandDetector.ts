@@ -21,8 +21,8 @@ export const getCardBrand = (cardNumber: string): string => {
 // SVG ícones das bandeiras embutidos
 const cardIcons = {
   visa: React.createElement('svg', {
-    width: "24",
-    height: "16", 
+    width: "32",
+    height: "20",
     viewBox: "0 0 24 16",
     fill: "none",
     xmlns: "http://www.w3.org/2000/svg"
@@ -31,9 +31,9 @@ const cardIcons = {
     React.createElement('path', { key: 'logo', d: "M8.5 4.5h2.3l-1.4 7h-2.3l1.4-7zM13.2 4.5c.4 0 1.2.1 1.6.4l-.3 1.5c-.3-.2-.8-.3-1.3-.3-.5 0-.8.2-.8.5 0 .3.3.4.9.7.8.4 1.2.9 1.2 1.6 0 1.2-1 2-2.6 2-.7 0-1.4-.2-1.8-.4l.3-1.6c.4.2 1 .4 1.6.4.5 0 .9-.2.9-.6 0-.3-.2-.4-.8-.7-.6-.3-1.3-.8-1.3-1.5 0-1.1 1-2 2.4-2zM18.8 4.5c.5 0 .9.3 1.1.8l1.6 6.2h-2.2l-.3-1.5h-2.5l-.5 1.5h-2l2.8-7h2zm.1 2.2l-.8 2.4h1.6l-.8-2.4zM5.5 4.5l2.2 7H5.4l-1.8-5.5-.7 3.8-.1.9c0 .5-.4.8-.9.8H0l2.5-7h2.3l.7 5.7L5.5 4.5z", fill: "white" })
   ]),
   mastercard: React.createElement('svg', {
-    width: "24",
-    height: "16",
-    viewBox: "0 0 24 16", 
+    width: "32",
+    height: "20",
+    viewBox: "0 0 24 16",
     fill: "none",
     xmlns: "http://www.w3.org/2000/svg"
   }, [
@@ -43,10 +43,10 @@ const cardIcons = {
     React.createElement('path', { key: 'overlap', d: "M12 4.5a4.99 4.99 0 000 7 4.99 4.99 0 000-7z", fill: "#FF5F00" })
   ]),
   elo: React.createElement('svg', {
-    width: "24",
-    height: "16",
+    width: "32",
+    height: "20",
     viewBox: "0 0 24 16",
-    fill: "none", 
+    fill: "none",
     xmlns: "http://www.w3.org/2000/svg"
   }, [
     React.createElement('rect', { key: 'bg', width: "24", height: "16", rx: "3", fill: "#FFD700" }),
@@ -54,8 +54,8 @@ const cardIcons = {
     React.createElement('text', { key: 'text', x: "12", y: "10", textAnchor: "middle", fontSize: "6", fill: "#FFD700", fontWeight: "bold" }, "ELO")
   ]),
   amex: React.createElement('svg', {
-    width: "24",
-    height: "16",
+    width: "32",
+    height: "20",
     viewBox: "0 0 24 16",
     fill: "none",
     xmlns: "http://www.w3.org/2000/svg"
@@ -65,8 +65,8 @@ const cardIcons = {
     React.createElement('text', { key: 'text', x: "12", y: "9.5", textAnchor: "middle", fontSize: "5", fill: "#006FCF", fontWeight: "bold" }, "AMEX")
   ]),
   generico: React.createElement('svg', {
-    width: "24",
-    height: "16",
+    width: "32",
+    height: "20",
     viewBox: "0 0 24 16",
     fill: "none",
     xmlns: "http://www.w3.org/2000/svg"
@@ -80,6 +80,41 @@ const cardIcons = {
 export const getCardBrandIcon = (cardNumber: string): React.ReactElement => {
   const brand = getCardBrand(cardNumber);
   return cardIcons[brand as keyof typeof cardIcons] || cardIcons.generico;
+};
+
+export const getCardColorByBrand = (brand: string): string => {
+  switch (brand.toLowerCase()) {
+    case "visa": 
+      return "bg-gradient-to-br from-blue-500 to-blue-700";
+    case "mastercard": 
+      return "bg-gradient-to-br from-yellow-500 to-red-600";
+    case "elo": 
+      return "bg-gradient-to-br from-purple-500 to-indigo-600";
+    case "hipercard": 
+      return "bg-gradient-to-br from-rose-500 to-pink-700";
+    case "amex": 
+      return "bg-gradient-to-br from-cyan-500 to-blue-900";
+    case "diners": 
+      return "bg-gradient-to-br from-gray-600 to-black";
+    case "discover": 
+      return "bg-gradient-to-br from-orange-400 to-orange-700";
+    case "cabal": 
+      return "bg-gradient-to-br from-green-400 to-green-700";
+    case "jcb": 
+      return "bg-gradient-to-br from-indigo-500 to-purple-800";
+    case "aura": 
+      return "bg-gradient-to-br from-red-400 to-red-700";
+    case "unionpay": 
+      return "bg-gradient-to-br from-emerald-500 to-teal-700";
+    default: 
+      return "bg-gradient-to-br from-neutral-500 to-neutral-700";
+  }
+};
+
+export const isBackgroundDark = (bgColor: string): boolean => {
+  // Lista de cores que são consideradas escuras
+  const darkColors = ['blue-700', 'red-600', 'indigo-600', 'pink-700', 'blue-900', 'black', 'orange-700', 'green-700', 'purple-800', 'red-700', 'teal-700', 'neutral-700'];
+  return darkColors.some(color => bgColor.includes(color));
 };
 
 export const formatCardNumber = (cardNumber: string): string => {
