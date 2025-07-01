@@ -4,7 +4,7 @@ import { Edit, Trash2, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CreditCardUsage } from '@/types/creditCard';
-import { formatCardNumber, getCardBrandImage } from '@/utils/cardBrandDetector';
+import { formatCardNumber, getCardBrandIcon } from '@/utils/cardBrandDetector';
 
 interface CreditCardItemProps {
   usage: CreditCardUsage;
@@ -38,22 +38,14 @@ export const CreditCardItem: React.FC<CreditCardItemProps> = ({
     return 'bg-green-500';
   };
 
-  const cardBrandImage = card.numero_cartao ? getCardBrandImage(card.numero_cartao) : '';
   const maskedNumber = card.numero_cartao ? formatCardNumber(card.numero_cartao) : '';
 
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-lg font-medium flex items-center gap-2">
-          {cardBrandImage ? (
-            <img 
-              src={cardBrandImage} 
-              alt="Bandeira do cartão" 
-              className="h-6 w-auto"
-              onError={(e) => {
-                e.currentTarget.src = '/bandeiras/generico.png';
-              }}
-            />
+          {card.numero_cartao ? (
+            getCardBrandIcon(card.numero_cartao)
           ) : (
             <CreditCard size={20} />
           )}

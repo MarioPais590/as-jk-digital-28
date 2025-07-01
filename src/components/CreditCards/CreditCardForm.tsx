@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { CreateCreditCardInput, CreditCard } from '@/types/creditCard';
-import { getCardBrandImage } from '@/utils/cardBrandDetector';
+import { getCardBrandIcon } from '@/utils/cardBrandDetector';
 
 interface CreditCardFormProps {
   onSubmit: (data: CreateCreditCardInput) => void;
@@ -27,14 +27,6 @@ export const CreditCardForm: React.FC<CreditCardFormProps> = ({
     numero_cartao: editingCard?.numero_cartao || '',
     valor_proximas_faturas: editingCard?.valor_proximas_faturas || 0
   });
-
-  const [brandImage, setBrandImage] = useState<string>('');
-
-  useEffect(() => {
-    if (formData.numero_cartao) {
-      setBrandImage(getCardBrandImage(formData.numero_cartao));
-    }
-  }, [formData.numero_cartao]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,15 +62,10 @@ export const CreditCardForm: React.FC<CreditCardFormProps> = ({
             maxLength={16}
             required
           />
-          {brandImage && (
-            <img 
-              src={brandImage} 
-              alt="Bandeira do cartão" 
-              className="h-6 w-auto"
-              onError={(e) => {
-                e.currentTarget.src = '/bandeiras/generico.png';
-              }}
-            />
+          {formData.numero_cartao && (
+            <div className="flex-shrink-0">
+              {getCardBrandIcon(formData.numero_cartao)}
+            </div>
           )}
         </div>
       </div>
