@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash2, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CreditCardUsage } from '@/types/creditCard';
 import { 
@@ -15,6 +15,7 @@ interface CreditCardVisualProps {
   usage: CreditCardUsage;
   onEdit: () => void;
   onDelete: () => void;
+  onEditColor?: () => void;
   showActions?: boolean;
 }
 
@@ -22,6 +23,7 @@ export const CreditCardVisual: React.FC<CreditCardVisualProps> = ({
   usage,
   onEdit,
   onDelete,
+  onEditColor,
   showActions = true
 }) => {
   const { card, faturaAtual, percentualUsado, limiteDisponivel } = usage;
@@ -34,7 +36,7 @@ export const CreditCardVisual: React.FC<CreditCardVisualProps> = ({
   };
 
   const brand = card.numero_cartao ? getCardBrand(card.numero_cartao) : 'generico';
-  const bgColor = getCardColorByBrand(brand);
+  const bgColor = card.custom_color || getCardColorByBrand(brand);
   const textColor = isBackgroundDark(bgColor) ? "text-white" : "text-black";
   const maskedNumber = card.numero_cartao ? formatCardNumber(card.numero_cartao) : '';
 
@@ -144,6 +146,16 @@ export const CreditCardVisual: React.FC<CreditCardVisualProps> = ({
           >
             <Edit size={14} />
           </Button>
+          {onEditColor && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={onEditColor}
+              className="h-8 w-8 p-0 bg-white bg-opacity-90 hover:bg-opacity-100"
+            >
+              <Palette size={14} />
+            </Button>
+          )}
           <Button
             variant="secondary"
             size="sm"

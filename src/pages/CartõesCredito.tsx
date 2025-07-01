@@ -8,6 +8,7 @@ import { useCreditCardCalculations } from '@/hooks/useCreditCardCalculations';
 import { useSupabaseFinancialData } from '@/hooks/useSupabaseFinancialData';
 import { CreditCardForm } from '@/components/CreditCards/CreditCardForm';
 import { CreditCardItem } from '@/components/CreditCards/CreditCardItem';
+import { ColorPicker } from '@/components/CreditCards/ColorPicker';
 import { CreateCreditCardInput, CreditCard } from '@/types/creditCard';
 import { toast } from 'sonner';
 
@@ -19,6 +20,8 @@ export const CartõesCredito: React.FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingCard, setEditingCard] = useState<CreditCard | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isColorPickerOpen, setIsColorPickerOpen] = useState(false);
+  const [editingColorCard, setEditingColorCard] = useState<CreditCard | null>(null);
 
   const handleSubmit = async (data: CreateCreditCardInput) => {
     setIsSubmitting(true);
@@ -56,6 +59,24 @@ export const CartõesCredito: React.FC = () => {
         console.error('Erro ao excluir cartão:', error);
         toast.error('Erro ao excluir cartão. Tente novamente.');
       }
+    }
+  };
+
+  const handleEditColor = (card: CreditCard) => {
+    setEditingColorCard(card);
+    setIsColorPickerOpen(true);
+  };
+
+  const handleColorChange = async (color: string) => {
+    if (!editingColorCard) return;
+
+    try {
+      await updateCreditCard(editingColorCard.id, { custom_color: color });
+      toast.success('Cor do cartão atualizada com sucesso!');
+      setEditingColorCard(null);
+    } catch (error) {
+      console.error('Erro ao atualizar cor do cartão:', error);
+      toast.error('Erro ao atualizar cor do cartão. Tente novamente.');
     }
   };
 
@@ -161,10 +182,20 @@ export const CartõesCredito: React.FC = () => {
               usage={usage}
               onEdit={() => handleEdit(usage.card)}
               onDelete={() => handleDelete(usage.card)}
+              onEditColor={() => handleEditColor(usage.card)}
             />
           ))}
         </div>
       )}
+
+      {/* Color Picker Dialog */}
+      <ColorPicker
+        isOpen={isColorPickerOpen}
+        onOpenChange={setIsColorPickerOpen}
+        currentColor={editingColorCard?.custom_color}
+        onColorChange={handleColorChange}
+        cardName={editingColorCard?.nome || ''}
+      />
     </div>
   );
 };

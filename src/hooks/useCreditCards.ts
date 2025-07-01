@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { CreditCard, CreateCreditCardInput } from '@/types/creditCard';
@@ -42,6 +41,7 @@ export const useCreditCards = () => {
         bin: item.bin,
         last_four: item.last_four,
         limite_disponivel: Number(item.limite_disponivel) || 0,
+        custom_color: item.custom_color,
         created_at: item.created_at,
         updated_at: item.updated_at
       }));
@@ -76,6 +76,7 @@ export const useCreditCards = () => {
           dia_vencimento: cardData.dia_vencimento,
           numero_cartao: cleanNumber,
           valor_proximas_faturas: cardData.valor_proximas_faturas || 0,
+          custom_color: cardData.custom_color,
           bin: bin,
           last_four: lastFour,
           limite_disponivel: cardData.limite
@@ -97,6 +98,7 @@ export const useCreditCards = () => {
         dia_vencimento: data.dia_vencimento,
         numero_cartao: data.numero_cartao || '',
         valor_proximas_faturas: Number(data.valor_proximas_faturas) || 0,
+        custom_color: data.custom_color,
         bin: data.bin,
         last_four: data.last_four,
         limite_disponivel: Number(data.limite_disponivel) || 0,
@@ -149,6 +151,7 @@ export const useCreditCards = () => {
                 dia_vencimento: data.dia_vencimento,
                 numero_cartao: data.numero_cartao || '',
                 valor_proximas_faturas: Number(data.valor_proximas_faturas) || 0,
+                custom_color: data.custom_color,
                 bin: data.bin,
                 last_four: data.last_four,
                 limite_disponivel: Number(data.limite_disponivel) || 0,

@@ -1,4 +1,3 @@
-
 export interface CreditCard {
   id: string;
   user_id: string;
@@ -11,6 +10,7 @@ export interface CreditCard {
   bin?: string;
   last_four?: string;
   limite_disponivel?: number;
+  custom_color?: string;
   created_at: string;
   updated_at: string;
 }
@@ -22,6 +22,7 @@ export interface CreateCreditCardInput {
   dia_vencimento: number;
   numero_cartao?: string;
   valor_proximas_faturas?: number;
+  custom_color?: string;
 }
 
 export interface CreditCardUsage {
