@@ -43,6 +43,7 @@ export type Database = {
         Row: {
           bin: string | null
           created_at: string
+          custom_color: string | null
           dia_fechamento: number
           dia_vencimento: number
           id: string
@@ -58,6 +59,7 @@ export type Database = {
         Insert: {
           bin?: string | null
           created_at?: string
+          custom_color?: string | null
           dia_fechamento: number
           dia_vencimento: number
           id?: string
@@ -73,6 +75,7 @@ export type Database = {
         Update: {
           bin?: string | null
           created_at?: string
+          custom_color?: string | null
           dia_fechamento?: number
           dia_vencimento?: number
           id?: string
