@@ -38,7 +38,7 @@ export const useCreditCardCalculations = (creditCards: CreditCard[], transaction
       
       const percentualUsado = card.limite > 0 ? (faturaAtual / card.limite) * 100 : 0;
       const limiteDisponivel = card.limite - faturaAtual - (card.valor_proximas_faturas || 0);
-      
+
       return {
         card,
         faturaAtual,

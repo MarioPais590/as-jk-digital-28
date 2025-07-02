@@ -29,6 +29,9 @@ export const CreditCardVisual: React.FC<CreditCardVisualProps> = ({
   const { card, faturaAtual, percentualUsado, limiteDisponivel } = usage;
   
   const formatCurrency = (value: number) => {
+    if (typeof value !== 'number' || isNaN(value)) {
+      return 'R$ 0,00';
+    }
     return new Intl.NumberFormat('pt-BR', { 
       style: 'currency', 
       currency: 'BRL' 
