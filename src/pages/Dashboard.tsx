@@ -3,13 +3,15 @@ import { FinancialCard } from '@/components/FinancialCard';
 import { MonthlyChart } from '@/components/Charts/MonthlyChart';
 import { YearlyChart } from '@/components/Charts/YearlyChart';
 import { useSupabaseFinancialData } from '@/hooks/useSupabaseFinancialData';
+import { useFinancialReports } from '@/hooks/useFinancialReports';
 import { CURRENCY_CONFIG, DATE_CONFIG } from '@/constants/app';
 import { useCreditCards } from '@/hooks/useCreditCards';
 import { useCreditCardCalculations } from '@/hooks/useCreditCardCalculations';
 import { CreditCardsSection } from '@/components/Dashboard/CreditCardsSection';
 
 export const Dashboard: React.FC = () => {
-  const { getMonthlyData, getDailyBalances, getYearlyData, loading, transactions } = useSupabaseFinancialData();
+  const { loading, transactions } = useSupabaseFinancialData();
+  const { getMonthlyData, getDailyBalances, getYearlyData } = useFinancialReports(transactions);
   const { creditCards } = useCreditCards();
   const { creditCardUsages } = useCreditCardCalculations(creditCards, transactions);
   

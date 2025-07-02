@@ -29,7 +29,7 @@ export const CreditCardVisual: React.FC<CreditCardVisualProps> = ({
   const { card, faturaAtual, percentualUsado, limiteDisponivel } = usage;
   
   const formatCurrency = (value: number) => {
-    if (typeof value !== 'number' || isNaN(value)) {
+    if (typeof value !== 'number' || isNaN(value) || value === null || value === undefined) {
       return 'R$ 0,00';
     }
     return new Intl.NumberFormat('pt-BR', { 

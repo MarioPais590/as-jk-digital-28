@@ -2,12 +2,14 @@
 import React, { useState } from 'react';
 import { Calendar, TrendingUp, TrendingDown, BarChart3 } from 'lucide-react';
 import { useSupabaseFinancialData } from '@/hooks/useSupabaseFinancialData';
+import { useFinancialReports } from '@/hooks/useFinancialReports';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FinancialCard } from '@/components/FinancialCard';
 import { MonthlyChart } from '@/components/Charts/MonthlyChart';
 
 export const RelatoriosMensais: React.FC = () => {
-  const { getMonthlyData, getDailyBalances, transactions, loading } = useSupabaseFinancialData();
+  const { transactions, loading } = useSupabaseFinancialData();
+  const { getMonthlyData, getDailyBalances } = useFinancialReports(transactions);
   
   const currentDate = new Date();
   const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear().toString());

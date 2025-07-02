@@ -33,7 +33,7 @@ export const useCreditCards = () => {
         id: item.id,
         user_id: item.user_id,
         nome: item.nome,
-        limite: Number(item.limite),
+        limite: Number(item.limite) || 0,
         dia_fechamento: item.dia_fechamento,
         dia_vencimento: item.dia_vencimento,
         numero_cartao: item.numero_cartao || '',
