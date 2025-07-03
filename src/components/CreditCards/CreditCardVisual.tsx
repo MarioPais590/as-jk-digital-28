@@ -85,22 +85,10 @@ export const CreditCardVisual: React.FC<CreditCardVisualProps> = ({
               {percentualUsado.toFixed(1)}%
             </p>
           </div>
-          
-          <div>
-            <p className="opacity-80">Limite Total</p>
-            <p className="font-medium">{formatCurrency(card.limite)}</p>
-          </div>
-          
-          <div>
-            <p className="opacity-80">Disponível</p>
-            <p className={`font-medium ${limiteDisponivel >= 0 ? (isBackgroundDark(bgColor) ? 'text-green-300' : 'text-green-600') : (isBackgroundDark(bgColor) ? 'text-red-300' : 'text-red-600')}`}>
-              {formatCurrency(limiteDisponivel)}
-            </p>
-          </div>
         </div>
 
         {/* Barra de progresso */}
-        <div className="absolute bottom-12 left-6 right-6">
+        <div className="absolute bottom-16 left-6 right-6">
           <div className="w-full bg-black bg-opacity-20 rounded-full h-1.5">
             <div 
               className="h-1.5 rounded-full bg-white bg-opacity-80 transition-all duration-300"
