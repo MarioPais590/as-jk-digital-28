@@ -12,7 +12,13 @@ export const RelatoriosMensais: React.FC = () => {
   const { getMonthlyData, getDailyBalances } = useFinancialReports(transactions);
   
   const currentDate = new Date();
-  const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear().toString());
+  
+  // Garantir que temos anos disponíveis das transações, senão usar o ano atual
+  const availableYears = transactions.length > 0 
+    ? Array.from(new Set(transactions.map(t => new Date(t.date).getFullYear()))).sort((a, b) => b - a)
+    : [currentDate.getFullYear()];
+  
+  const [selectedYear, setSelectedYear] = useState(availableYears[0]?.toString() || currentDate.getFullYear().toString());
   const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth().toString());
 
   const monthlyData = getMonthlyData(parseInt(selectedYear), parseInt(selectedMonth));
@@ -34,9 +40,6 @@ export const RelatoriosMensais: React.FC = () => {
     }
     return acc;
   }, {} as Record<string, { entradas: number; saidas: number }>);
-
-  const availableYears = Array.from(new Set(transactions.map(t => new Date(t.date).getFullYear())))
-    .sort((a, b) => b - a);
 
   const months = [
     'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
