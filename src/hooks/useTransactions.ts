@@ -22,6 +22,7 @@ export const useTransactions = () => {
       const { data, error } = await supabase
         .from('transactions')
         .select('*')
+        .eq('user_id', user.id)
         .order('date', { ascending: false });
 
       if (error) {

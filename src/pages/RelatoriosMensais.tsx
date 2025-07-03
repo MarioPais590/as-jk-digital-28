@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calendar, TrendingUp, TrendingDown, BarChart3 } from 'lucide-react';
 import { useSupabaseFinancialData } from '@/hooks/useSupabaseFinancialData';
 import { useFinancialReports } from '@/hooks/useFinancialReports';
@@ -18,8 +18,22 @@ export const RelatoriosMensais: React.FC = () => {
     ? Array.from(new Set(transactions.map(t => new Date(t.date).getFullYear()))).sort((a, b) => b - a)
     : [currentDate.getFullYear()];
   
-  const [selectedYear, setSelectedYear] = useState(availableYears[0]?.toString() || currentDate.getFullYear().toString());
+  // Inicializar com o primeiro ano disponível e o mês atual
+  const [selectedYear, setSelectedYear] = useState(() => {
+    return availableYears.length > 0 ? availableYears[0].toString() : currentDate.getFullYear().toString();
+  });
   const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth().toString());
+
+  // Atualizar selectedYear quando as transações carregarem
+  useEffect(() => {
+    if (transactions.length > 0 && availableYears.length > 0) {
+      const currentSelectedYear = parseInt(selectedYear);
+      // Se o ano selecionado não está nas opções disponíveis, selecionar o primeiro disponível
+      if (!availableYears.includes(currentSelectedYear)) {
+        setSelectedYear(availableYears[0].toString());
+      }
+    }
+  }, [transactions.length, availableYears]);
 
   const monthlyData = getMonthlyData(parseInt(selectedYear), parseInt(selectedMonth));
   const dailyBalances = getDailyBalances(parseInt(selectedYear), parseInt(selectedMonth));
