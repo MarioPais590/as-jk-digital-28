@@ -88,7 +88,7 @@ export const CreditCardVisual: React.FC<CreditCardVisualProps> = ({
         </div>
 
         {/* Barra de progresso */}
-        <div className="absolute bottom-16 left-6 right-6">
+        <div className="absolute bottom-20 left-6 right-6">
           <div className="w-full bg-black bg-opacity-20 rounded-full h-1.5">
             <div 
               className="h-1.5 rounded-full bg-white bg-opacity-80 transition-all duration-300"
