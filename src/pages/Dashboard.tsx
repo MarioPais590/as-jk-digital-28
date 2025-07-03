@@ -16,8 +16,21 @@ export const Dashboard: React.FC = () => {
   const { creditCardUsages } = useCreditCardCalculations(creditCards, transactions);
   
   const currentDate = new Date();
-  const currentYear = currentDate.getFullYear();
-  const currentMonth = currentDate.getMonth();
+  
+  // Encontrar o primeiro mês/ano com dados ou usar atual como fallback
+  const getLatestDataDate = () => {
+    if (transactions.length === 0) {
+      return { year: currentDate.getFullYear(), month: currentDate.getMonth() };
+    }
+    
+    // Ordenar transações por data e pegar a mais recente
+    const sortedTransactions = [...transactions].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    const latestDate = new Date(sortedTransactions[0].date);
+    
+    return { year: latestDate.getFullYear(), month: latestDate.getMonth() };
+  };
+  
+  const { year: currentYear, month: currentMonth } = getLatestDataDate();
   
   const monthlyData = getMonthlyData(currentYear, currentMonth);
   const dailyBalances = getDailyBalances(currentYear, currentMonth);

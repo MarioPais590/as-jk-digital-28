@@ -18,19 +18,38 @@ export const RelatoriosMensais: React.FC = () => {
     ? Array.from(new Set(transactions.map(t => new Date(t.date).getFullYear()))).sort((a, b) => b - a)
     : [currentDate.getFullYear()];
   
-  // Inicializar com o primeiro ano disponível e o mês atual
+  // Inicializar com o primeiro ano disponível e o primeiro mês com dados
   const [selectedYear, setSelectedYear] = useState(() => {
     return availableYears.length > 0 ? availableYears[0].toString() : currentDate.getFullYear().toString();
   });
-  const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth().toString());
+  
+  // Encontrar o primeiro mês com dados para o ano selecionado
+  const getFirstMonthWithData = (year: number) => {
+    const monthsWithData = new Set(
+      transactions
+        .filter(t => new Date(t.date).getFullYear() === year)
+        .map(t => new Date(t.date).getMonth())
+    );
+    return monthsWithData.size > 0 ? Math.min(...Array.from(monthsWithData)) : currentDate.getMonth();
+  };
+  
+  const [selectedMonth, setSelectedMonth] = useState(() => {
+    const year = availableYears.length > 0 ? availableYears[0] : currentDate.getFullYear();
+    return getFirstMonthWithData(year).toString();
+  });
 
-  // Atualizar selectedYear quando as transações carregarem
+  // Atualizar selectedYear e selectedMonth quando as transações carregarem
   useEffect(() => {
     if (transactions.length > 0 && availableYears.length > 0) {
       const currentSelectedYear = parseInt(selectedYear);
       // Se o ano selecionado não está nas opções disponíveis, selecionar o primeiro disponível
       if (!availableYears.includes(currentSelectedYear)) {
-        setSelectedYear(availableYears[0].toString());
+        const newYear = availableYears[0];
+        setSelectedYear(newYear.toString());
+        setSelectedMonth(getFirstMonthWithData(newYear).toString());
+      } else {
+        // Atualizar o mês para o primeiro mês com dados do ano atual
+        setSelectedMonth(getFirstMonthWithData(currentSelectedYear).toString());
       }
     }
   }, [transactions.length, availableYears]);
