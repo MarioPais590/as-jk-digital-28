@@ -100,13 +100,23 @@ export const CreditCardVisual: React.FC<CreditCardVisualProps> = ({
         </div>
 
         {/* Barra de progresso */}
-        <div className="absolute bottom-6 left-6 right-6">
+        <div className="absolute bottom-12 left-6 right-6">
           <div className="w-full bg-black bg-opacity-20 rounded-full h-1.5">
             <div 
               className="h-1.5 rounded-full bg-white bg-opacity-80 transition-all duration-300"
               style={{ width: `${Math.min(percentualUsado, 100)}%` }}
             />
           </div>
+        </div>
+
+        {/* Valores resumidos abaixo da barra */}
+        <div className="absolute bottom-3 left-6 right-6 flex justify-between text-xs">
+          <span className={`${textColor} opacity-90`}>
+            Limite Total: {formatCurrency(card.limite)}
+          </span>
+          <span className={`${textColor} opacity-90`}>
+            Disponível: {formatCurrency(limiteDisponivel)}
+          </span>
         </div>
       </div>
 
