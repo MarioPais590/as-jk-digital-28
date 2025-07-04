@@ -38,7 +38,7 @@ export const RelatoriosMensais: React.FC = () => {
     return getFirstMonthWithData(year).toString();
   });
 
-  // Atualizar selectedYear e selectedMonth quando as transações carregarem
+  // Atualizar selectedYear quando as transações carregarem
   useEffect(() => {
     if (transactions.length > 0 && availableYears.length > 0) {
       const currentSelectedYear = parseInt(selectedYear);
@@ -47,12 +47,30 @@ export const RelatoriosMensais: React.FC = () => {
         const newYear = availableYears[0];
         setSelectedYear(newYear.toString());
         setSelectedMonth(getFirstMonthWithData(newYear).toString());
-      } else {
-        // Atualizar o mês para o primeiro mês com dados do ano atual
-        setSelectedMonth(getFirstMonthWithData(currentSelectedYear).toString());
       }
+      // Não forçar a mudança do mês se o ano já está correto - permite seleção manual
     }
   }, [transactions.length, availableYears]);
+
+  // Atualizar o mês quando o ano muda
+  useEffect(() => {
+    if (transactions.length > 0) {
+      const year = parseInt(selectedYear);
+      const currentMonth = parseInt(selectedMonth);
+      
+      // Verificar se o mês atual tem dados para o ano selecionado
+      const monthsWithData = new Set(
+        transactions
+          .filter(t => new Date(t.date).getFullYear() === year)
+          .map(t => new Date(t.date).getMonth())
+      );
+      
+      // Se o mês atual não tem dados, selecionar o primeiro mês com dados
+      if (monthsWithData.size > 0 && !monthsWithData.has(currentMonth)) {
+        setSelectedMonth(getFirstMonthWithData(year).toString());
+      }
+    }
+  }, [selectedYear, transactions]);
 
   const monthlyData = getMonthlyData(parseInt(selectedYear), parseInt(selectedMonth));
   const dailyBalances = getDailyBalances(parseInt(selectedYear), parseInt(selectedMonth));
