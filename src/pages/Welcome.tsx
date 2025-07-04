@@ -21,7 +21,7 @@ export const Welcome = () => {
             A plataforma completa para gerenciar suas finanças pessoais com inteligência e simplicidade
           </p>
           <div className="flex gap-4 justify-center">
-            <Link to="/cadastro">
+            <Link to="/login">
               <Button size="lg" className="px-8">
                 Começar Agora
               </Button>

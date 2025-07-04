@@ -112,7 +112,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, sidebarOpen, onSide
       if (signOut) {
         await signOut();
         toast.success('Logout realizado com sucesso!');
-        navigate('/login');
+        navigate('/welcome');
       }
     } catch (error) {
       console.error('Erro no logout:', error);
