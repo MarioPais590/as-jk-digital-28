@@ -30,6 +30,9 @@ const predefinedColors = [
   { name: 'Aura', color: 'bg-gradient-to-br from-red-400 to-red-700' },
   { name: 'UnionPay', color: 'bg-gradient-to-br from-emerald-500 to-teal-700' },
   { name: 'Padrão', color: 'bg-gradient-to-br from-neutral-500 to-neutral-700' },
+  { name: 'Dourado', color: 'bg-gradient-to-br from-yellow-400 to-amber-600' },
+  { name: 'Rubi', color: 'bg-gradient-to-br from-red-700 to-red-900' },
+  { name: 'Safira', color: 'bg-gradient-to-br from-blue-900 to-slate-900' },
 ];
 
 export const ColorPicker: React.FC<ColorPickerProps> = ({
