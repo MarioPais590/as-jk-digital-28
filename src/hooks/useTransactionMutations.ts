@@ -64,7 +64,7 @@ export const useTransactionMutations = (
       const updateData: any = {};
       
       if (updates.type !== undefined) updateData.type = updates.type;
-      if (updates.amount !== undefined && updates.amount > 0) updateData.amount = updates.amount;
+      if (updates.amount !== undefined && updates.amount >= 0) updateData.amount = updates.amount;
       if (updates.date !== undefined) updateData.date = updates.date;
       if (updates.category !== undefined) updateData.category = updates.category;
       if (updates.description !== undefined) updateData.description = updates.description;
