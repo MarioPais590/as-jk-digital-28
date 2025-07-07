@@ -60,17 +60,20 @@ export const useTransactionMutations = (
     }
 
     try {
+      // Prepare update data, ensuring amount is positive and valid
+      const updateData: any = {};
+      
+      if (updates.type !== undefined) updateData.type = updates.type;
+      if (updates.amount !== undefined && updates.amount > 0) updateData.amount = updates.amount;
+      if (updates.date !== undefined) updateData.date = updates.date;
+      if (updates.category !== undefined) updateData.category = updates.category;
+      if (updates.description !== undefined) updateData.description = updates.description;
+      if (updates.notes !== undefined) updateData.notes = updates.notes;
+      if (updates.cartao_id !== undefined) updateData.cartao_id = updates.cartao_id || null;
+
       const { data, error } = await supabase
         .from('transactions')
-        .update({
-          type: updates.type,
-          amount: updates.amount,
-          date: updates.date,
-          category: updates.category,
-          description: updates.description,
-          notes: updates.notes,
-          cartao_id: updates.cartao_id || null
-        })
+        .update(updateData)
         .eq('id', id)
         .select()
         .single();
