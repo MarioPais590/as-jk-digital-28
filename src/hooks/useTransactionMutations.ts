@@ -60,28 +60,72 @@ export const useTransactionMutations = (
     }
 
     try {
-      // Prepare update data, ensuring amount is positive and valid
+      console.log('Iniciando atualização da transação:', { id, updates });
+      
+      // Prepare update data with strict validation
       const updateData: any = {};
       
-      if (updates.type !== undefined) updateData.type = updates.type;
-      if (updates.amount !== undefined && updates.amount >= 0) updateData.amount = updates.amount;
-      if (updates.date !== undefined) updateData.date = updates.date;
-      if (updates.category !== undefined) updateData.category = updates.category;
-      if (updates.description !== undefined) updateData.description = updates.description;
-      if (updates.notes !== undefined) updateData.notes = updates.notes;
-      if (updates.cartao_id !== undefined) updateData.cartao_id = updates.cartao_id || null;
+      // Only include fields that are actually being updated and are valid
+      if (updates.type !== undefined && ['entrada', 'saida'].includes(updates.type)) {
+        updateData.type = updates.type;
+      }
+      
+      if (updates.amount !== undefined) {
+        const amount = Number(updates.amount);
+        if (!isNaN(amount) && amount >= 0) {
+          updateData.amount = amount;
+        } else {
+          throw new Error('Valor inválido. Deve ser um número maior ou igual a zero.');
+        }
+      }
+      
+      if (updates.date !== undefined && updates.date.trim() !== '') {
+        updateData.date = updates.date;
+      }
+      
+      if (updates.category !== undefined && updates.category.trim() !== '') {
+        updateData.category = updates.category;
+      }
+      
+      if (updates.description !== undefined) {
+        updateData.description = updates.description.trim();
+      }
+      
+      if (updates.notes !== undefined) {
+        updateData.notes = updates.notes.trim();
+      }
+      
+      if (updates.cartao_id !== undefined) {
+        updateData.cartao_id = updates.cartao_id === 'cash' ? null : updates.cartao_id;
+      }
+
+      console.log('Dados para atualização:', updateData);
+
+      // Check if there's anything to update
+      if (Object.keys(updateData).length === 0) {
+        console.warn('Nenhum campo válido para atualizar');
+        return;
+      }
 
       const { data, error } = await supabase
         .from('transactions')
         .update(updateData)
         .eq('id', id)
+        .eq('user_id', user.id) // Extra security check
         .select()
         .single();
 
       if (error) {
-        console.error('Erro ao atualizar transação:', error);
+        console.error('Erro detalhado ao atualizar transação:', {
+          error,
+          id,
+          updateData,
+          userId: user.id
+        });
         throw error;
       }
+
+      console.log('Transação atualizada com sucesso:', data);
 
       setTransactions(prev =>
         prev.map(transaction =>
