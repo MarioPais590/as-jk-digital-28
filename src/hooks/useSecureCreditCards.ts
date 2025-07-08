@@ -3,7 +3,8 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { CreditCard, CreateCreditCardInput } from '@/types/creditCard';
 import { useSupabaseAuth } from './useSupabaseAuth';
-import { encryptCardNumber, decryptCardNumber, validateCardNumber, sanitizeInput } from '@/utils/cardSecurity';
+import { encryptCardNumber, decryptCardNumber, validateCardNumber } from '@/utils/cardSecurity';
+import { sanitizeInput } from '@/utils/inputValidation';
 
 export const useSecureCreditCards = () => {
   const [creditCards, setCreditCards] = useState<CreditCard[]>([]);
