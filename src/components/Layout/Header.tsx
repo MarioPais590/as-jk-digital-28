@@ -1,12 +1,12 @@
-
 import React, { useState, useEffect } from 'react';
-import { Menu, Sun, Moon, LogOut } from 'lucide-react';
+import { Menu, Sun, Moon, LogOut, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@/components/ThemeProvider';
 import { useAuth } from '@/components/Auth/AuthProvider';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -147,10 +147,10 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, sidebarOpen, onSide
           {/* Desktop sidebar toggle button */}
           <button
             onClick={onSidebarToggle}
-            className="hidden lg:block p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+            className="hidden lg:flex items-center justify-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             aria-label="Toggle sidebar"
           >
-            <Menu size={20} />
+            <ChevronLeft size={20} />
           </button>
         </div>
 

@@ -20,9 +20,19 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 interface SidebarProps {
   className?: string;
+  isOpen: boolean;
+  onClose: () => void;
+  collapsed: boolean;
+  onCollapsedChange: (collapsed: boolean) => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ className }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ 
+  className, 
+  isOpen, 
+  onClose, 
+  collapsed, 
+  onCollapsedChange 
+}) => {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -42,32 +52,116 @@ export const Sidebar: React.FC<SidebarProps> = ({ className }) => {
 
   const handleNavigation = (path: string) => {
     navigate(path);
+    onClose(); // Fecha a sidebar no mobile após navegar
   };
 
-  return (
-    <div className={cn("pb-12 w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800", className)}>
-      <div className="space-y-4 py-4">
-        <div className="px-3 py-2">
-          <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
-            Menu
-          </h2>
-          <ScrollArea className="h-[calc(100vh-8rem)] px-1">
-            <div className="space-y-1">
-              {menuItems.map((item) => (
-                <Button
-                  key={item.path}
-                  variant={location.pathname === item.path ? "secondary" : "ghost"}
-                  className="w-full justify-start"
-                  onClick={() => handleNavigation(item.path)}
-                >
-                  <item.icon className="mr-2 h-4 w-4" />
-                  {item.label}
-                </Button>
-              ))}
-            </div>
-          </ScrollArea>
-        </div>
+  // Sidebar para desktop
+  const DesktopSidebar = () => (
+    <div className={cn(
+      "hidden lg:flex h-full flex-col bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transition-all duration-300",
+      collapsed ? "w-16" : "w-64",
+      className
+    )}>
+      {/* Logo */}
+      <div className="flex items-center justify-center p-4 border-b border-gray-200 dark:border-gray-800">
+        {!collapsed && (
+          <div className="flex items-center gap-2">
+            <img 
+              src="/lovable-uploads/e6254b16-9322-4b60-866d-3e65af6c400b.png" 
+              alt="Logo" 
+              className="h-8 w-auto"
+            />
+            <span className="text-xl font-bold text-gray-900 dark:text-white">
+              Finanças JK
+            </span>
+          </div>
+        )}
+        {collapsed && (
+          <img 
+            src="/lovable-uploads/e6254b16-9322-4b60-866d-3e65af6c400b.png" 
+            alt="Logo" 
+            className="h-8 w-auto"
+          />
+        )}
       </div>
+
+      {/* Menu Items */}
+      <ScrollArea className="flex-1 px-2 py-4">
+        <div className="space-y-1">
+          {menuItems.map((item) => (
+            <Button
+              key={item.path}
+              variant={location.pathname === item.path ? "secondary" : "ghost"}
+              className={cn(
+                "w-full justify-start",
+                collapsed ? "px-2" : "px-4"
+              )}
+              onClick={() => handleNavigation(item.path)}
+              title={collapsed ? item.label : undefined}
+            >
+              <item.icon className={cn("h-4 w-4", !collapsed && "mr-2")} />
+              {!collapsed && <span>{item.label}</span>}
+            </Button>
+          ))}
+        </div>
+      </ScrollArea>
     </div>
+  );
+
+  // Sidebar para mobile (overlay)
+  const MobileSidebar = () => (
+    <>
+      {/* Overlay */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={onClose}
+        />
+      )}
+      
+      {/* Sidebar */}
+      <div className={cn(
+        "fixed left-0 top-0 h-full w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transform transition-transform duration-300 z-50 lg:hidden",
+        isOpen ? "translate-x-0" : "-translate-x-full"
+      )}>
+        {/* Logo */}
+        <div className="flex items-center justify-center p-4 border-b border-gray-200 dark:border-gray-800">
+          <div className="flex items-center gap-2">
+            <img 
+              src="/lovable-uploads/e6254b16-9322-4b60-866d-3e65af6c400b.png" 
+              alt="Logo" 
+              className="h-8 w-auto"
+            />
+            <span className="text-xl font-bold text-gray-900 dark:text-white">
+              Finanças JK
+            </span>
+          </div>
+        </div>
+
+        {/* Menu Items */}
+        <ScrollArea className="flex-1 px-2 py-4">
+          <div className="space-y-1">
+            {menuItems.map((item) => (
+              <Button
+                key={item.path}
+                variant={location.pathname === item.path ? "secondary" : "ghost"}
+                className="w-full justify-start px-4"
+                onClick={() => handleNavigation(item.path)}
+              >
+                <item.icon className="mr-2 h-4 w-4" />
+                <span>{item.label}</span>
+              </Button>
+            ))}
+          </div>
+        </ScrollArea>
+      </div>
+    </>
+  );
+
+  return (
+    <>
+      <DesktopSidebar />
+      <MobileSidebar />
+    </>
   );
 };
