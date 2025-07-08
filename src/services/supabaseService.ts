@@ -122,6 +122,82 @@ export class SupabaseService {
     if (error) throw error;
   }
 
+  // Installments
+  static async getInstallments() {
+    const { data, error } = await supabase
+      .from('parcelas_cartao')
+      .select('*')
+      .order('data_vencimento', { ascending: true });
+    
+    if (error) throw error;
+    return data;
+  }
+
+  static async createInstallments(installments: any[]) {
+    const { data, error } = await supabase
+      .from('parcelas_cartao')
+      .insert(installments)
+      .select();
+    
+    if (error) throw error;
+    return data;
+  }
+
+  static async updateInstallment(id: string, updates: any) {
+    const { data, error } = await supabase
+      .from('parcelas_cartao')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  }
+
+  // Fixed Expenses
+  static async getFixedExpenses() {
+    const { data, error } = await supabase
+      .from('despesas_fixas')
+      .select('*')
+      .order('proximo_vencimento', { ascending: true });
+    
+    if (error) throw error;
+    return data;
+  }
+
+  static async createFixedExpense(expense: any) {
+    const { data, error } = await supabase
+      .from('despesas_fixas')
+      .insert(expense)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  }
+
+  static async updateFixedExpense(id: string, updates: any) {
+    const { data, error } = await supabase
+      .from('despesas_fixas')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  }
+
+  static async deleteFixedExpense(id: string) {
+    const { error } = await supabase
+      .from('despesas_fixas')
+      .delete()
+      .eq('id', id);
+    
+    if (error) throw error;
+  }
+
   // Profiles
   static async getProfile(userId: string) {
     const { data, error } = await supabase

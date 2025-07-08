@@ -103,6 +103,59 @@ export type Database = {
           },
         ]
       }
+      despesas_fixas: {
+        Row: {
+          ativa: boolean
+          categoria: string
+          created_at: string
+          dia_vencimento: number
+          id: string
+          nome: string
+          proximo_vencimento: string
+          status: string
+          ultimo_pagamento: string | null
+          updated_at: string
+          user_id: string
+          valor: number
+        }
+        Insert: {
+          ativa?: boolean
+          categoria: string
+          created_at?: string
+          dia_vencimento: number
+          id?: string
+          nome: string
+          proximo_vencimento: string
+          status?: string
+          ultimo_pagamento?: string | null
+          updated_at?: string
+          user_id: string
+          valor: number
+        }
+        Update: {
+          ativa?: boolean
+          categoria?: string
+          created_at?: string
+          dia_vencimento?: number
+          id?: string
+          nome?: string
+          proximo_vencimento?: string
+          status?: string
+          ultimo_pagamento?: string | null
+          updated_at?: string
+          user_id?: string
+          valor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "despesas_fixas_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       monthly_reports: {
         Row: {
           ano: number
@@ -143,6 +196,82 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "monthly_reports_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      parcelas_cartao: {
+        Row: {
+          cartao_id: string
+          compra_id: string
+          created_at: string
+          data_compra: string
+          data_vencimento: string
+          descricao: string
+          id: string
+          numero_parcela: number
+          parcelas_totais: number
+          status: string
+          transaction_id: string | null
+          updated_at: string
+          user_id: string
+          valor_parcela: number
+          valor_total: number
+        }
+        Insert: {
+          cartao_id: string
+          compra_id: string
+          created_at?: string
+          data_compra: string
+          data_vencimento: string
+          descricao: string
+          id?: string
+          numero_parcela: number
+          parcelas_totais: number
+          status?: string
+          transaction_id?: string | null
+          updated_at?: string
+          user_id: string
+          valor_parcela: number
+          valor_total: number
+        }
+        Update: {
+          cartao_id?: string
+          compra_id?: string
+          created_at?: string
+          data_compra?: string
+          data_vencimento?: string
+          descricao?: string
+          id?: string
+          numero_parcela?: number
+          parcelas_totais?: number
+          status?: string
+          transaction_id?: string | null
+          updated_at?: string
+          user_id?: string
+          valor_parcela?: number
+          valor_total?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parcelas_cartao_cartao_id_fkey"
+            columns: ["cartao_id"]
+            isOneToOne: false
+            referencedRelation: "credit_cards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parcelas_cartao_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parcelas_cartao_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"

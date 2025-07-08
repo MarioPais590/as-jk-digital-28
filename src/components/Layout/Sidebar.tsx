@@ -1,186 +1,73 @@
 
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
-  LayoutDashboard, 
-  TrendingUp, 
-  TrendingDown, 
-  BarChart3, 
+  Home, 
+  ArrowUpCircle, 
+  ArrowDownCircle, 
+  CreditCard, 
   Calendar,
-  FileText,
-  Settings,
-  X,
-  LogOut,
-  Tag,
-  CreditCard
+  Clock,
+  Tag, 
+  FileText, 
+  BarChart3, 
+  PieChart, 
+  Settings 
 } from 'lucide-react';
-import { useAuth } from '@/components/Auth/AuthProvider';
-import { toast } from 'sonner';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface SidebarProps {
-  isOpen: boolean;
-  onClose: () => void;
-  collapsed?: boolean;
-  onCollapsedChange?: (collapsed: boolean) => void;
+  className?: string;
 }
 
-const menuItems = [
-  { 
-    path: '/', 
-    icon: LayoutDashboard, 
-    label: 'Dashboard' 
-  },
-  { 
-    path: '/entradas', 
-    icon: TrendingUp, 
-    label: 'Entradas' 
-  },
-  { 
-    path: '/saidas', 
-    icon: TrendingDown, 
-    label: 'Saídas' 
-  },
-  { 
-    path: '/cartoes-credito', 
-    icon: CreditCard, 
-    label: 'Cartões de Crédito' 
-  },
-  { 
-    path: '/categorias', 
-    icon: Tag, 
-    label: 'Categorias' 
-  },
-  { 
-    path: '/relatorios-mensais', 
-    icon: BarChart3, 
-    label: 'Relatórios Mensais' 
-  },
-  { 
-    path: '/relatorios-anuais', 
-    icon: Calendar, 
-    label: 'Relatórios Anuais' 
-  },
-  { 
-    path: '/resumo-financeiro', 
-    icon: FileText, 
-    label: 'Resumo Financeiro' 
-  },
-  { 
-    path: '/configuracoes', 
-    icon: Settings, 
-    label: 'Configurações' 
-  }
-];
+export const Sidebar: React.FC<SidebarProps> = ({ className }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
 
-export const Sidebar: React.FC<SidebarProps> = ({ 
-  isOpen, 
-  onClose, 
-  collapsed = false,
-  onCollapsedChange 
-}) => {
-  const { signOut } = useAuth();
+  const menuItems = [
+    { icon: Home, label: 'Dashboard', path: '/dashboard' },
+    { icon: ArrowUpCircle, label: 'Entradas', path: '/entradas' },
+    { icon: ArrowDownCircle, label: 'Saídas', path: '/saidas' },
+    { icon: CreditCard, label: 'Cartões de Crédito', path: '/cartoes-credito' },
+    { icon: Calendar, label: 'Parcelas', path: '/parcelas' },
+    { icon: Clock, label: 'Despesas Fixas', path: '/despesas-fixas' },
+    { icon: Tag, label: 'Categorias', path: '/categorias' },
+    { icon: FileText, label: 'Resumo Financeiro', path: '/resumo-financeiro' },
+    { icon: BarChart3, label: 'Relatórios Mensais', path: '/relatorios-mensais' },
+    { icon: PieChart, label: 'Relatórios Anuais', path: '/relatorios-anuais' },
+    { icon: Settings, label: 'Configurações', path: '/configuracoes' },
+  ];
 
-  const handleLogout = async () => {
-    try {
-      await signOut();
-      toast.success('Logout realizado com sucesso!');
-      onClose();
-    } catch (error) {
-      console.error('Erro no logout:', error);
-      toast.error('Erro ao fazer logout. Tente novamente.');
-    }
+  const handleNavigation = (path: string) => {
+    navigate(path);
   };
 
   return (
-    <>
-      {/* Overlay para mobile */}
-      {isOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-          onClick={onClose}
-        />
-      )}
-      
-      {/* Sidebar */}
-      <aside className={`
-        fixed top-0 left-0 z-50 h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transform transition-all duration-300 ease-in-out
-        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-        ${collapsed ? 'w-16' : 'w-64'}
-        lg:translate-x-0 lg:static lg:z-auto lg:flex-shrink-0
-      `}>
-        <div className="flex flex-col h-full">
-          {/* Header */}
-          <div className={`flex items-center p-4 border-b border-gray-200 dark:border-gray-800 ${
-            collapsed ? 'justify-center' : 'justify-between'
-          }`}>
-            <div className={`flex items-center gap-3 ${collapsed ? 'justify-center' : ''}`}>
-              <img 
-                src="/lovable-uploads/e6254b16-9322-4b60-866d-3e65af6c400b.png" 
-                alt="Finanças JK" 
-                className={`${collapsed ? 'h-8 w-8' : 'h-8 w-8'}`}
-              />
-              {!collapsed && (
-                <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-                  Finanças JK
-                </h1>
-              )}
-            </div>
-            {!collapsed && (
-              <button
-                onClick={onClose}
-                className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 lg:hidden"
-              >
-                <X size={20} />
-              </button>
-            )}
-          </div>
-
-          {/* Navigation */}
-          <nav className="flex-1 p-2">
-            <ul className="space-y-1">
+    <div className={cn("pb-12", className)}>
+      <div className="space-y-4 py-4">
+        <div className="px-3 py-2">
+          <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
+            Menu
+          </h2>
+          <ScrollArea className="h-[calc(100vh-8rem)] px-1">
+            <div className="space-y-1">
               {menuItems.map((item) => (
-                <li key={item.path}>
-                  <NavLink
-                    to={item.path}
-                    onClick={onClose}
-                    className={({ isActive }) => `
-                      flex items-center rounded-lg transition-colors
-                      ${collapsed 
-                        ? 'justify-center p-3 mx-1' 
-                        : 'gap-3 px-3 py-2.5'
-                      }
-                      ${isActive 
-                        ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300' 
-                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-                      }
-                    `}
-                    title={collapsed ? item.label : undefined}
-                  >
-                    <item.icon size={collapsed ? 22 : 20} className="flex-shrink-0" />
-                    {!collapsed && <span className="font-medium">{item.label}</span>}
-                  </NavLink>
-                </li>
+                <Button
+                  key={item.path}
+                  variant={location.pathname === item.path ? "secondary" : "ghost"}
+                  className="w-full justify-start"
+                  onClick={() => handleNavigation(item.path)}
+                >
+                  <item.icon className="mr-2 h-4 w-4" />
+                  {item.label}
+                </Button>
               ))}
-            </ul>
-          </nav>
-
-          {/* Logout Button - Only visible on mobile/tablet */}
-          <div className="p-2 border-t border-gray-200 dark:border-gray-800 lg:hidden">
-            <button
-              onClick={handleLogout}
-              className={`flex items-center rounded-lg transition-colors w-full text-gray-700 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 ${
-                collapsed 
-                  ? 'justify-center p-3 mx-1' 
-                  : 'gap-3 px-3 py-2.5'
-              }`}
-              title={collapsed ? 'Sair' : undefined}
-            >
-              <LogOut size={collapsed ? 22 : 20} className="flex-shrink-0" />
-              {!collapsed && <span className="font-medium">Sair</span>}
-            </button>
-          </div>
+            </div>
+          </ScrollArea>
         </div>
-      </aside>
-    </>
+      </div>
+    </div>
   );
 };
