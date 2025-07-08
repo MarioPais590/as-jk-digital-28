@@ -10,7 +10,6 @@ interface LayoutProps {
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const location = useLocation();
 
   // Páginas onde não deve exibir sidebar e header
@@ -24,18 +23,13 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <div className="flex h-screen overflow-hidden">
-        <Sidebar 
-          isOpen={sidebarOpen} 
-          onClose={() => setSidebarOpen(false)}
-          collapsed={sidebarCollapsed}
-          onCollapsedChange={setSidebarCollapsed}
-        />
+        <Sidebar />
         
-        <div className={`flex flex-col flex-1 min-w-0 transition-all duration-300`}>
+        <div className="flex flex-col flex-1 min-w-0">
           <Header 
             onMenuClick={() => setSidebarOpen(!sidebarOpen)} 
             sidebarOpen={sidebarOpen}
-            onSidebarToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
+            onSidebarToggle={() => setSidebarOpen(!sidebarOpen)}
           />
           
           <main className="flex-1 overflow-auto p-4 lg:p-6">

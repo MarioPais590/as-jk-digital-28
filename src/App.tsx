@@ -9,7 +9,7 @@ import { CategoryProvider } from './contexts/CategoryContext';
 import { Layout } from './components/Layout/Layout';
 
 // Pages
-import { Index } from './pages/Index';
+import Index from './pages/Index';
 import { Dashboard } from './pages/Dashboard';
 import { Entradas } from './pages/Entradas';
 import { Saidas } from './pages/Saidas';
@@ -24,7 +24,7 @@ import { Configuracoes } from './pages/Configuracoes';
 import { Welcome } from './pages/Welcome';
 import { Login } from './pages/Login';
 import { Cadastro } from './pages/Cadastro';
-import { NotFound } from './pages/NotFound';
+import NotFound from './pages/NotFound';
 
 const queryClient = new QueryClient({
   defaultOptions: {
