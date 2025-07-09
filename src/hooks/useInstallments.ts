@@ -146,6 +146,26 @@ export const useInstallments = () => {
         throw updateError;
       }
 
+      // Sincronizar com cartão de crédito - atualizar valor das próximas faturas
+      const { data: cardData, error: cardError } = await supabase
+        .from('credit_cards')
+        .select('valor_proximas_faturas, limite')
+        .eq('id', installment.cartao_id)
+        .single();
+
+      if (!cardError && cardData) {
+        const novoValorFaturas = Math.max(0, (cardData.valor_proximas_faturas || 0) - installment.valor_parcela);
+        const novoLimiteDisponivel = cardData.limite - novoValorFaturas;
+
+        await supabase
+          .from('credit_cards')
+          .update({
+            valor_proximas_faturas: novoValorFaturas,
+            limite_disponivel: novoLimiteDisponivel
+          })
+          .eq('id', installment.cartao_id);
+      }
+
       await loadInstallments();
     } catch (error) {
       console.error('Erro ao marcar parcela como paga:', error);

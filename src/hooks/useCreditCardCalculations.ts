@@ -36,12 +36,15 @@ export const useCreditCardCalculations = (creditCards: CreditCard[], transaction
         })
         .reduce((sum, transaction) => sum + transaction.amount, 0);
       
-      const percentualUsado = card.limite > 0 ? (faturaAtual / card.limite) * 100 : 0;
-      const limiteDisponivel = card.limite - faturaAtual - (card.valor_proximas_faturas || 0);
+      // Somar o valor das próximas faturas (incluindo parcelas futuras)
+      const faturaTotal = faturaAtual + (card.valor_proximas_faturas || 0);
+      
+      const percentualUsado = card.limite > 0 ? (faturaTotal / card.limite) * 100 : 0;
+      const limiteDisponivel = card.limite - faturaTotal;
 
       return {
         card,
-        faturaAtual,
+        faturaAtual: faturaTotal, // Agora inclui as próximas faturas para cálculo correto
         percentualUsado,
         proximoVencimento,
         proximoFechamento,
