@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect } from 'react';
-import { Menu, Sun, Moon, LogOut, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Menu, Sun, Moon, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@/components/ThemeProvider';
 import { useAuth } from '@/components/Auth/AuthProvider';
@@ -144,13 +145,13 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, sidebarOpen, onSide
             <Menu size={20} />
           </button>
           
-          {/* Desktop sidebar toggle button */}
+          {/* Desktop sidebar toggle button - restaurado com ícone de hambúrguer */}
           <button
             onClick={onSidebarToggle}
             className="hidden lg:flex items-center justify-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             aria-label="Toggle sidebar"
           >
-            <ChevronLeft size={20} />
+            <Menu size={20} />
           </button>
         </div>
 

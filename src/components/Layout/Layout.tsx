@@ -26,15 +26,16 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <div className="flex h-screen overflow-hidden">
         <Sidebar 
-          isOpen={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
+          open={sidebarOpen}
+          onOpenChange={setSidebarOpen}
           collapsed={sidebarCollapsed}
           onCollapsedChange={setSidebarCollapsed}
         />
         
         <div className={cn(
           "flex flex-col flex-1 min-w-0 transition-all duration-300",
-          sidebarCollapsed ? "lg:ml-16" : "lg:ml-64"
+          // Remover margem no desktop para colar na sidebar
+          "lg:ml-0"
         )}>
           <Header 
             onMenuClick={() => setSidebarOpen(!sidebarOpen)} 

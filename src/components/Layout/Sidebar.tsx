@@ -20,16 +20,16 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 interface SidebarProps {
   className?: string;
-  isOpen: boolean;
-  onClose: () => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   collapsed: boolean;
   onCollapsedChange: (collapsed: boolean) => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ 
   className, 
-  isOpen, 
-  onClose, 
+  open, 
+  onOpenChange, 
   collapsed, 
   onCollapsedChange 
 }) => {
@@ -52,7 +52,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const handleNavigation = (path: string) => {
     navigate(path);
-    onClose(); // Fecha a sidebar no mobile após navegar
+    onOpenChange(false); // Fecha a sidebar no mobile após navegar
   };
 
   // Sidebar para desktop
@@ -112,17 +112,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const MobileSidebar = () => (
     <>
       {/* Overlay */}
-      {isOpen && (
+      {open && (
         <div 
           className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-          onClick={onClose}
+          onClick={() => onOpenChange(false)}
         />
       )}
       
       {/* Sidebar */}
       <div className={cn(
         "fixed left-0 top-0 h-full w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transform transition-transform duration-300 z-50 lg:hidden",
-        isOpen ? "translate-x-0" : "-translate-x-full"
+        open ? "translate-x-0" : "-translate-x-full"
       )}>
         {/* Logo */}
         <div className="flex items-center justify-center p-4 border-b border-gray-200 dark:border-gray-800">
