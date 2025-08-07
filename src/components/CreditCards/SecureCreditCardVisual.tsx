@@ -4,12 +4,12 @@ import { Edit, Trash2, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CreditCardUsage } from '@/types/creditCard';
 import { 
-  getCardBrandIcon, 
   getCardBrand, 
   getCardColorByBrand, 
   isBackgroundDark 
 } from '@/utils/cardBrandDetector';
 import { maskCardNumber } from '@/utils/cardSecurity';
+import { CardBrandIcon } from './CardBrandIcon';
 
 interface SecureCreditCardVisualProps {
   usage: CreditCardUsage;
@@ -57,7 +57,7 @@ export const SecureCreditCardVisual: React.FC<SecureCreditCardVisualProps> = ({
       <div className={`w-[340px] h-[200px] ${bgColor} ${textColor} rounded-xl shadow-md p-6 relative overflow-hidden transition-transform hover:scale-105`}>
         {/* Bandeira do cartão - Canto superior direito */}
         <div className="absolute top-4 right-4">
-          {card.numero_cartao && getCardBrandIcon(card.numero_cartao)}
+          {card.numero_cartao && <CardBrandIcon cardNumber={card.numero_cartao} />}
         </div>
 
         {/* Nome do cartão */}

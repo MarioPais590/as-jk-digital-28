@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { CreateCreditCardInput, CreditCard } from '@/types/creditCard';
-import { getCardBrandIcon } from '@/utils/cardBrandDetector';
+import { CardBrandIcon } from './CardBrandIcon';
 
 interface CreditCardFormProps {
   onSubmit: (data: CreateCreditCardInput) => void;
@@ -64,7 +64,7 @@ export const CreditCardForm: React.FC<CreditCardFormProps> = ({
           />
           {formData.numero_cartao && (
             <div className="flex-shrink-0">
-              {getCardBrandIcon(formData.numero_cartao)}
+              <CardBrandIcon cardNumber={formData.numero_cartao} />
             </div>
           )}
         </div>

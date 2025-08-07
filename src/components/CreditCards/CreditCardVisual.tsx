@@ -5,11 +5,11 @@ import { Button } from '@/components/ui/button';
 import { CreditCardUsage } from '@/types/creditCard';
 import { 
   formatCardNumber, 
-  getCardBrandIcon, 
   getCardBrand, 
   getCardColorByBrand, 
   isBackgroundDark 
 } from '@/utils/cardBrandDetector';
+import { CardBrandIcon } from './CardBrandIcon';
 
 interface CreditCardVisualProps {
   usage: CreditCardUsage;
@@ -55,7 +55,7 @@ export const CreditCardVisual: React.FC<CreditCardVisualProps> = ({
       <div className={`w-[340px] h-[200px] ${bgColor} ${textColor} rounded-xl shadow-md p-6 relative overflow-hidden transition-transform hover:scale-105`}>
         {/* Bandeira do cartão - Canto superior direito */}
         <div className="absolute top-4 right-4">
-          {card.numero_cartao && getCardBrandIcon(card.numero_cartao)}
+          {card.numero_cartao && <CardBrandIcon cardNumber={card.numero_cartao} />}
         </div>
 
         {/* Nome do cartão */}
