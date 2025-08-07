@@ -1,3 +1,4 @@
+
 import * as React from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Installment, CreateInstallmentInput, InstallmentGroup } from '@/types/installment';
@@ -12,7 +13,7 @@ export const useInstallments = () => {
   const [loading, setLoading] = React.useState(true);
   const { user, isAuthenticated, isLoading: authLoading } = useSupabaseAuth();
 
-  const loadInstallments = async () => {
+  const loadInstallments = React.useCallback(async () => {
     if (authLoading || !isAuthenticated || !user) {
       console.log('useInstallments: Auth not ready, skipping load');
       setInstallments([]);
@@ -58,9 +59,9 @@ export const useInstallments = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [authLoading, isAuthenticated, user]);
 
-  const createInstallmentPurchase = async (input: CreateInstallmentInput) => {
+  const createInstallmentPurchase = React.useCallback(async (input: CreateInstallmentInput) => {
     if (!user) {
       throw new Error('Usuário não autenticado');
     }
@@ -106,9 +107,9 @@ export const useInstallments = () => {
       console.error('Erro ao criar parcelas:', error);
       throw error;
     }
-  };
+  }, [user, loadInstallments]);
 
-  const markInstallmentAsPaid = async (installmentId: string) => {
+  const markInstallmentAsPaid = React.useCallback(async (installmentId: string) => {
     if (!user) {
       throw new Error('Usuário não autenticado');
     }
@@ -176,9 +177,9 @@ export const useInstallments = () => {
       console.error('Erro ao marcar parcela como paga:', error);
       throw error;
     }
-  };
+  }, [user, installments, loadInstallments]);
 
-  const markInstallmentAsPending = async (installmentId: string) => {
+  const markInstallmentAsPending = React.useCallback(async (installmentId: string) => {
     if (!user) {
       throw new Error('Usuário não autenticado');
     }
@@ -239,9 +240,9 @@ export const useInstallments = () => {
       console.error('Erro ao desmarcar parcela como paga:', error);
       throw error;
     }
-  };
+  }, [user, installments, loadInstallments]);
 
-  const updateInstallmentPurchase = async (compraId: string, updates: { descricao?: string; valor_total?: number }) => {
+  const updateInstallmentPurchase = React.useCallback(async (compraId: string, updates: { descricao?: string; valor_total?: number }) => {
     if (!user) {
       throw new Error('Usuário não autenticado');
     }
@@ -275,9 +276,9 @@ export const useInstallments = () => {
       console.error('Erro ao atualizar compra:', error);
       throw error;
     }
-  };
+  }, [user, installments, loadInstallments]);
 
-  const deleteInstallmentPurchase = async (compraId: string) => {
+  const deleteInstallmentPurchase = React.useCallback(async (compraId: string) => {
     if (!user) {
       throw new Error('Usuário não autenticado');
     }
@@ -288,33 +289,7 @@ export const useInstallments = () => {
       // Reverter parcelas pagas e remover transações
       for (const installment of installmentsToDelete) {
         if (installment.status === 'paga') {
-          // Note: This creates a dependency loop, so we'll inline the logic
-          if (installment.transaction_id) {
-            await supabase
-              .from('transactions')
-              .delete()
-              .eq('id', installment.transaction_id);
-          }
-          
-          // Update card limits
-          const { data: cardData } = await supabase
-            .from('credit_cards')
-            .select('valor_proximas_faturas, limite')
-            .eq('id', installment.cartao_id)
-            .single();
-
-          if (cardData) {
-            const novoValorFaturas = (cardData.valor_proximas_faturas || 0) + installment.valor_parcela;
-            const novoLimiteDisponivel = cardData.limite - novoValorFaturas;
-
-            await supabase
-              .from('credit_cards')
-              .update({
-                valor_proximas_faturas: novoValorFaturas,
-                limite_disponivel: novoLimiteDisponivel
-              })
-              .eq('id', installment.cartao_id);
-          }
+          await markInstallmentAsPending(installment.id);
         }
       }
 
@@ -333,9 +308,9 @@ export const useInstallments = () => {
       console.error('Erro ao deletar compra:', error);
       throw error;
     }
-  };
+  }, [user, installments, markInstallmentAsPending, loadInstallments]);
 
-  const getInstallmentGroups = (): InstallmentGroup[] => {
+  const getInstallmentGroups = React.useCallback((): InstallmentGroup[] => {
     const groups: { [key: string]: InstallmentGroup } = {};
 
     installments.forEach(installment => {
@@ -358,217 +333,35 @@ export const useInstallments = () => {
     });
 
     return Object.values(groups);
-  };
+  }, [installments]);
 
   React.useEffect(() => {
     console.log('useInstallments: useEffect triggered', { authLoading, isAuthenticated, user: user?.id });
     if (!authLoading) {
       loadInstallments();
     }
-  }, [isAuthenticated, user, authLoading]);
+  }, [loadInstallments, authLoading]);
 
-  return {
+  return React.useMemo(() => ({
     installments,
     loading: loading || authLoading,
     createInstallmentPurchase,
-    markInstallmentAsPaid: async (installmentId: string) => {
-      if (!user) {
-        throw new Error('Usuário não autenticado');
-      }
-
-      try {
-        const installment = installments.find(i => i.id === installmentId);
-        if (!installment) {
-          throw new Error('Parcela não encontrada');
-        }
-
-        // Criar transação para a parcela paga
-        const { data: transactionData, error: transactionError } = await supabase
-          .from('transactions')
-          .insert({
-            user_id: user.id,
-            type: 'saida',
-            amount: installment.valor_parcela,
-            date: format(new Date(), 'yyyy-MM-dd'),
-            category: 'Cartão de Crédito',
-            description: `${installment.descricao} - Parcela ${installment.numero_parcela}/${installment.parcelas_totais}`,
-            cartao_id: installment.cartao_id
-          })
-          .select()
-          .single();
-
-        if (transactionError) {
-          throw transactionError;
-        }
-
-        // Atualizar parcela como paga
-        const { error: updateError } = await supabase
-          .from('parcelas_cartao')
-          .update({
-            status: 'paga',
-            transaction_id: transactionData.id
-          })
-          .eq('id', installmentId);
-
-        if (updateError) {
-          throw updateError;
-        }
-
-        // Sincronizar com cartão de crédito - atualizar valor das próximas faturas
-        const { data: cardData, error: cardError } = await supabase
-          .from('credit_cards')
-          .select('valor_proximas_faturas, limite')
-          .eq('id', installment.cartao_id)
-          .single();
-
-        if (!cardError && cardData) {
-          const novoValorFaturas = Math.max(0, (cardData.valor_proximas_faturas || 0) - installment.valor_parcela);
-          const novoLimiteDisponivel = cardData.limite - novoValorFaturas;
-
-          await supabase
-            .from('credit_cards')
-            .update({
-              valor_proximas_faturas: novoValorFaturas,
-              limite_disponivel: novoLimiteDisponivel
-            })
-            .eq('id', installment.cartao_id);
-        }
-
-        await loadInstallments();
-      } catch (error) {
-        console.error('Erro ao marcar parcela como paga:', error);
-        throw error;
-      }
-    },
-    markInstallmentAsPending: async (installmentId: string) => {
-      if (!user) {
-        throw new Error('Usuário não autenticado');
-      }
-
-      try {
-        const installment = installments.find(i => i.id === installmentId);
-        if (!installment || installment.status !== 'paga') {
-          throw new Error('Parcela não encontrada ou não está paga');
-        }
-
-        // Remover transação associada se existir
-        if (installment.transaction_id) {
-          const { error: deleteTransactionError } = await supabase
-            .from('transactions')
-            .delete()
-            .eq('id', installment.transaction_id);
-
-          if (deleteTransactionError) {
-            throw deleteTransactionError;
-          }
-        }
-
-        // Atualizar parcela como pendente
-        const { error: updateError } = await supabase
-          .from('parcelas_cartao')
-          .update({
-            status: 'pendente',
-            transaction_id: null
-          })
-          .eq('id', installmentId);
-
-        if (updateError) {
-          throw updateError;
-        }
-
-        // Sincronizar com cartão de crédito - adicionar valor de volta às próximas faturas
-        const { data: cardData, error: cardError } = await supabase
-          .from('credit_cards')
-          .select('valor_proximas_faturas, limite')
-          .eq('id', installment.cartao_id)
-          .single();
-
-        if (!cardError && cardData) {
-          const novoValorFaturas = (cardData.valor_proximas_faturas || 0) + installment.valor_parcela;
-          const novoLimiteDisponivel = cardData.limite - novoValorFaturas;
-
-          await supabase
-            .from('credit_cards')
-            .update({
-              valor_proximas_faturas: novoValorFaturas,
-              limite_disponivel: novoLimiteDisponivel
-            })
-            .eq('id', installment.cartao_id);
-        }
-
-        await loadInstallments();
-      } catch (error) {
-        console.error('Erro ao desmarcar parcela como paga:', error);
-        throw error;
-      }
-    },
-    updateInstallmentPurchase: async (compraId: string, updates: { descricao?: string; valor_total?: number }) => {
-      if (!user) {
-        throw new Error('Usuário não autenticado');
-      }
-
-      try {
-        const installmentsToUpdate = installments.filter(i => i.compra_id === compraId);
-        if (installmentsToUpdate.length === 0) {
-          throw new Error('Compra não encontrada');
-        }
-
-        const updateData: any = {};
-        if (updates.descricao) {
-          updateData.descricao = updates.descricao;
-        }
-        if (updates.valor_total) {
-          updateData.valor_total = updates.valor_total;
-          updateData.valor_parcela = updates.valor_total / installmentsToUpdate[0].parcelas_totais;
-        }
-
-        const { error } = await supabase
-          .from('parcelas_cartao')
-          .update(updateData)
-          .eq('compra_id', compraId);
-
-        if (error) {
-          throw error;
-        }
-
-        await loadInstallments();
-      } catch (error) {
-        console.error('Erro ao atualizar compra:', error);
-        throw error;
-      }
-    },
-    deleteInstallmentPurchase: async (compraId: string) => {
-      if (!user) {
-        throw new Error('Usuário não autenticado');
-      }
-
-      try {
-        const installmentsToDelete = installments.filter(i => i.compra_id === compraId);
-        
-        // Reverter parcelas pagas e remover transações
-        for (const installment of installmentsToDelete) {
-          if (installment.status === 'paga') {
-            await markInstallmentAsPending(installment.id);
-          }
-        }
-
-        // Deletar todas as parcelas da compra
-        const { error } = await supabase
-          .from('parcelas_cartao')
-          .delete()
-          .eq('compra_id', compraId);
-
-        if (error) {
-          throw error;
-        }
-
-        await loadInstallments();
-      } catch (error) {
-        console.error('Erro ao deletar compra:', error);
-        throw error;
-      }
-    },
+    markInstallmentAsPaid,
+    markInstallmentAsPending,
+    updateInstallmentPurchase,
+    deleteInstallmentPurchase,
     getInstallmentGroups,
     refreshInstallments: loadInstallments
-  };
+  }), [
+    installments,
+    loading,
+    authLoading,
+    createInstallmentPurchase,
+    markInstallmentAsPaid,
+    markInstallmentAsPending,
+    updateInstallmentPurchase,
+    deleteInstallmentPurchase,
+    getInstallmentGroups,
+    loadInstallments
+  ]);
 };
