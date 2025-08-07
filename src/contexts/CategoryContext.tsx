@@ -1,8 +1,9 @@
 
 import { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { Category, CreateCategoryInput } from '@/types/category';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
+import { CategoryService } from '@/services/categoryService';
+import { ErrorHandler } from '@/utils/errorHandler';
 
 interface CategoryContextType {
   categories: Category[];
@@ -42,16 +43,7 @@ export const CategoryProvider: React.FC<CategoryProviderProps> = ({ children }) 
     try {
       console.log('Loading categories for user:', user.id);
       
-      const { data, error } = await supabase
-        .from('categories')
-        .select('*')
-        .order('name', { ascending: true });
-
-      if (error) {
-        console.error('Erro ao carregar categorias:', error);
-        setCategories([]);
-        return;
-      }
+      const data = await CategoryService.getCategories();
 
       const formattedCategories: Category[] = (data || []).map(item => ({
         id: item.id,
@@ -65,7 +57,7 @@ export const CategoryProvider: React.FC<CategoryProviderProps> = ({ children }) 
 
       setCategories(formattedCategories);
     } catch (error) {
-      console.error('Erro ao carregar categorias:', error);
+      ErrorHandler.logError('Erro ao carregar categorias', error);
       setCategories([]);
     } finally {
       setLoading(false);
@@ -78,21 +70,12 @@ export const CategoryProvider: React.FC<CategoryProviderProps> = ({ children }) 
     }
 
     try {
-      const { data, error } = await supabase
-        .from('categories')
-        .insert({
-          user_id: user.id,
-          name: categoryData.name,
-          type: categoryData.type,
-          is_default: false
-        })
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Erro ao criar categoria:', error);
-        throw error;
-      }
+      const data = await CategoryService.createCategory({
+        user_id: user.id,
+        name: categoryData.name,
+        type: categoryData.type,
+        is_default: false
+      });
 
       const newCategory: Category = {
         id: data.id,
@@ -104,12 +87,10 @@ export const CategoryProvider: React.FC<CategoryProviderProps> = ({ children }) 
         updated_at: data.updated_at
       };
 
-      // Atualizar estado local imediatamente
       setCategories(prev => [...prev, newCategory].sort((a, b) => a.name.localeCompare(b.name)));
       return newCategory;
     } catch (error) {
-      console.error('Erro ao criar categoria:', error);
-      throw error;
+      ErrorHandler.handleAsyncError('Erro ao criar categoria')(error);
     }
   }, [user]);
 
@@ -119,21 +100,10 @@ export const CategoryProvider: React.FC<CategoryProviderProps> = ({ children }) 
     }
 
     try {
-      const { error } = await supabase
-        .from('categories')
-        .delete()
-        .eq('id', categoryId);
-
-      if (error) {
-        console.error('Erro ao deletar categoria:', error);
-        throw error;
-      }
-
-      // Atualizar estado local imediatamente
+      await CategoryService.deleteCategory(categoryId);
       setCategories(prev => prev.filter(cat => cat.id !== categoryId));
     } catch (error) {
-      console.error('Erro ao deletar categoria:', error);
-      throw error;
+      ErrorHandler.handleAsyncError('Erro ao deletar categoria')(error);
     }
   }, [user]);
 

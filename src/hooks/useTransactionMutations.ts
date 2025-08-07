@@ -1,7 +1,8 @@
 
-import { supabase } from '@/integrations/supabase/client';
 import { Transaction } from '@/types/financial';
 import { useSupabaseAuth } from './useSupabaseAuth';
+import { TransactionService } from '@/services/transactionService';
+import { ErrorHandler } from '@/utils/errorHandler';
 
 export const useTransactionMutations = (
   setTransactions: React.Dispatch<React.SetStateAction<Transaction[]>>
@@ -14,25 +15,16 @@ export const useTransactionMutations = (
     }
 
     try {
-      const { data, error } = await supabase
-        .from('transactions')
-        .insert({
-          user_id: user.id,
-          type: transaction.type,
-          amount: transaction.amount,
-          date: transaction.date,
-          category: transaction.category,
-          description: transaction.description,
-          notes: transaction.notes,
-          cartao_id: transaction.cartao_id || null
-        })
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Erro ao adicionar transação:', error);
-        throw error;
-      }
+      const data = await TransactionService.createTransaction({
+        user_id: user.id,
+        type: transaction.type,
+        amount: transaction.amount,
+        date: transaction.date,
+        category: transaction.category,
+        description: transaction.description,
+        notes: transaction.notes,
+        cartao_id: transaction.cartao_id || null
+      });
 
       const newTransaction: Transaction = {
         id: data.id,
@@ -49,8 +41,7 @@ export const useTransactionMutations = (
 
       setTransactions(prev => [newTransaction, ...prev]);
     } catch (error) {
-      console.error('Erro ao adicionar transação:', error);
-      throw error;
+      ErrorHandler.handleAsyncError('Erro ao adicionar transação')(error);
     }
   };
 
@@ -62,10 +53,8 @@ export const useTransactionMutations = (
     try {
       console.log('Iniciando atualização da transação:', { id, updates });
       
-      // Prepare update data with strict validation
       const updateData: any = {};
       
-      // Only include fields that are actually being updated and are valid
       if (updates.type !== undefined && ['entrada', 'saida'].includes(updates.type)) {
         updateData.type = updates.type;
       }
@@ -101,29 +90,12 @@ export const useTransactionMutations = (
 
       console.log('Dados para atualização:', updateData);
 
-      // Check if there's anything to update
       if (Object.keys(updateData).length === 0) {
         console.warn('Nenhum campo válido para atualizar');
         return;
       }
 
-      const { data, error } = await supabase
-        .from('transactions')
-        .update(updateData)
-        .eq('id', id)
-        .eq('user_id', user.id) // Extra security check
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Erro detalhado ao atualizar transação:', {
-          error,
-          id,
-          updateData,
-          userId: user.id
-        });
-        throw error;
-      }
+      const data = await TransactionService.updateTransaction(id, user.id, updateData);
 
       console.log('Transação atualizada com sucesso:', data);
 
@@ -145,8 +117,7 @@ export const useTransactionMutations = (
         )
       );
     } catch (error) {
-      console.error('Erro ao atualizar transação:', error);
-      throw error;
+      ErrorHandler.handleAsyncError('Erro ao atualizar transação')(error);
     }
   };
 
@@ -156,20 +127,10 @@ export const useTransactionMutations = (
     }
 
     try {
-      const { error } = await supabase
-        .from('transactions')
-        .delete()
-        .eq('id', id);
-
-      if (error) {
-        console.error('Erro ao deletar transação:', error);
-        throw error;
-      }
-
+      await TransactionService.deleteTransaction(id, user.id);
       setTransactions(prev => prev.filter(transaction => transaction.id !== id));
     } catch (error) {
-      console.error('Erro ao deletar transação:', error);
-      throw error;
+      ErrorHandler.handleAsyncError('Erro ao deletar transação')(error);
     }
   };
 
