@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Edit, Trash2, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
