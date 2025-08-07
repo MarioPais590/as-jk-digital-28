@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 
 type Theme = 'dark' | 'light' | 'system';
@@ -27,14 +26,19 @@ export function ThemeProvider({
   storageKey = 'vite-ui-theme',
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(() => {
+  console.log('ThemeProvider rendering...');
+  
+  // Use React.useState explicitly
+  const [theme, setTheme] = React.useState<Theme>(() => {
+    console.log('Initializing theme state...');
     if (typeof window !== 'undefined') {
       return (localStorage.getItem(storageKey) as Theme) || defaultTheme;
     }
     return defaultTheme;
   });
 
-  useEffect(() => {
+  React.useEffect(() => {
+    console.log('Theme effect running...', theme);
     if (typeof window === 'undefined') return;
     
     const root = window.document.documentElement;
@@ -54,9 +58,10 @@ export function ThemeProvider({
     root.classList.add(theme);
   }, [theme]);
 
-  const value = useMemo(() => ({
+  const value = React.useMemo(() => ({
     theme,
     setTheme: (theme: Theme) => {
+      console.log('Setting theme to:', theme);
       if (typeof window !== 'undefined') {
         localStorage.setItem(storageKey, theme);
       }
@@ -72,7 +77,7 @@ export function ThemeProvider({
 }
 
 export const useThemeContext = () => {
-  const context = useContext(ThemeProviderContext);
+  const context = React.useContext(ThemeProviderContext);
 
   if (context === undefined)
     throw new Error('useThemeContext must be used within a ThemeProvider');
