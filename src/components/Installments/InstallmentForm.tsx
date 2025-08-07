@@ -1,5 +1,5 @@
 
-import * as React from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,8 +15,8 @@ import { toast } from 'sonner';
 export const InstallmentForm: React.FC = () => {
   const { creditCards } = useSecureCreditCards();
   const { createInstallmentPurchase } = useInstallments();
-  const [loading, setLoading] = React.useState(false);
-  const [formData, setFormData] = React.useState<CreateInstallmentInput>({
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState<CreateInstallmentInput>({
     cartao_id: '',
     descricao: '',
     valor_total: 0,
@@ -24,7 +24,7 @@ export const InstallmentForm: React.FC = () => {
     data_compra: format(new Date(), 'yyyy-MM-dd')
   });
 
-  const handleSubmit = React.useCallback(async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
@@ -64,27 +64,27 @@ export const InstallmentForm: React.FC = () => {
     }
   }, [formData, createInstallmentPurchase]);
 
-  const valorParcela = React.useMemo(() => {
+  const valorParcela = useMemo(() => {
     return formData.valor_total / formData.parcelas_totais;
   }, [formData.valor_total, formData.parcelas_totais]);
 
-  const handleCardChange = React.useCallback((value: string) => {
+  const handleCardChange = useCallback((value: string) => {
     setFormData(prev => ({ ...prev, cartao_id: value }));
   }, []);
 
-  const handleDateChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDateChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({ ...prev, data_compra: e.target.value }));
   }, []);
 
-  const handleDescriptionChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDescriptionChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({ ...prev, descricao: e.target.value }));
   }, []);
 
-  const handleValueChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleValueChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({ ...prev, valor_total: Number(e.target.value) }));
   }, []);
 
-  const handleInstallmentsChange = React.useCallback((value: string) => {
+  const handleInstallmentsChange = useCallback((value: string) => {
     setFormData(prev => ({ ...prev, parcelas_totais: Number(value) }));
   }, []);
 

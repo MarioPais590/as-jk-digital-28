@@ -73,8 +73,7 @@ export const CategoryProvider: React.FC<CategoryProviderProps> = ({ children }) 
       const data = await CategoryService.createCategory({
         user_id: user.id,
         name: categoryData.name,
-        type: categoryData.type,
-        is_default: false
+        type: categoryData.type
       });
 
       const newCategory: Category = {
