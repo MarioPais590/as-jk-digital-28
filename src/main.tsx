@@ -1,12 +1,8 @@
-
-import React, { StrictMode } from 'react';
+import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
-import './index.css';
 
-// Add debugging to verify React is properly loaded
-console.log('main.tsx: React:', React);
-console.log('main.tsx: StrictMode:', StrictMode);
+console.log('main.tsx: React version check:', React.version);
 
 const container = document.getElementById('root');
 if (!container) {
@@ -14,9 +10,4 @@ if (!container) {
 }
 
 const root = createRoot(container);
-
-root.render(
-  <StrictMode>
-    <App />
-  </StrictMode>
-);
+root.render(React.createElement(App));
