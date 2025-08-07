@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+
+import * as React from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Category, CreateCategoryInput } from '@/types/category';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
@@ -12,10 +13,10 @@ interface CategoryContextType {
   refreshCategories: () => Promise<void>;
 }
 
-const CategoryContext = createContext<CategoryContextType | undefined>(undefined);
+const CategoryContext = React.createContext<CategoryContextType | undefined>(undefined);
 
 export const useCategoryContext = () => {
-  const context = useContext(CategoryContext);
+  const context = React.useContext(CategoryContext);
   if (!context) {
     throw new Error('useCategoryContext must be used within a CategoryProvider');
   }
@@ -23,12 +24,12 @@ export const useCategoryContext = () => {
 };
 
 interface CategoryProviderProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 export const CategoryProvider: React.FC<CategoryProviderProps> = ({ children }) => {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = React.useState<Category[]>([]);
+  const [loading, setLoading] = React.useState(true);
   const { user, isAuthenticated, isLoading: authLoading } = useSupabaseAuth();
 
   const loadCategories = async () => {
@@ -144,7 +145,7 @@ export const CategoryProvider: React.FC<CategoryProviderProps> = ({ children }) 
     await loadCategories();
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!authLoading) {
       loadCategories();
     }

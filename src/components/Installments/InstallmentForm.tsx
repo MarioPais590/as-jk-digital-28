@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import * as React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,8 +15,8 @@ import { toast } from 'sonner';
 export const InstallmentForm: React.FC = () => {
   const { creditCards } = useSecureCreditCards();
   const { createInstallmentPurchase } = useInstallments();
-  const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState<CreateInstallmentInput>({
+  const [loading, setLoading] = React.useState(false);
+  const [formData, setFormData] = React.useState<CreateInstallmentInput>({
     cartao_id: '',
     descricao: '',
     valor_total: 0,
