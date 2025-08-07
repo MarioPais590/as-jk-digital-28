@@ -9,7 +9,7 @@ export const useTransactions = () => {
   const [loading, setLoading] = React.useState(true);
   const { user, isAuthenticated, isLoading: authLoading } = useSupabaseAuth();
 
-  const loadTransactions = async () => {
+  const loadTransactions = React.useCallback(async () => {
     if (authLoading || !isAuthenticated || !user) {
       setTransactions([]);
       setLoading(false);
@@ -51,18 +51,18 @@ export const useTransactions = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [authLoading, isAuthenticated, user]);
 
   React.useEffect(() => {
     if (!authLoading) {
       loadTransactions();
     }
-  }, [isAuthenticated, user, authLoading]);
+  }, [loadTransactions]);
 
-  return {
+  return React.useMemo(() => ({
     transactions,
     loading: loading || authLoading,
     refreshTransactions: loadTransactions,
     setTransactions
-  };
+  }), [transactions, loading, authLoading, loadTransactions]);
 };

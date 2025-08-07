@@ -19,7 +19,7 @@ export const InstallmentList: React.FC = () => {
   const installmentGroups = getInstallmentGroups();
   const [loadingActions, setLoadingActions] = React.useState<{ [key: string]: boolean }>({});
 
-  const handleMarkAsPaid = async (installmentId: string) => {
+  const handleMarkAsPaid = React.useCallback(async (installmentId: string) => {
     setLoadingActions(prev => ({ ...prev, [installmentId]: true }));
     try {
       await markInstallmentAsPaid(installmentId);
@@ -30,9 +30,9 @@ export const InstallmentList: React.FC = () => {
     } finally {
       setLoadingActions(prev => ({ ...prev, [installmentId]: false }));
     }
-  };
+  }, [markInstallmentAsPaid]);
 
-  const handleMarkAsPending = async (installmentId: string) => {
+  const handleMarkAsPending = React.useCallback(async (installmentId: string) => {
     setLoadingActions(prev => ({ ...prev, [installmentId]: true }));
     try {
       await markInstallmentAsPending(installmentId);
@@ -43,9 +43,9 @@ export const InstallmentList: React.FC = () => {
     } finally {
       setLoadingActions(prev => ({ ...prev, [installmentId]: false }));
     }
-  };
+  }, [markInstallmentAsPending]);
 
-  const handleDeletePurchase = async (compraId: string) => {
+  const handleDeletePurchase = React.useCallback(async (compraId: string) => {
     try {
       await deleteInstallmentPurchase(compraId);
       toast.success('Compra excluída com sucesso!');
@@ -53,19 +53,19 @@ export const InstallmentList: React.FC = () => {
       console.error('Erro ao excluir compra:', error);
       toast.error('Erro ao excluir compra');
     }
-  };
+  }, [deleteInstallmentPurchase]);
 
-  const formatCurrency = (value: number) => {
+  const formatCurrency = React.useCallback((value: number) => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL'
     }).format(value);
-  };
+  }, []);
 
-  const getCardName = (cardId: string) => {
+  const getCardName = React.useCallback((cardId: string) => {
     const card = creditCards.find(c => c.id === cardId);
     return card?.nome || 'Cartão';
-  };
+  }, [creditCards]);
 
   if (installmentGroups.length === 0) {
     return (

@@ -20,7 +20,7 @@ export const EditInstallmentDialog: React.FC<EditInstallmentDialogProps> = ({ gr
   const [loading, setLoading] = React.useState(false);
   const { updateInstallmentPurchase } = useInstallments();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = React.useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
@@ -37,7 +37,7 @@ export const EditInstallmentDialog: React.FC<EditInstallmentDialogProps> = ({ gr
     } finally {
       setLoading(false);
     }
-  };
+  }, [group.compra_id, descricao, valorTotal, updateInstallmentPurchase]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

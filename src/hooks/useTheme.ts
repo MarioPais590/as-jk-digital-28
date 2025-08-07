@@ -15,10 +15,10 @@ export const useTheme = () => {
     setTheme(isDark ? 'light' : 'dark');
   }, [isDark, setTheme]);
 
-  return {
+  return React.useMemo(() => ({
     theme,
     setTheme,
     isDark,
     toggleTheme,
-  };
+  }), [theme, setTheme, isDark, toggleTheme]);
 };
