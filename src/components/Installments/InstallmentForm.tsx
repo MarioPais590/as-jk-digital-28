@@ -24,7 +24,7 @@ export const InstallmentForm: React.FC = () => {
     data_compra: format(new Date(), 'yyyy-MM-dd')
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = React.useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
@@ -62,9 +62,31 @@ export const InstallmentForm: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [formData, createInstallmentPurchase]);
 
-  const valorParcela = formData.valor_total / formData.parcelas_totais;
+  const valorParcela = React.useMemo(() => {
+    return formData.valor_total / formData.parcelas_totais;
+  }, [formData.valor_total, formData.parcelas_totais]);
+
+  const handleCardChange = React.useCallback((value: string) => {
+    setFormData(prev => ({ ...prev, cartao_id: value }));
+  }, []);
+
+  const handleDateChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData(prev => ({ ...prev, data_compra: e.target.value }));
+  }, []);
+
+  const handleDescriptionChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData(prev => ({ ...prev, descricao: e.target.value }));
+  }, []);
+
+  const handleValueChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData(prev => ({ ...prev, valor_total: Number(e.target.value) }));
+  }, []);
+
+  const handleInstallmentsChange = React.useCallback((value: string) => {
+    setFormData(prev => ({ ...prev, parcelas_totais: Number(value) }));
+  }, []);
 
   return (
     <Card>
@@ -79,7 +101,7 @@ export const InstallmentForm: React.FC = () => {
               <CreditCardSelect
                 creditCards={creditCards}
                 value={formData.cartao_id}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, cartao_id: value }))}
+                onValueChange={handleCardChange}
                 placeholder="Selecione o cartão"
               />
             </div>
@@ -90,7 +112,7 @@ export const InstallmentForm: React.FC = () => {
                 id="data_compra"
                 type="date"
                 value={formData.data_compra}
-                onChange={(e) => setFormData(prev => ({ ...prev, data_compra: e.target.value }))}
+                onChange={handleDateChange}
                 required
               />
             </div>
@@ -101,7 +123,7 @@ export const InstallmentForm: React.FC = () => {
             <Input
               id="descricao"
               value={formData.descricao}
-              onChange={(e) => setFormData(prev => ({ ...prev, descricao: e.target.value }))}
+              onChange={handleDescriptionChange}
               placeholder="Ex: Notebook Dell Inspiron"
               required
             />
@@ -116,7 +138,7 @@ export const InstallmentForm: React.FC = () => {
                 step="0.01"
                 min="0"
                 value={formData.valor_total}
-                onChange={(e) => setFormData(prev => ({ ...prev, valor_total: Number(e.target.value) }))}
+                onChange={handleValueChange}
                 placeholder="0,00"
                 required
               />
@@ -126,7 +148,7 @@ export const InstallmentForm: React.FC = () => {
               <Label htmlFor="parcelas">Número de Parcelas</Label>
               <Select
                 value={formData.parcelas_totais.toString()}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, parcelas_totais: Number(value) }))}
+                onValueChange={handleInstallmentsChange}
               >
                 <SelectTrigger>
                   <SelectValue />
