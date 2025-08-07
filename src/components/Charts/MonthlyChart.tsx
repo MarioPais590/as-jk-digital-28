@@ -1,11 +1,19 @@
 
 import React from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { DailyBalance } from '@/types/financial';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
 
 interface MonthlyChartProps {
   data: DailyBalance[];
 }
+
+const chartConfig = {
+  balance: {
+    label: "Saldo",
+    color: "hsl(var(--chart-1))",
+  },
+};
 
 export const MonthlyChart: React.FC<MonthlyChartProps> = ({ data }) => {
   const formatCurrency = (value: number) => {
@@ -26,39 +34,31 @@ export const MonthlyChart: React.FC<MonthlyChartProps> = ({ data }) => {
         Evolução Diária do Saldo
       </h3>
       
-      <div className="h-80">
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-            <XAxis 
-              dataKey="date" 
-              tickFormatter={formatDate}
-              className="text-gray-600 dark:text-gray-400"
-            />
-            <YAxis 
-              tickFormatter={formatCurrency}
-              className="text-gray-600 dark:text-gray-400"
-            />
-            <Tooltip 
-              formatter={(value: number) => [formatCurrency(value), 'Saldo']}
-              labelFormatter={(label) => `Dia ${formatDate(label)}`}
-              contentStyle={{
-                backgroundColor: 'var(--background)',
-                border: '1px solid var(--border)',
-                borderRadius: '8px'
-              }}
-            />
-            <Line 
-              type="monotone" 
-              dataKey="balance" 
-              stroke="#10b981" 
-              strokeWidth={2}
-              dot={{ fill: '#10b981', strokeWidth: 2, r: 4 }}
-              activeDot={{ r: 6, fill: '#10b981' }}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
+      <ChartContainer config={chartConfig} className="h-80">
+        <LineChart data={data}>
+          <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+          <XAxis 
+            dataKey="date" 
+            tickFormatter={formatDate}
+            className="text-gray-600 dark:text-gray-400"
+          />
+          <YAxis 
+            tickFormatter={formatCurrency}
+            className="text-gray-600 dark:text-gray-400"
+          />
+          <ChartTooltip 
+            content={<ChartTooltipContent />}
+          />
+          <Line 
+            type="monotone" 
+            dataKey="balance" 
+            stroke="var(--color-balance)" 
+            strokeWidth={2}
+            dot={{ fill: "var(--color-balance)", strokeWidth: 2, r: 4 }}
+            activeDot={{ r: 6, fill: "var(--color-balance)" }}
+          />
+        </LineChart>
+      </ChartContainer>
     </div>
   );
 };
