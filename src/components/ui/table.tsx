@@ -1,4 +1,4 @@
-import React, { forwardRef, HTMLAttributes, TdHTMLAttributes, ThHTMLAttributes } from "react" // Fixed React import
+import React, { forwardRef, HTMLAttributes, TdHTMLAttributes, ThHTMLAttributes } from "react"
 
 import { cn } from "@/lib/utils"
 
