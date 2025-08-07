@@ -1,5 +1,5 @@
 
-import { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
 import { Category, CreateCategoryInput } from '@/types/category';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { CategoryService } from '@/services/categoryService';
