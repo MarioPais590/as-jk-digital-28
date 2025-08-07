@@ -1,11 +1,8 @@
 
-import React, { StrictMode } from 'react';
+import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
-
-// Make React available globally for recharts
-(window as any).React = React;
 
 const container = document.getElementById('root');
 if (!container) {
