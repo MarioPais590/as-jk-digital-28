@@ -71,11 +71,11 @@ export function ThemeProvider({
   );
 }
 
-export const useTheme = () => {
+export const useThemeContext = () => {
   const context = useContext(ThemeProviderContext);
 
   if (context === undefined)
-    throw new Error('useTheme must be used within a ThemeProvider');
+    throw new Error('useThemeContext must be used within a ThemeProvider');
 
   return context;
 };

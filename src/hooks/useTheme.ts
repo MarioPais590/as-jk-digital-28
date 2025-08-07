@@ -1,6 +1,6 @@
 
 import { useMemo, useCallback } from 'react';
-import { useTheme as useThemeContext } from '@/components/ThemeProvider';
+import { useThemeContext } from '@/components/ThemeProvider';
 
 export const useTheme = () => {
   const { theme, setTheme } = useThemeContext();
