@@ -1,9 +1,9 @@
 
-import * as React from 'react';
+import { FC } from 'react';
 import { InstallmentForm } from '@/components/Installments/InstallmentForm';
 import { InstallmentList } from '@/components/Installments/InstallmentList';
 
-export const Parcelas: React.FC = () => {
+export const Parcelas: FC = () => {
   console.log('Parcelas component rendering');
   
   return (

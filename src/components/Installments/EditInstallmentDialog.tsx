@@ -1,5 +1,5 @@
 
-import * as React from 'react';
+import { FC, useState, useCallback } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,14 +13,14 @@ interface EditInstallmentDialogProps {
   group: InstallmentGroup;
 }
 
-export const EditInstallmentDialog: React.FC<EditInstallmentDialogProps> = ({ group }) => {
-  const [open, setOpen] = React.useState(false);
-  const [descricao, setDescricao] = React.useState(group.descricao);
-  const [valorTotal, setValorTotal] = React.useState(group.valor_total.toString());
-  const [loading, setLoading] = React.useState(false);
+export const EditInstallmentDialog: FC<EditInstallmentDialogProps> = ({ group }) => {
+  const [open, setOpen] = useState(false);
+  const [descricao, setDescricao] = useState(group.descricao);
+  const [valorTotal, setValorTotal] = useState(group.valor_total.toString());
+  const [loading, setLoading] = useState(false);
   const { updateInstallmentPurchase } = useInstallments();
 
-  const handleSubmit = React.useCallback(async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
