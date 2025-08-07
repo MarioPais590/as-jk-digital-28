@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { Transaction } from '@/types/financial';
@@ -21,7 +20,10 @@ interface jsPDFWithPlugin extends jsPDF {
 }
 
 export const usePDFGenerator = () => {
-  const [isGenerating, setIsGenerating] = useState(false);
+  console.log('usePDFGenerator: React:', React);
+  console.log('usePDFGenerator: useState:', useState);
+  
+  const [isGenerating, setIsGenerating] = React.useState(false);
 
   const generateFinancialPDF = async (
     transactions: Transaction[],
