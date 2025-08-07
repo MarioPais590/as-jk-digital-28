@@ -1,5 +1,5 @@
 
-import * as React from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Category, CreateCategoryInput } from '@/types/category';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
@@ -13,10 +13,10 @@ interface CategoryContextType {
   refreshCategories: () => Promise<void>;
 }
 
-const CategoryContext = React.createContext<CategoryContextType | undefined>(undefined);
+const CategoryContext = createContext<CategoryContextType | undefined>(undefined);
 
 export const useCategoryContext = () => {
-  const context = React.useContext(CategoryContext);
+  const context = useContext(CategoryContext);
   if (!context) {
     throw new Error('useCategoryContext must be used within a CategoryProvider');
   }
@@ -28,11 +28,11 @@ interface CategoryProviderProps {
 }
 
 export const CategoryProvider: React.FC<CategoryProviderProps> = ({ children }) => {
-  const [categories, setCategories] = React.useState<Category[]>([]);
-  const [loading, setLoading] = React.useState(true);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
   const { user, isAuthenticated, isLoading: authLoading } = useSupabaseAuth();
 
-  const loadCategories = React.useCallback(async () => {
+  const loadCategories = useCallback(async () => {
     if (authLoading || !isAuthenticated || !user) {
       setCategories([]);
       setLoading(false);
@@ -72,7 +72,7 @@ export const CategoryProvider: React.FC<CategoryProviderProps> = ({ children }) 
     }
   }, [authLoading, isAuthenticated, user]);
 
-  const createCategory = React.useCallback(async (categoryData: CreateCategoryInput): Promise<Category> => {
+  const createCategory = useCallback(async (categoryData: CreateCategoryInput): Promise<Category> => {
     if (!user) {
       throw new Error('Usuário não autenticado');
     }
@@ -113,7 +113,7 @@ export const CategoryProvider: React.FC<CategoryProviderProps> = ({ children }) 
     }
   }, [user]);
 
-  const deleteCategory = React.useCallback(async (categoryId: string): Promise<void> => {
+  const deleteCategory = useCallback(async (categoryId: string): Promise<void> => {
     if (!user) {
       throw new Error('Usuário não autenticado');
     }
@@ -137,21 +137,21 @@ export const CategoryProvider: React.FC<CategoryProviderProps> = ({ children }) 
     }
   }, [user]);
 
-  const getCategoriesByType = React.useCallback((type: 'entrada' | 'saida'): Category[] => {
+  const getCategoriesByType = useCallback((type: 'entrada' | 'saida'): Category[] => {
     return categories.filter(cat => cat.type === type);
   }, [categories]);
 
-  const refreshCategories = React.useCallback(async (): Promise<void> => {
+  const refreshCategories = useCallback(async (): Promise<void> => {
     await loadCategories();
   }, [loadCategories]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!authLoading) {
       loadCategories();
     }
   }, [loadCategories, authLoading]);
 
-  const value: CategoryContextType = React.useMemo(() => ({
+  const value: CategoryContextType = useMemo(() => ({
     categories,
     loading: loading || authLoading,
     createCategory,
