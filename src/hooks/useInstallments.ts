@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+
+import * as React from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Installment, CreateInstallmentInput, InstallmentGroup } from '@/types/installment';
 import { useSupabaseAuth } from './useSupabaseAuth';
@@ -6,8 +7,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { addMonths, format } from 'date-fns';
 
 export const useInstallments = () => {
-  const [installments, setInstallments] = useState<Installment[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [installments, setInstallments] = React.useState<Installment[]>([]);
+  const [loading, setLoading] = React.useState(true);
   const { user, isAuthenticated, isLoading: authLoading } = useSupabaseAuth();
 
   const loadInstallments = async () => {
@@ -328,7 +329,8 @@ export const useInstallments = () => {
     return Object.values(groups);
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
+    console.log('useInstallments: useEffect triggered', { authLoading, isAuthenticated, user: user?.id });
     if (!authLoading) {
       loadInstallments();
     }

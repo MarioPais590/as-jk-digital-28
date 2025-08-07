@@ -1,9 +1,11 @@
 
-import React from 'react';
+import * as React from 'react';
 import { InstallmentForm } from '@/components/Installments/InstallmentForm';
 import { InstallmentList } from '@/components/Installments/InstallmentList';
 
 export const Parcelas: React.FC = () => {
+  console.log('Parcelas component rendering');
+  
   return (
     <div className="space-y-6">
       {/* Header */}
