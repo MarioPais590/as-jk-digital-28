@@ -1,10 +1,10 @@
 
-import React from 'react';
+import { ReactNode } from 'react';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { Navigate, useLocation } from 'react-router-dom';
 
 interface AuthGuardProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export const AuthGuard = ({ children }: AuthGuardProps) => {
