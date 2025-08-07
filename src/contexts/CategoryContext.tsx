@@ -32,7 +32,7 @@ export const CategoryProvider: React.FC<CategoryProviderProps> = ({ children }) 
   const [loading, setLoading] = React.useState(true);
   const { user, isAuthenticated, isLoading: authLoading } = useSupabaseAuth();
 
-  const loadCategories = async () => {
+  const loadCategories = React.useCallback(async () => {
     if (authLoading || !isAuthenticated || !user) {
       setCategories([]);
       setLoading(false);
@@ -70,9 +70,9 @@ export const CategoryProvider: React.FC<CategoryProviderProps> = ({ children }) 
     } finally {
       setLoading(false);
     }
-  };
+  }, [authLoading, isAuthenticated, user]);
 
-  const createCategory = async (categoryData: CreateCategoryInput): Promise<Category> => {
+  const createCategory = React.useCallback(async (categoryData: CreateCategoryInput): Promise<Category> => {
     if (!user) {
       throw new Error('Usuário não autenticado');
     }
@@ -111,9 +111,9 @@ export const CategoryProvider: React.FC<CategoryProviderProps> = ({ children }) 
       console.error('Erro ao criar categoria:', error);
       throw error;
     }
-  };
+  }, [user]);
 
-  const deleteCategory = async (categoryId: string): Promise<void> => {
+  const deleteCategory = React.useCallback(async (categoryId: string): Promise<void> => {
     if (!user) {
       throw new Error('Usuário não autenticado');
     }
@@ -135,30 +135,30 @@ export const CategoryProvider: React.FC<CategoryProviderProps> = ({ children }) 
       console.error('Erro ao deletar categoria:', error);
       throw error;
     }
-  };
+  }, [user]);
 
-  const getCategoriesByType = (type: 'entrada' | 'saida'): Category[] => {
+  const getCategoriesByType = React.useCallback((type: 'entrada' | 'saida'): Category[] => {
     return categories.filter(cat => cat.type === type);
-  };
+  }, [categories]);
 
-  const refreshCategories = async (): Promise<void> => {
+  const refreshCategories = React.useCallback(async (): Promise<void> => {
     await loadCategories();
-  };
+  }, [loadCategories]);
 
   React.useEffect(() => {
     if (!authLoading) {
       loadCategories();
     }
-  }, [isAuthenticated, user, authLoading]);
+  }, [loadCategories, authLoading]);
 
-  const value: CategoryContextType = {
+  const value: CategoryContextType = React.useMemo(() => ({
     categories,
     loading: loading || authLoading,
     createCategory,
     deleteCategory,
     getCategoriesByType,
     refreshCategories
-  };
+  }), [categories, loading, authLoading, createCategory, deleteCategory, getCategoriesByType, refreshCategories]);
 
   return (
     <CategoryContext.Provider value={value}>

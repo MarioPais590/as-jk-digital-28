@@ -54,7 +54,7 @@ export function ThemeProvider({
     root.classList.add(theme);
   }, [theme]);
 
-  const value = {
+  const value = React.useMemo(() => ({
     theme,
     setTheme: (theme: Theme) => {
       if (typeof window !== 'undefined') {
@@ -62,7 +62,7 @@ export function ThemeProvider({
       }
       setTheme(theme);
     },
-  };
+  }), [theme, storageKey]);
 
   return (
     <ThemeProviderContext.Provider {...props} value={value}>
