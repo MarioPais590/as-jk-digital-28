@@ -1,17 +1,17 @@
 
-import { useMemo, useCallback } from 'react';
+import * as React from 'react';
 import { useThemeContext } from '@/components/ThemeProvider';
 
 export const useTheme = () => {
   const { theme, setTheme } = useThemeContext();
   
-  const isDark = useMemo(() => {
+  const isDark = React.useMemo(() => {
     if (typeof window === 'undefined') return false;
     
     return theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
   }, [theme]);
   
-  const toggleTheme = useCallback(() => {
+  const toggleTheme = React.useCallback(() => {
     setTheme(isDark ? 'light' : 'dark');
   }, [isDark, setTheme]);
 
