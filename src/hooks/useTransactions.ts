@@ -1,15 +1,15 @@
 
-import * as React from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Transaction } from '@/types/financial';
 import { useSupabaseAuth } from './useSupabaseAuth';
 
 export const useTransactions = () => {
-  const [transactions, setTransactions] = React.useState<Transaction[]>([]);
-  const [loading, setLoading] = React.useState(true);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState(true);
   const { user, isAuthenticated, isLoading: authLoading } = useSupabaseAuth();
 
-  const loadTransactions = React.useCallback(async () => {
+  const loadTransactions = useCallback(async () => {
     if (authLoading || !isAuthenticated || !user) {
       setTransactions([]);
       setLoading(false);
@@ -53,13 +53,13 @@ export const useTransactions = () => {
     }
   }, [authLoading, isAuthenticated, user]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!authLoading) {
       loadTransactions();
     }
   }, [loadTransactions]);
 
-  return React.useMemo(() => ({
+  return useMemo(() => ({
     transactions,
     loading: loading || authLoading,
     refreshTransactions: loadTransactions,

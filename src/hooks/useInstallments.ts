@@ -1,5 +1,5 @@
 
-import * as React from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Installment, CreateInstallmentInput, InstallmentGroup } from '@/types/installment';
 import { useSupabaseAuth } from './useSupabaseAuth';
@@ -9,11 +9,11 @@ import { addMonths, format } from 'date-fns';
 export const useInstallments = () => {
   console.log('useInstallments: Hook initializing');
   
-  const [installments, setInstallments] = React.useState<Installment[]>([]);
-  const [loading, setLoading] = React.useState(true);
+  const [installments, setInstallments] = useState<Installment[]>([]);
+  const [loading, setLoading] = useState(true);
   const { user, isAuthenticated, isLoading: authLoading } = useSupabaseAuth();
 
-  const loadInstallments = React.useCallback(async () => {
+  const loadInstallments = useCallback(async () => {
     if (authLoading || !isAuthenticated || !user) {
       console.log('useInstallments: Auth not ready, skipping load');
       setInstallments([]);
@@ -61,7 +61,7 @@ export const useInstallments = () => {
     }
   }, [authLoading, isAuthenticated, user]);
 
-  const createInstallmentPurchase = React.useCallback(async (input: CreateInstallmentInput) => {
+  const createInstallmentPurchase = useCallback(async (input: CreateInstallmentInput) => {
     if (!user) {
       throw new Error('Usuário não autenticado');
     }
@@ -109,7 +109,7 @@ export const useInstallments = () => {
     }
   }, [user, loadInstallments]);
 
-  const markInstallmentAsPaid = React.useCallback(async (installmentId: string) => {
+  const markInstallmentAsPaid = useCallback(async (installmentId: string) => {
     if (!user) {
       throw new Error('Usuário não autenticado');
     }
@@ -179,7 +179,7 @@ export const useInstallments = () => {
     }
   }, [user, installments, loadInstallments]);
 
-  const markInstallmentAsPending = React.useCallback(async (installmentId: string) => {
+  const markInstallmentAsPending = useCallback(async (installmentId: string) => {
     if (!user) {
       throw new Error('Usuário não autenticado');
     }
@@ -242,7 +242,7 @@ export const useInstallments = () => {
     }
   }, [user, installments, loadInstallments]);
 
-  const updateInstallmentPurchase = React.useCallback(async (compraId: string, updates: { descricao?: string; valor_total?: number }) => {
+  const updateInstallmentPurchase = useCallback(async (compraId: string, updates: { descricao?: string; valor_total?: number }) => {
     if (!user) {
       throw new Error('Usuário não autenticado');
     }
@@ -278,7 +278,7 @@ export const useInstallments = () => {
     }
   }, [user, installments, loadInstallments]);
 
-  const deleteInstallmentPurchase = React.useCallback(async (compraId: string) => {
+  const deleteInstallmentPurchase = useCallback(async (compraId: string) => {
     if (!user) {
       throw new Error('Usuário não autenticado');
     }
@@ -310,7 +310,7 @@ export const useInstallments = () => {
     }
   }, [user, installments, markInstallmentAsPending, loadInstallments]);
 
-  const getInstallmentGroups = React.useCallback((): InstallmentGroup[] => {
+  const getInstallmentGroups = useCallback((): InstallmentGroup[] => {
     const groups: { [key: string]: InstallmentGroup } = {};
 
     installments.forEach(installment => {
@@ -335,14 +335,14 @@ export const useInstallments = () => {
     return Object.values(groups);
   }, [installments]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     console.log('useInstallments: useEffect triggered', { authLoading, isAuthenticated, user: user?.id });
     if (!authLoading) {
       loadInstallments();
     }
   }, [loadInstallments, authLoading]);
 
-  return React.useMemo(() => ({
+  return useMemo(() => ({
     installments,
     loading: loading || authLoading,
     createInstallmentPurchase,
