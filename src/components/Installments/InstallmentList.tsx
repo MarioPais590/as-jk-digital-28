@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import * as React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -17,7 +16,7 @@ export const InstallmentList: React.FC = () => {
   const { getInstallmentGroups, markInstallmentAsPaid, markInstallmentAsPending, deleteInstallmentPurchase } = useInstallments();
   const { creditCards } = useSecureCreditCards();
   const installmentGroups = getInstallmentGroups();
-  const [loadingActions, setLoadingActions] = useState<{ [key: string]: boolean }>({});
+  const [loadingActions, setLoadingActions] = React.useState<{ [key: string]: boolean }>({});
 
   const handleMarkAsPaid = async (installmentId: string) => {
     setLoadingActions(prev => ({ ...prev, [installmentId]: true }));

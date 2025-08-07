@@ -1,5 +1,5 @@
 
-import React from 'react';
+import * as React from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Transaction } from '@/types/financial';
 import { useSupabaseAuth } from './useSupabaseAuth';
