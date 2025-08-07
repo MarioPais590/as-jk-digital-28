@@ -1,5 +1,5 @@
 
-import * as React from 'react';
+import { useEffect } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CreditCard } from '@/types/creditCard';
 

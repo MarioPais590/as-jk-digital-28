@@ -1,4 +1,4 @@
-import * as React from "react"
+import { useId, ComponentProps } from "react"
 import * as RechartsPrimitive from "recharts"
 
 import { cn } from "@/lib/utils"

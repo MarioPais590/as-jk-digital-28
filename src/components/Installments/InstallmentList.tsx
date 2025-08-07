@@ -1,5 +1,5 @@
 
-import * as React from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -17,9 +17,9 @@ export const InstallmentList: React.FC = () => {
   const { getInstallmentGroups, markInstallmentAsPaid, markInstallmentAsPending, deleteInstallmentPurchase } = useInstallments();
   const { creditCards } = useSecureCreditCards();
   const installmentGroups = getInstallmentGroups();
-  const [loadingActions, setLoadingActions] = React.useState<{ [key: string]: boolean }>({});
+  const [loadingActions, setLoadingActions] = useState<{ [key: string]: boolean }>({});
 
-  const handleMarkAsPaid = React.useCallback(async (installmentId: string) => {
+  const handleMarkAsPaid = useCallback(async (installmentId: string) => {
     setLoadingActions(prev => ({ ...prev, [installmentId]: true }));
     try {
       await markInstallmentAsPaid(installmentId);
@@ -32,7 +32,7 @@ export const InstallmentList: React.FC = () => {
     }
   }, [markInstallmentAsPaid]);
 
-  const handleMarkAsPending = React.useCallback(async (installmentId: string) => {
+  const handleMarkAsPending = useCallback(async (installmentId: string) => {
     setLoadingActions(prev => ({ ...prev, [installmentId]: true }));
     try {
       await markInstallmentAsPending(installmentId);
@@ -45,7 +45,7 @@ export const InstallmentList: React.FC = () => {
     }
   }, [markInstallmentAsPending]);
 
-  const handleDeletePurchase = React.useCallback(async (compraId: string) => {
+  const handleDeletePurchase = useCallback(async (compraId: string) => {
     try {
       await deleteInstallmentPurchase(compraId);
       toast.success('Compra excluída com sucesso!');
@@ -55,14 +55,14 @@ export const InstallmentList: React.FC = () => {
     }
   }, [deleteInstallmentPurchase]);
 
-  const formatCurrency = React.useCallback((value: number) => {
+  const formatCurrency = useCallback((value: number) => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL'
     }).format(value);
   }, []);
 
-  const getCardName = React.useCallback((cardId: string) => {
+  const getCardName = useCallback((cardId: string) => {
     const card = creditCards.find(c => c.id === cardId);
     return card?.nome || 'Cartão';
   }, [creditCards]);

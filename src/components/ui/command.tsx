@@ -1,4 +1,4 @@
-import * as React from "react"
+import { forwardRef, ElementRef, ComponentPropsWithoutRef, HTMLAttributes } from "react"
 import { type DialogProps } from "@radix-ui/react-dialog"
 import { Command as CommandPrimitive } from "cmdk"
 import { Search } from "lucide-react"
