@@ -26,6 +26,9 @@ import { Login } from './pages/Login';
 import { Cadastro } from './pages/Cadastro';
 import NotFound from './pages/NotFound';
 
+// Add debugging
+console.log('App.tsx: React:', React);
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -36,6 +39,8 @@ const queryClient = new QueryClient({
 });
 
 function App() {
+  console.log('App component rendering...');
+  
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
