@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Migração de Dados - Sistema Financeiro</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f9fafb;
+            color: #111827;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #1f2937;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+        
+        .section {
+            margin-bottom: 32px;
+            padding: 24px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+        }
+        
+        .button {
+            background: #3b82f6;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .button:hover {
+            background: #2563eb;
+        }
+        
+        .button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        
+        input[type="file"] {
+            margin: 12px 0;
+            padding: 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            width: 100%;
+        }
+        
+        .status {
+            margin-top: 16px;
+            padding: 12px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+        
+        .success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+        
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+        
+        .loading {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #93c5fd;
+        }
+        
+        .auth-section {
+            background: #f3f4f6;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+        
+        input[type="email"], input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 Migração de Dados - Sistema Financeiro</h1>
+        
+        <div class="auth-section">
+            <h3>Login no Supabase</h3>
+            <div id="auth-form">
+                <input type="email" id="email" placeholder="Seu email" />
+                <input type="password" id="password" placeholder="Sua senha" />
+                <button class="button" onclick="login()">Fazer Login</button>
+            </div>
+            <div id="auth-status"></div>
+        </div>
+        
+        <div class="section">
+            <h3>📥 Exportar Dados</h3>
+            <p>Baixe todos os seus dados do sistema atual:</p>
+            <button class="button" onclick="exportData()" id="export-btn" disabled>
+                Baixar Backup Completo
+            </button>
+            <div id="export-status"></div>
+        </div>
+        
+        <div class="section">
+            <h3>📤 Importar Dados</h3>
+            <p>Faça upload do arquivo de backup para o novo projeto:</p>
+            <input type="file" id="import-file" accept=".json" />
+            <button class="button" onclick="importData()" id="import-btn" disabled>
+                Importar Dados
+            </button>
+            <div id="import-status"></div>
+        </div>
+        
+        <div class="section">
+            <h3>📋 Instruções</h3>
+            <ol>
+                <li>Faça login com suas credenciais do Supabase</li>
+                <li>Clique em "Baixar Backup Completo" para exportar todos os dados</li>
+                <li>Crie um novo projeto limpo</li>
+                <li>Acesse esta mesma página no novo projeto</li>
+                <li>Faça upload do arquivo de backup e clique em "Importar Dados"</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://sgbscopplrpnekqetknq.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNnYnNjb3BwbHJwbmVrcWV0a25xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAxOTczNjIsImV4cCI6MjA2NTc3MzM2Mn0.Km-1shy4IbFBDUZHmJFZ-ACn_Gx5hHTsYqJsfVQu69I";
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        let currentUser = null;
+        
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const statusDiv = document.getElementById('auth-status');
+            
+            if (!email || !password) {
+                statusDiv.innerHTML = '<div class="error">Por favor, preencha email e senha</div>';
+                return;
+            }
+            
+            statusDiv.innerHTML = '<div class="loading">Fazendo login...</div>';
+            
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+                
+                if (error) throw error;
+                
+                currentUser = data.user;
+                statusDiv.innerHTML = '<div class="success">Login realizado com sucesso!</div>';
+                document.getElementById('export-btn').disabled = false;
+                document.getElementById('import-btn').disabled = false;
+                document.getElementById('auth-form').style.display = 'none';
+                
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="error">Erro no login: ${error.message}</div>`;
+            }
+        }
+        
+        async function exportData() {
+            if (!currentUser) {
+                alert('Faça login primeiro');
+                return;
+            }
+            
+            const statusDiv = document.getElementById('export-status');
+            const btn = document.getElementById('export-btn');
+            
+            btn.disabled = true;
+            statusDiv.innerHTML = '<div class="loading">Exportando dados...</div>';
+            
+            try {
+                const userId = currentUser.id;
+                
+                // Buscar todos os dados
+                const [transactions, categories, creditCards, fixedExpenses, installments, profile] = await Promise.all([
+                    supabase.from('transactions').select('*').eq('user_id', userId),
+                    supabase.from('categories').select('*').eq('user_id', userId),
+                    supabase.from('credit_cards').select('*').eq('user_id', userId),
+                    supabase.from('fixed_expenses').select('*').eq('user_id', userId),
+                    supabase.from('installments').select('*').eq('user_id', userId),
+                    supabase.from('profiles').select('*').eq('id', userId)
+                ]);
+                
+                const backupData = {
+                    transactions: transactions.data || [],
+                    categories: categories.data || [],
+                    creditCards: creditCards.data || [],
+                    fixedExpenses: fixedExpenses.data || [],
+                    installments: installments.data || [],
+                    profile: profile.data?.[0] || null,
+                    exportDate: new Date().toISOString(),
+                    version: '1.0'
+                };
+                
+                // Download do arquivo
+                const dataStr = JSON.stringify(backupData, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `backup-financeiro-${new Date().toISOString().split('T')[0]}.json`;
+                link.click();
+                
+                URL.revokeObjectURL(url);
+                
+                statusDiv.innerHTML = '<div class="success">Backup realizado com sucesso! Arquivo baixado.</div>';
+                
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="error">Erro ao exportar: ${error.message}</div>`;
+            } finally {
+                btn.disabled = false;
+            }
+        }
+        
+        async function importData() {
+            if (!currentUser) {
+                alert('Faça login primeiro');
+                return;
+            }
+            
+            const fileInput = document.getElementById('import-file');
+            const statusDiv = document.getElementById('import-status');
+            const btn = document.getElementById('import-btn');
+            
+            if (!fileInput.files[0]) {
+                statusDiv.innerHTML = '<div class="error">Selecione um arquivo de backup</div>';
+                return;
+            }
+            
+            btn.disabled = true;
+            statusDiv.innerHTML = '<div class="loading">Importando dados...</div>';
+            
+            try {
+                const file = fileInput.files[0];
+                const text = await file.text();
+                const backupData = JSON.parse(text);
+                
+                const newUserId = currentUser.id;
+                
+                // Importar dados
+                if (backupData.transactions?.length) {
+                    const transactions = backupData.transactions.map(t => ({ ...t, user_id: newUserId }));
+                    await supabase.from('transactions').insert(transactions);
+                }
+                
+                if (backupData.categories?.length) {
+                    const categories = backupData.categories.map(c => ({ ...c, user_id: newUserId }));
+                    await supabase.from('categories').insert(categories);
+                }
+                
+                if (backupData.creditCards?.length) {
+                    const creditCards = backupData.creditCards.map(cc => ({ ...cc, user_id: newUserId }));
+                    await supabase.from('credit_cards').insert(creditCards);
+                }
+                
+                if (backupData.fixedExpenses?.length) {
+                    const fixedExpenses = backupData.fixedExpenses.map(fe => ({ ...fe, user_id: newUserId }));
+                    await supabase.from('fixed_expenses').insert(fixedExpenses);
+                }
+                
+                if (backupData.installments?.length) {
+                    const installments = backupData.installments.map(i => ({ ...i, user_id: newUserId }));
+                    await supabase.from('installments').insert(installments);
+                }
+                
+                if (backupData.profile) {
+                    await supabase.from('profiles').upsert({ 
+                        ...backupData.profile, 
+                        id: newUserId 
+                    });
+                }
+                
+                statusDiv.innerHTML = '<div class="success">Dados importados com sucesso! Recarregue a página.</div>';
+                
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="error">Erro ao importar: ${error.message}</div>`;
+            } finally {
+                btn.disabled = false;
+            }
+        }
+        
+        // Verificar se já está logado
+        supabase.auth.onAuthStateChange((event, session) => {
+            if (session?.user) {
+                currentUser = session.user;
+                document.getElementById('auth-status').innerHTML = '<div class="success">Usuário logado!</div>';
+                document.getElementById('export-btn').disabled = false;
+                document.getElementById('import-btn').disabled = false;
+                document.getElementById('auth-form').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
