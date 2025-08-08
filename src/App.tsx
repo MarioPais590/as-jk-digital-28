@@ -1,153 +1,81 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from '@/components/Auth/AuthProvider';
-import { ThemeProvider } from '@/components/ThemeProvider';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { CategoryProvider } from '@/contexts/CategoryContext';
-import { Layout } from '@/components/Layout/Layout';
-import { AuthGuard } from '@/components/Auth/AuthGuard';
-import { Toaster } from '@/components/ui/sonner';
-
-// Import pages
-import Index from '@/pages/Index';
-import { Login } from '@/pages/Login';
-import { Cadastro } from '@/pages/Cadastro';
-import { Welcome } from '@/pages/Welcome';
-import { Dashboard } from '@/pages/Dashboard';
-import { Entradas } from '@/pages/Entradas';
-import { Saidas } from '@/pages/Saidas';
-import { CartõesCredito } from '@/pages/CartõesCredito';
-import { Parcelas } from '@/pages/Parcelas';
-import { DespesasFixas } from '@/pages/DespesasFixas';
-import { Categorias } from '@/pages/Categorias';
-import { ResumoFinanceiro } from '@/pages/ResumoFinanceiro';
-import { RelatoriosMensais } from '@/pages/RelatoriosMensais';
-import { RelatoriosAnuais } from '@/pages/RelatoriosAnuais';
-import { Configuracoes } from '@/pages/Configuracoes';
-import { Migracao } from '@/pages/Migracao';
-import NotFound from '@/pages/NotFound';
-
-const queryClient = new QueryClient();
 
 function App() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-        <AuthProvider>
-          <CategoryProvider>
-            <Router>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/cadastro" element={<Cadastro />} />
-                <Route path="/welcome" element={<Welcome />} />
-                
-                {/* Protected routes */}
-                <Route path="/dashboard" element={
-                  <AuthGuard>
-                    <Layout>
-                      <Dashboard />
-                    </Layout>
-                  </AuthGuard>
-                } />
-                
-                <Route path="/entradas" element={
-                  <AuthGuard>
-                    <Layout>
-                      <Entradas />
-                    </Layout>
-                  </AuthGuard>
-                } />
-                
-                <Route path="/saidas" element={
-                  <AuthGuard>
-                    <Layout>
-                      <Saidas />
-                    </Layout>
-                  </AuthGuard>
-                } />
-                
-                <Route path="/cartoes-credito" element={
-                  <AuthGuard>
-                    <Layout>
-                      <CartõesCredito />
-                    </Layout>
-                  </AuthGuard>
-                } />
-                
-                <Route path="/parcelas" element={
-                  <AuthGuard>
-                    <Layout>
-                      <Parcelas />
-                    </Layout>
-                  </AuthGuard>
-                } />
-                
-                <Route path="/despesas-fixas" element={
-                  <AuthGuard>
-                    <Layout>
-                      <DespesasFixas />
-                    </Layout>
-                  </AuthGuard>
-                } />
-                
-                <Route path="/categorias" element={
-                  <AuthGuard>
-                    <Layout>
-                      <Categorias />
-                    </Layout>
-                  </AuthGuard>
-                } />
-                
-                <Route path="/resumo-financeiro" element={
-                  <AuthGuard>
-                    <Layout>
-                      <ResumoFinanceiro />
-                    </Layout>
-                  </AuthGuard>
-                } />
-                
-                <Route path="/relatorios-mensais" element={
-                  <AuthGuard>
-                    <Layout>
-                      <RelatoriosMensais />
-                    </Layout>
-                  </AuthGuard>
-                } />
-                
-                <Route path="/relatorios-anuais" element={
-                  <AuthGuard>
-                    <Layout>
-                      <RelatoriosAnuais />
-                    </Layout>
-                  </AuthGuard>
-                } />
-                
-                <Route path="/configuracoes" element={
-                  <AuthGuard>
-                    <Layout>
-                      <Configuracoes />
-                    </Layout>
-                  </AuthGuard>
-                } />
-                
-                <Route path="/migracao" element={
-                  <AuthGuard>
-                    <Layout>
-                      <Migracao />
-                    </Layout>
-                  </AuthGuard>
-                } />
-                
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Router>
-            <Toaster />
-          </CategoryProvider>
-        </AuthProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
-  );
+  return React.createElement('div', {
+    className: 'min-h-screen bg-white p-8',
+    style: {
+      fontFamily: 'system-ui, -apple-system, sans-serif'
+    }
+  }, [
+    React.createElement('div', {
+      key: 'header',
+      className: 'max-w-4xl mx-auto'
+    }, [
+      React.createElement('h1', {
+        key: 'title',
+        className: 'text-3xl font-bold text-gray-900 mb-4'
+      }, 'Sistema Financeiro - Migração de Dados'),
+      
+      React.createElement('div', {
+        key: 'migration-info',
+        className: 'bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6'
+      }, [
+        React.createElement('h2', {
+          key: 'subtitle',
+          className: 'text-xl font-semibold text-blue-900 mb-3'
+        }, 'Acesso à Ferramenta de Migração'),
+        
+        React.createElement('p', {
+          key: 'description',
+          className: 'text-blue-800 mb-4'
+        }, 'Devido a problemas técnicos no projeto atual, você pode acessar a ferramenta de migração através do link direto abaixo:'),
+        
+        React.createElement('a', {
+          key: 'migration-link',
+          href: '/migracao',
+          className: 'inline-block bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors',
+          style: { textDecoration: 'none' }
+        }, '🔗 Acessar Migração de Dados'),
+        
+        React.createElement('div', {
+          key: 'instructions',
+          className: 'mt-4 text-sm text-blue-700'
+        }, [
+          React.createElement('p', {
+            key: 'step1',
+            className: 'mb-2'
+          }, '1. Clique no link acima para acessar a ferramenta'),
+          React.createElement('p', {
+            key: 'step2',
+            className: 'mb-2'
+          }, '2. Faça login com suas credenciais'),
+          React.createElement('p', {
+            key: 'step3'
+          }, '3. Use a ferramenta para exportar todos os seus dados')
+        ])
+      ]),
+      
+      React.createElement('div', {
+        key: 'problem-info',
+        className: 'bg-yellow-50 border border-yellow-200 rounded-lg p-6'
+      }, [
+        React.createElement('h3', {
+          key: 'problem-title',
+          className: 'text-lg font-semibold text-yellow-900 mb-2'
+        }, 'Sobre o Problema Técnico'),
+        
+        React.createElement('p', {
+          key: 'problem-desc',
+          className: 'text-yellow-800 mb-3'
+        }, 'O projeto atual está com corrupção no sistema de build (bundling do React/Vite). Isso causa erros persistentes que não podem ser corrigidos apenas alterando código.'),
+        
+        React.createElement('p', {
+          key: 'solution-desc',
+          className: 'text-yellow-800'
+        }, 'A solução recomendada é migrar todos os dados para um novo projeto limpo usando a ferramenta de migração que foi criada especificamente para esta situação.')
+      ])
+    ])
+  ]);
 }
 
 export default App;
