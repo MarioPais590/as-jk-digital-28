@@ -13,7 +13,8 @@ import {
   FileText, 
   BarChart3, 
   PieChart, 
-  Settings 
+  Settings,
+  Move3D
 } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -46,6 +47,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { icon: FileText, label: 'Resumo Financeiro', path: '/resumo-financeiro' },
     { icon: BarChart3, label: 'Relatórios Mensais', path: '/relatorios-mensais' },
     { icon: PieChart, label: 'Relatórios Anuais', path: '/relatorios-anuais' },
+    { icon: Move3D, label: 'Migração', path: '/migracao' },
     { icon: Settings, label: 'Configurações', path: '/configuracoes' },
   ];
 
